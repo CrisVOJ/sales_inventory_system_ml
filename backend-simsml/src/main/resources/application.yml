@@ -15,3 +15,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+security:
+  jwt:
+    key:
+      private: 709e5f4de55e726a13a89d1cc875ca90f23464610aec6f0efb716b997fffcb91
+    user:
+      generator: AUTH0JWT-SIMSML-BACKEND
