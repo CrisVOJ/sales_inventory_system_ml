@@ -1,7 +1,13 @@
 package bo.edu.ucb.backend_simsml.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "permissions")
 public class PermissionEntity {

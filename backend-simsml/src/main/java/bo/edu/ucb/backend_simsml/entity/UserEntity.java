@@ -33,10 +33,19 @@ public class UserEntity {
     private String maternalSurname;
     @Column(name = "email")
     private String email;
-    @Column(name = "username")
+    @Column(name = "username", unique = true)
     private String username;
     @Column(name = "password")
     private String password;
+
+    @Column(name = "is_enabled")
+    private boolean isEnabled;
+    @Column(name = "account_no_expired")
+    private boolean accountNoExpired;
+    @Column(name = "account_no_locked")
+    private boolean accountNoLocked;
+    @Column(name = "credential_no_expired")
+    private boolean credentialNoExpired;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
