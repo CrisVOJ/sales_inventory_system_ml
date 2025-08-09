@@ -4,7 +4,7 @@ import bo.edu.ucb.backend_simsml.dto.AuthLoginRequest;
 import bo.edu.ucb.backend_simsml.dto.AuthResponse;
 import bo.edu.ucb.backend_simsml.entity.UserEntity;
 import bo.edu.ucb.backend_simsml.repository.UserRepository;
-import bo.edu.ucb.backend_simsml.util.JwtUtils;
+import bo.edu.ucb.backend_simsml.config.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

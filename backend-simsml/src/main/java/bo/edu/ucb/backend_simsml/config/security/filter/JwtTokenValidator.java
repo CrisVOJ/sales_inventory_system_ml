@@ -1,6 +1,6 @@
-package bo.edu.ucb.backend_simsml.config.filter;
+package bo.edu.ucb.backend_simsml.config.security.filter;
 
-import bo.edu.ucb.backend_simsml.util.JwtUtils;
+import bo.edu.ucb.backend_simsml.config.security.jwt.JwtUtils;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -1,4 +1,4 @@
-package bo.edu.ucb.backend_simsml.util;
+package bo.edu.ucb.backend_simsml.config.security.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
