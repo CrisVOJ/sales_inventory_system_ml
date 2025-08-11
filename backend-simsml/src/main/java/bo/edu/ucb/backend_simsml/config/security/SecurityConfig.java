@@ -1,7 +1,7 @@
 package bo.edu.ucb.backend_simsml.config.security;
 
 import bo.edu.ucb.backend_simsml.config.security.filter.JwtTokenValidator;
-import bo.edu.ucb.backend_simsml.service.UserDetailServiceImpl;
+import bo.edu.ucb.backend_simsml.service.AuthService;
 import bo.edu.ucb.backend_simsml.config.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -63,7 +63,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider(UserDetailServiceImpl userDetailService) {
+    public AuthenticationProvider authenticationProvider(AuthService userDetailService) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(passwordEncoder());
         provider.setUserDetailsService(userDetailService);

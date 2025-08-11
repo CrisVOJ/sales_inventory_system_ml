@@ -19,23 +19,23 @@ public class UserEntity {
     @Column(name = "user_id")
     private Long userId;
 
-    @Column(name = "identity_document")
+    @Column(name = "identity_document", nullable = false, unique = true)
     private String identityDoc;
-    @Column(name = "phone")
+    @Column(name = "phone", nullable = false)
     private String phone;
     @Column(name = "address")
     private String address;
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "paternal_surname")
+    @Column(name = "paternal_surname", nullable = false)
     private String paternalSurname;
     @Column(name = "maternal_surname")
     private String maternalSurname;
-    @Column(name = "email")
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
-    @Column(name = "username", unique = true)
+    @Column(name = "username", nullable = false, unique = true)
     private String username;
-    @Column(name = "password")
+    @Column(name = "password", nullable = false)
     private String password;
 
     @Column(name = "is_enabled")
@@ -54,4 +54,12 @@ public class UserEntity {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<RoleEntity> roles = new HashSet<>();
+
+    @PrePersist
+    protected void onCreate() {
+        isEnabled = true;
+        accountNoExpired = true;
+        accountNoLocked = true;
+        credentialNoExpired = true;
+    }
 }

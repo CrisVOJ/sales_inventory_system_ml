@@ -16,6 +16,6 @@ public class PermissionEntity {
     @Column(name = "permission_id")
     private Long permissionId;
 
-    @Column(name = "name")
+    @Column(name = "name", nullable = false)
     private String name;
 }

@@ -1,7 +1,7 @@
 package bo.edu.ucb.backend_simsml.service;
 
-import bo.edu.ucb.backend_simsml.dto.AuthLoginRequest;
-import bo.edu.ucb.backend_simsml.dto.AuthResponse;
+import bo.edu.ucb.backend_simsml.dto.auth.AuthLoginRequest;
+import bo.edu.ucb.backend_simsml.dto.auth.AuthResponse;
 import bo.edu.ucb.backend_simsml.entity.UserEntity;
 import bo.edu.ucb.backend_simsml.repository.UserRepository;
 import bo.edu.ucb.backend_simsml.config.security.jwt.JwtUtils;
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class UserDetailServiceImpl implements UserDetailsService {
+public class AuthService implements UserDetailsService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;

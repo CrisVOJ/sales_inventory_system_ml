@@ -1,4 +1,4 @@
-package bo.edu.ucb.backend_simsml.dto;
+package bo.edu.ucb.backend_simsml.dto.auth;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
