@@ -1,11 +1,13 @@
 package bo.edu.ucb.backend_simsml.service;
 
+import bo.edu.ucb.backend_simsml.dto.UnsuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.auth.AuthLoginRequest;
 import bo.edu.ucb.backend_simsml.dto.auth.AuthResponse;
 import bo.edu.ucb.backend_simsml.entity.UserEntity;
 import bo.edu.ucb.backend_simsml.repository.UserRepository;
 import bo.edu.ucb.backend_simsml.config.security.jwt.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -39,6 +41,10 @@ public class AuthService implements UserDetailsService {
         UserEntity userEntity = userRepository.findUserEntityByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("El usuario " + username + " no fue encontrado"));
 
+        if (!userEntity.isEnabled()) {
+            throw new RuntimeException("La cuenta del usuario: " + username + " no esta habilitada");
+        }
+
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
         userEntity.getRoles()
@@ -48,26 +54,23 @@ public class AuthService implements UserDetailsService {
                 .flatMap(role -> role.getPermissions().stream())
                 .forEach(permission -> authorities.add(new SimpleGrantedAuthority(permission.getName())));
 
-        return new User(userEntity.getUsername(),
+        return new User(
+                userEntity.getUsername(),
                 userEntity.getPassword(),
                 userEntity.isEnabled(),
                 userEntity.isAccountNoExpired(),
                 userEntity.isCredentialNoExpired(),
                 userEntity.isAccountNoLocked(),
-                authorities);
+                authorities
+        );
     }
 
     public AuthResponse loginUser(AuthLoginRequest authLoginRequest) {
-        String username = authLoginRequest.username();
-        String password = authLoginRequest.password();
-
-        Authentication authentication = this.authenticate(username, password);
+        Authentication authentication = authenticate(authLoginRequest.username(), authLoginRequest.password());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String accessToken = jwtUtils.createToken(authentication);
-        AuthResponse authResponse = new AuthResponse(username, "User logged successfully", accessToken, true);
-
-        return authResponse;
+        return new AuthResponse(authLoginRequest.username(), "User logged successfully", accessToken, true);
     }
 
     public Authentication authenticate(String username, String password) {

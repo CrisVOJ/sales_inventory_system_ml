@@ -6,6 +6,7 @@ import bo.edu.ucb.backend_simsml.dto.UnsuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.auth.AuthLoginRequest;
 import bo.edu.ucb.backend_simsml.dto.auth.AuthResponse;
 import bo.edu.ucb.backend_simsml.dto.user.CreateUserRequest;
+import bo.edu.ucb.backend_simsml.dto.user.UpdateUserRequest;
 import bo.edu.ucb.backend_simsml.service.AuthService;
 import bo.edu.ucb.backend_simsml.service.UserService;
 import jakarta.validation.Valid;
@@ -13,14 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(Globals.baseApi + "user")
-@PreAuthorize("permitAll()")
+@PreAuthorize("hasRole('ADMIN')")
 public class UserController {
 
     @Autowired
@@ -29,12 +27,12 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/login")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<AuthResponse> login(@RequestBody @Valid AuthLoginRequest userRequest) {
         return new ResponseEntity<>(this.authService.loginUser(userRequest), HttpStatus.OK);
     }
 
     @PostMapping("/create")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> createUser(@Valid @RequestBody CreateUserRequest request) {
         try {
             Object response = userService.createUser(request);
@@ -42,6 +40,50 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new UnsuccessfulResponse("400", "Error al crear usuario", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/update")
+    public ResponseEntity<Object> updateUser(@RequestBody @Valid UpdateUserRequest request) {
+        try {
+            Object response = userService.updateUser(request);
+            return generateResponse(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UnsuccessfulResponse("400", "Error al actualizar usuario", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Object> getUsers() {
+        try {
+            Object response = userService.getUsers();
+            return generateResponse(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UnsuccessfulResponse("400", "Error al obtener usuarios", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<Object> getUser(@RequestParam("userId") Long userId) {
+        try {
+            Object response = userService.getUserById(userId);
+            return generateResponse(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UnsuccessfulResponse("400", "Error al obtener usuario", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/disable")
+    public ResponseEntity<Object> disableUser(@RequestParam("userId") Long userId) {
+        try {
+            Object response = userService.disableUser(userId);
+            return generateResponse(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UnsuccessfulResponse("400", "Error al deshabilitar usuario", e.getMessage()));
         }
     }
 

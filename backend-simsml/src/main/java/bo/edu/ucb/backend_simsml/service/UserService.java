@@ -3,7 +3,8 @@ package bo.edu.ucb.backend_simsml.service;
 import bo.edu.ucb.backend_simsml.dto.SuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.UnsuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.user.CreateUserRequest;
-import bo.edu.ucb.backend_simsml.dto.user.CreatedUserResponse;
+import bo.edu.ucb.backend_simsml.dto.user.UpdateUserRequest;
+import bo.edu.ucb.backend_simsml.dto.user.UserResponse;
 import bo.edu.ucb.backend_simsml.entity.RoleEntity;
 import bo.edu.ucb.backend_simsml.entity.UserEntity;
 import bo.edu.ucb.backend_simsml.repository.RolesRepository;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -49,6 +52,129 @@ public class UserService {
         }
     }
 
+    // Update User
+    public Object updateUser(UpdateUserRequest request) {
+        try {
+            Set<RoleEntity> roles = resolveRolesOrDefault(request.roles());
+
+            UserEntity user = userRepository.findById(request.userId()).orElse(null);
+
+            if (user == null) {
+                return new UnsuccessfulResponse("404", "Usuario no encontrado", request.username());
+            }
+
+            String pass = user.getPassword();
+
+            if (!passwordEncoder.matches(request.password(), pass)) {
+                pass = passwordEncoder.encode(request.password().trim());
+            }
+
+            user.setIdentityDoc(request.identityDoc().trim());
+            user.setPhone(request.phone().trim());
+            user.setAddress(request.address().trim());
+            user.setName(request.name().trim());
+            user.setPaternalSurname(request.paternalSurname().trim());
+            user.setMaternalSurname(request.maternalSurname().trim());
+            user.setEmail(request.email().trim().toLowerCase());
+            user.setUsername(request.username().trim().toLowerCase());
+            user.setPassword(pass);
+            user.setEnabled(request.isEnabled());
+            user.setAccountNoLocked(request.accountNoLocked());
+
+            user.getRoles().clear();
+            user.getRoles().addAll(roles);
+
+            userRepository.save(user);
+            return new SuccessfulResponse("200", "Usuario actualizado exitosamente", request.username());
+        } catch (Exception e) {
+            return new UnsuccessfulResponse("500", "Error al actualizar usuario: " + e.getMessage(), e.getMessage());
+        }
+    }
+
+    // Find all users
+    public Object getUsers() {
+        try {
+            List<UserResponse> users = userRepository.findAll().stream()
+                    .map(userResponse -> new UserResponse(
+                            userResponse.getUserId(),
+                            userResponse.getIdentityDoc(),
+                            userResponse.getPhone(),
+                            userResponse.getAddress(),
+                            userResponse.getName(),
+                            userResponse.getPaternalSurname(),
+                            userResponse.getMaternalSurname(),
+                            userResponse.getEmail(),
+                            userResponse.getUsername(),
+                            userResponse.isEnabled(),
+                            userResponse.isAccountNoLocked(),
+                            userResponse.getRoles()
+                                    .stream()
+                                    .map(RoleEntity::getName)
+                                    .collect(Collectors.toSet())))
+                    .toList();
+
+            if (!users.isEmpty()) {
+                return new SuccessfulResponse("200", "Usuarios encontrados exitosamente", users);
+            }
+
+            return new UnsuccessfulResponse("404", "No hay usuarios registrados", null);
+        } catch (Exception e) {
+            return new UnsuccessfulResponse("500", "Error al encontrar usuarios", e.getMessage());
+        }
+    }
+
+    // Find user by ID
+    public Object getUserById(Long userId) {
+        try {
+            UserResponse user = userRepository.findById(userId)
+                    .map(userResponse -> new UserResponse(
+                            userResponse.getUserId(),
+                            userResponse.getIdentityDoc(),
+                            userResponse.getPhone(),
+                            userResponse.getAddress(),
+                            userResponse.getName(),
+                            userResponse.getPaternalSurname(),
+                            userResponse.getMaternalSurname(),
+                            userResponse.getEmail(),
+                            userResponse.getUsername(),
+                            userResponse.isEnabled(),
+                            userResponse.isAccountNoLocked(),
+                            userResponse.getRoles()
+                                    .stream()
+                                    .map(RoleEntity::getName)
+                                    .collect(Collectors.toSet())))
+                    .orElse(null);
+
+            if (user != null) {
+                return new SuccessfulResponse("200", "Usuario encontrado exitosamente", user);
+            }
+
+            return new UnsuccessfulResponse("404", "Usuario no encontrado", null);
+        } catch (Exception e) {
+            return new UnsuccessfulResponse("500", "Error al encontrar usuario", e.getMessage());
+        }
+    }
+
+    // Disable user
+    public Object disableUser(Long userId) {
+        try {
+            UserEntity user = userRepository.findById(userId).orElse(null);
+
+            if (user == null) {
+                return new UnsuccessfulResponse("404", "Usuario no encontrado", null);
+            }
+
+            user.setEnabled(false);
+            user.setAccountNoLocked(false);
+
+            userRepository.save(user);
+
+            return new SuccessfulResponse("200", "Usuario deshabilitado exitosamente", user.getUsername());
+        } catch (Exception e) {
+            return new UnsuccessfulResponse("500", "Error al desabilitar usuario", e.getMessage());
+        }
+    }
+
     private Set<RoleEntity> resolveRolesOrDefault(Set<String> roleNames) {
         Set<String> names = (roleNames == null || roleNames.isEmpty())
                 ? Set.of("ROLE_SELLER")
@@ -62,6 +188,6 @@ public class UserService {
             throw new IllegalArgumentException("Roles not found: " + String.join(", ", missing));
         }
 
-        return Set.copyOf(roles);
+        return new HashSet<>(roles);
     }
 }

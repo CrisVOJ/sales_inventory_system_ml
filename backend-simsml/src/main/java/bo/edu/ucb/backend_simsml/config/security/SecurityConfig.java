@@ -28,31 +28,17 @@ public class SecurityConfig {
     @Autowired
     private JwtUtils jwtUtils;
 
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-//        return httpSecurity
-//                .csrf(csrf -> csrf.disable())
-//                .httpBasic(Customizer.withDefaults())
-//                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                .authorizeHttpRequests(http -> {
-//                    // Configuración de endpoints publicos
-//                    http.requestMatchers(HttpMethod.GET, "/auth/public").permitAll();
-//
-//                    // Configuración de endpoints privados
-//                    http.requestMatchers(HttpMethod.GET, "/auth/private").hasAuthority("CREATE");
-//
-//                    // Configuración del resto de endpoints no especificados
-//                    http.anyRequest().denyAll();
-//                })
-//                .build();
-//    }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf(csrf -> csrf.disable())
-                .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/v1/user/login"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
                 .addFilterBefore(new JwtTokenValidator(jwtUtils), BasicAuthenticationFilter.class)
                 .build();
     }
