@@ -10,6 +10,8 @@ import bo.edu.ucb.backend_simsml.entity.UserEntity;
 import bo.edu.ucb.backend_simsml.repository.RolesRepository;
 import bo.edu.ucb.backend_simsml.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -92,9 +94,9 @@ public class UserService {
     }
 
     // Find all users
-    public Object getUsers() {
+    public Object getUsers(String filter, Boolean status, Pageable pageable) {
         try {
-            List<UserResponse> users = userRepository.findAll().stream()
+            Page<UserResponse> users = userRepository.findAlleUsers(filter, status, pageable)
                     .map(userResponse -> new UserResponse(
                             userResponse.getUserId(),
                             userResponse.getIdentityDoc(),
@@ -110,8 +112,7 @@ public class UserService {
                             userResponse.getRoles()
                                     .stream()
                                     .map(RoleEntity::getName)
-                                    .collect(Collectors.toSet())))
-                    .toList();
+                                    .collect(Collectors.toSet())));
 
             if (!users.isEmpty()) {
                 return new SuccessfulResponse("200", "Usuarios encontrados exitosamente", users);

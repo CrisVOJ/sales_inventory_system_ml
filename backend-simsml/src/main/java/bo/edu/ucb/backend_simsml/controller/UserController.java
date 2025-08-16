@@ -11,6 +11,9 @@ import bo.edu.ucb.backend_simsml.service.AuthService;
 import bo.edu.ucb.backend_simsml.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -55,9 +58,13 @@ public class UserController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getUsers() {
+    public ResponseEntity<Object> getUsers(
+            @RequestParam(value = "filter", required = false) String filter,
+            @RequestParam(value = "status", required = false) Boolean status,
+            @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
         try {
-            Object response = userService.getUsers();
+            Object response = userService.getUsers(filter, status, pageable);
             return generateResponse(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
