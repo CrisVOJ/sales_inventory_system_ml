@@ -8,7 +8,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
+@Entity(name = "permissions")
 @Table(name = "permissions")
 public class PermissionEntity {
     @Id
