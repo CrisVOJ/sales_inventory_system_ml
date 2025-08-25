@@ -28,3 +28,15 @@ INSERT INTO user_roles
 (role_id, user_id) values
                        (1, 1),
                        (2, 2);
+INSERT INTO units
+(name, active) VALUES
+                   ('unidad', true),
+                   ('kg', true),
+                   ('gramo', true),
+                   ('litro', true);
+
+INSERT INTO locations
+(code, name, active) VALUES
+                         ('A-B-1', 'Edificio A, Piso B, Estante 1', true),
+                         ('A-B-2', 'Edificio A, Piso B, Estante 2', true),
+                         ('A-B-3', 'Edificio A, Piso B, Estante 3', true);

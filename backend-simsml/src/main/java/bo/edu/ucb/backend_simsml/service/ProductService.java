@@ -6,10 +6,13 @@ import bo.edu.ucb.backend_simsml.dto.category.CategorySummary;
 import bo.edu.ucb.backend_simsml.dto.product.CreateProductRequest;
 import bo.edu.ucb.backend_simsml.dto.product.ProductResponse;
 import bo.edu.ucb.backend_simsml.dto.product.UpdateProductRequest;
+import bo.edu.ucb.backend_simsml.dto.unit.UnitResponse;
 import bo.edu.ucb.backend_simsml.entity.CategoryEntity;
 import bo.edu.ucb.backend_simsml.entity.ProductEntity;
+import bo.edu.ucb.backend_simsml.entity.UnitEntity;
 import bo.edu.ucb.backend_simsml.repository.CategoryRepository;
 import bo.edu.ucb.backend_simsml.repository.ProductRepository;
+import bo.edu.ucb.backend_simsml.repository.UnitRepository;
 import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -28,6 +31,8 @@ public class ProductService {
     private ProductRepository productRepository;
     @Autowired
     private CategoryRepository categoryRepository;
+    @Autowired
+    private UnitRepository unitRepository;
 
     public Object createProduct(CreateProductRequest request) {
         try {
@@ -43,13 +48,19 @@ public class ProductService {
                 throw new BadRequestException("Categorias inexistentes" + missing);
             }
 
+            UnitEntity unit = unitRepository.findById(request.unitId()).orElse(null);
+
+            if (unit == null) {
+                return new UnsuccessfulResponse("404", "Unidad no encontrada", null);
+            }
+
             ProductEntity product = new ProductEntity();
             product.setName(request.name().trim());
             product.setDescription(request.description().trim());
             product.setCode(request.code().trim());
             product.setSuggestedPrice(request.suggestedPrice());
-            product.setUnit(request.unit().trim());
             product.getCategories().addAll(found);
+            product.setUnit(unit);
 
             productRepository.save(product);
             return new SuccessfulResponse("201", "Producto registrado exitosamente", product.getName());
@@ -67,12 +78,12 @@ public class ProductService {
                             productResponse.getDescription(),
                             productResponse.getCode(),
                             productResponse.getSuggestedPrice(),
-                            productResponse.getUnit(),
                             productResponse.isActive(),
                             productResponse.getCategories()
                                     .stream()
                                     .map(CategorySummary::from)
-                                    .collect(Collectors.toSet())
+                                    .collect(Collectors.toSet()),
+                            UnitResponse.from(productResponse.getUnit())
                     ));
 
             if (products.isEmpty()) {
@@ -94,12 +105,12 @@ public class ProductService {
                             productResponse.getDescription(),
                             productResponse.getCode(),
                             productResponse.getSuggestedPrice(),
-                            productResponse.getUnit(),
                             productResponse.isActive(),
                             productResponse.getCategories()
                                     .stream()
                                     .map(CategorySummary::from)
-                                    .collect(Collectors.toSet())
+                                    .collect(Collectors.toSet()),
+                            UnitResponse.from(productResponse.getUnit())
                     )).orElse(null);
 
             if (product == null) {
@@ -126,6 +137,12 @@ public class ProductService {
                 throw new BadRequestException("Categorias inexistentes" + missing);
             }
 
+            UnitEntity unit = unitRepository.findById(request.unitId()).orElse(null);
+
+            if (unit == null) {
+                return new UnsuccessfulResponse("404", "Unidad no encontrada", null);
+            }
+
             ProductEntity product = productRepository.findById(request.productId())
                     .orElse(null);
 
@@ -137,10 +154,10 @@ public class ProductService {
             product.setDescription(request.description().trim());
             product.setCode(request.code().trim());
             product.setSuggestedPrice(request.suggestedPrice());
-            product.setUnit(request.unit().trim());
             product.setActive(request.active());
             product.getCategories().clear();
             product.getCategories().addAll(found);
+            product.setUnit(unit);
 
             productRepository.save(product);
             return new SuccessfulResponse("200", "Producto actualizado exitosamente", product.getName());

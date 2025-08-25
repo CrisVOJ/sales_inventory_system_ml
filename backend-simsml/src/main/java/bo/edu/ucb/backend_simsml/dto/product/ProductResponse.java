@@ -1,6 +1,7 @@
 package bo.edu.ucb.backend_simsml.dto.product;
 
 import bo.edu.ucb.backend_simsml.dto.category.CategorySummary;
+import bo.edu.ucb.backend_simsml.dto.unit.UnitResponse;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -11,8 +12,8 @@ public record ProductResponse(
         String description,
         String code,
         BigDecimal suggestedPrice,
-        String unit,
         boolean active,
-        Set<CategorySummary> categories
+        Set<CategorySummary> categories,
+        UnitResponse unit
 ) {
 }

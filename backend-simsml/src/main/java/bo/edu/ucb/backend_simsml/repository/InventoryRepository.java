@@ -10,10 +10,8 @@ import org.springframework.data.repository.query.Param;
 public interface InventoryRepository extends JpaRepository<InventoryEntity, Long> {
 
     @Query(value = "SELECT i FROM inventories i " +
-            "WHERE (" +
-            ":filter IS NULL OR " +
-            "i.location ILIKE %:filter%) AND " +
+            "WHERE " +
             "(:status IS NULL OR i.active = :status)")
-    Page<InventoryEntity> findAllInventories(@Param("filter") String filter, @Param("status") Boolean status, Pageable pageable);
+    Page<InventoryEntity> findAllInventories(@Param("status") Boolean status, Pageable pageable);
 
 }

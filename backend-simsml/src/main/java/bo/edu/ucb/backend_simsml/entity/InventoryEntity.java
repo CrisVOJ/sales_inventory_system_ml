@@ -25,8 +25,6 @@ public class InventoryEntity {
     private Long currentStock;
     @Column(name = "minimum_stock")
     private Long minimumStock;
-    @Column(name = "location", nullable = false)
-    private String location;
 
     @Column(name = "active")
     private boolean active;
@@ -37,6 +35,8 @@ public class InventoryEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private ProductEntity product;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private LocationEntity location;
 
     @PrePersist
     protected void onCreate() {

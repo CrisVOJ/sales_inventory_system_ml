@@ -29,8 +29,6 @@ public class ProductEntity {
     private String code;
     @Column(name = "suggested_price", precision = 10, scale = 2, nullable = false)
     private BigDecimal suggestedPrice;
-    @Column(name = "unit", nullable = false)
-    private String unit;
 
     @Column(name = "active")
     private boolean active;
@@ -46,6 +44,8 @@ public class ProductEntity {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<CategoryEntity> categories = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    private UnitEntity unit;
 
     @PrePersist
     protected void onCreate() {

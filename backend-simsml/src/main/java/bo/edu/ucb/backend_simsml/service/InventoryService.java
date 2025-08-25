@@ -5,10 +5,13 @@ import bo.edu.ucb.backend_simsml.dto.UnsuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.inventory.CreateInventoryRequest;
 import bo.edu.ucb.backend_simsml.dto.inventory.InventoryResponse;
 import bo.edu.ucb.backend_simsml.dto.inventory.UpdateInventoryRequest;
+import bo.edu.ucb.backend_simsml.dto.location.LocationResponse;
 import bo.edu.ucb.backend_simsml.dto.product.ProductSummary;
 import bo.edu.ucb.backend_simsml.entity.InventoryEntity;
+import bo.edu.ucb.backend_simsml.entity.LocationEntity;
 import bo.edu.ucb.backend_simsml.entity.ProductEntity;
 import bo.edu.ucb.backend_simsml.repository.InventoryRepository;
+import bo.edu.ucb.backend_simsml.repository.LocationRepository;
 import bo.edu.ucb.backend_simsml.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,6 +27,8 @@ public class InventoryService {
     private InventoryRepository inventoryRepository;
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private LocationRepository locationRepository;
 
     public Object createInventory(CreateInventoryRequest request) {
         try {
@@ -34,11 +39,18 @@ public class InventoryService {
                 return new UnsuccessfulResponse("404", "No se pudo encontrar el producto", null);
             }
 
+            LocationEntity location = locationRepository.findById(request.locationId())
+                    .orElse(null);
+
+            if (location == null) {
+                return new UnsuccessfulResponse("404", "No se pudo encontrar la locacion", null);
+            }
+
             InventoryEntity inventory = new InventoryEntity();
             inventory.setCurrentStock(request.currentStock());
             inventory.setMinimumStock(request.minimumStock());
-            inventory.setLocation(request.location().trim());
             inventory.setProduct(product);
+            inventory.setLocation(location);
 
             inventoryRepository.save(inventory);
             return new SuccessfulResponse("201", "Inventario creado exitosamente", inventory.getInventoryId());
@@ -47,15 +59,15 @@ public class InventoryService {
         }
     }
 
-    public Object getInventories(String filter, Boolean status, Pageable pageable) {
+    public Object getInventories(Boolean status, Pageable pageable) {
         try {
-            Page<InventoryResponse> inventories = inventoryRepository.findAllInventories(filter, status, pageable)
+            Page<InventoryResponse> inventories = inventoryRepository.findAllInventories(status, pageable)
                     .map(inventoryResponse -> new InventoryResponse(
                             inventoryResponse.getInventoryId(),
                             inventoryResponse.getCurrentStock(),
                             inventoryResponse.getMinimumStock(),
-                            inventoryResponse.getLocation(),
                             ProductSummary.from(inventoryResponse.getProduct()),
+                            LocationResponse.from(inventoryResponse.getLocation()),
                             inventoryResponse.isActive()
                     ));
 
@@ -76,8 +88,8 @@ public class InventoryService {
                             inventoryResponse.getInventoryId(),
                             inventoryResponse.getCurrentStock(),
                             inventoryResponse.getMinimumStock(),
-                            inventoryResponse.getLocation(),
                             ProductSummary.from(inventoryResponse.getProduct()),
+                            LocationResponse.from(inventoryResponse.getLocation()),
                             inventoryResponse.isActive()
                     )).orElse(null);
 
@@ -107,10 +119,17 @@ public class InventoryService {
                 return new UnsuccessfulResponse("404", "No se pudo encontrar el inventario", null);
             }
 
+            LocationEntity location = locationRepository.findById(request.locationId())
+                    .orElse(null);
+
+            if (location == null) {
+                return new UnsuccessfulResponse("404", "No se pudo encontrar la locacion", null);
+            }
+
             inventory.setCurrentStock(request.currentStock());
             inventory.setMinimumStock(request.minimumStock());
-            inventory.setLocation(request.location().trim());
             inventory.setProduct(product);
+            inventory.setLocation(location);
             inventory.setActive(request.active());
             inventory.setUpdatedAt(LocalDateTime.now());
 

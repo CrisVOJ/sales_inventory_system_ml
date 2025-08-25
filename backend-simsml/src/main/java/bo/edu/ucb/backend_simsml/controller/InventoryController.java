@@ -37,12 +37,11 @@ public class InventoryController {
 
     @GetMapping("/all")
     public ResponseEntity<Object> getInventories(
-            @RequestParam(value = "filter", required = false) String filter,
             @RequestParam(value = "status", required = false) Boolean status,
             @PageableDefault(sort = "updatedAt", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         try {
-            Object response = inventoryService.getInventories(filter, status, pageable);
+            Object response = inventoryService.getInventories(status, pageable);
             return generateResponse(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
