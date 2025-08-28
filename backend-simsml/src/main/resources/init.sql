@@ -40,3 +40,10 @@ INSERT INTO locations
                          ('A-B-1', 'Edificio A, Piso B, Estante 1', true),
                          ('A-B-2', 'Edificio A, Piso B, Estante 2', true),
                          ('A-B-3', 'Edificio A, Piso B, Estante 3', true);
+
+INSERT INTO sale_statuses
+(name, active) VALUES
+                   ('ACTIVO', true),
+                   ('DEUDA', true),
+                   ('PAGADO', true),
+                   ('ANULADO', true);
