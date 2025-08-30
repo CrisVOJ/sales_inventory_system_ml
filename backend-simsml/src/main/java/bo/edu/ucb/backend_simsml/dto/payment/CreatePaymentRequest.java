@@ -1,0 +1,15 @@
+package bo.edu.ucb.backend_simsml.dto.payment;
+
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+public record CreatePaymentRequest(@NotNull @DecimalMin("0.0")BigDecimal amount,
+                                   @NotNull LocalDate date,
+                                   String reference,
+                                   @NotNull Long userId,
+                                   @NotNull Long saleId,
+                                   @NotNull Long paymentMethodId) {
+}

@@ -47,3 +47,9 @@ INSERT INTO sale_statuses
                    ('DEUDA', true),
                    ('PAGADO', true),
                    ('ANULADO', true);
+
+INSERT INTO payment_methods
+(name, active) VALUES
+                   ('QR', true),
+                   ('Efectivo', true),
+                   ('Transferencia', true);
