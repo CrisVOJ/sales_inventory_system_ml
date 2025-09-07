@@ -1,5 +1,6 @@
 package bo.edu.ucb.backend_simsml.dto.prediction;
 
+import bo.edu.ucb.backend_simsml.dto.inventory.InventorySummary;
 import bo.edu.ucb.backend_simsml.dto.product.ProductSummary;
 
 import java.math.BigDecimal;
@@ -11,7 +12,7 @@ public record PredictionResponse(
         Long estimatedAmount,
         Double reliability,
         LocalDateTime generationDate,
-        ProductSummary product,
+        InventorySummary inventory,
         boolean active
 ) {
 }

@@ -2,11 +2,14 @@ package bo.edu.ucb.backend_simsml.service;
 
 import bo.edu.ucb.backend_simsml.dto.SuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.UnsuccessfulResponse;
+import bo.edu.ucb.backend_simsml.dto.inventory.InventorySummary;
 import bo.edu.ucb.backend_simsml.dto.prediction.CreatePredictionRequest;
 import bo.edu.ucb.backend_simsml.dto.prediction.PredictionResponse;
 import bo.edu.ucb.backend_simsml.dto.product.ProductSummary;
+import bo.edu.ucb.backend_simsml.entity.InventoryEntity;
 import bo.edu.ucb.backend_simsml.entity.PredictionEntity;
 import bo.edu.ucb.backend_simsml.entity.ProductEntity;
+import bo.edu.ucb.backend_simsml.repository.InventoryRepository;
 import bo.edu.ucb.backend_simsml.repository.PredictionRepository;
 import bo.edu.ucb.backend_simsml.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,21 +25,21 @@ public class PredictionService {
     @Autowired
     private PredictionRepository predictionRepository;
     @Autowired
-    private ProductRepository productRepository;
+    private InventoryRepository inventoryRepository;
 
     public Object createPrediction(CreatePredictionRequest request) {
         try {
-            ProductEntity product = productRepository.findById(request.productId())
+            InventoryEntity inventory = inventoryRepository.findById(request.inventoryId())
                     .orElse(null);
 
-            if (product == null) {
+            if (inventory == null) {
                 return new UnsuccessfulResponse("404", "No se pudo encontrar el producto", null);
             }
 
             PredictionEntity prediction = new PredictionEntity();
             prediction.setEstimatedAmount(request.estimatedAmount());
             prediction.setReliability(request.reliability());
-            prediction.setProduct(product);
+            prediction.setInventory(inventory);
 
             predictionRepository.save(prediction);
             return new SuccessfulResponse("201", "Predicción registrada exitosamente", prediction.getPredictionId());
@@ -54,7 +57,7 @@ public class PredictionService {
                             predictionResponse.getEstimatedAmount(),
                             predictionResponse.getReliability(),
                             predictionResponse.getGenerationDate(),
-                            ProductSummary.from(predictionResponse.getProduct()),
+                            InventorySummary.from(predictionResponse.getInventory()),
                             predictionResponse.isActive()
                     ));
 

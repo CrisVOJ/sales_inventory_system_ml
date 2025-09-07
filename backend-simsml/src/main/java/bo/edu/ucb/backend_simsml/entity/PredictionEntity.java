@@ -37,7 +37,7 @@ public class PredictionEntity {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private ProductEntity product;
+    private InventoryEntity inventory;
 
     @PrePersist
     protected void onCreate() {

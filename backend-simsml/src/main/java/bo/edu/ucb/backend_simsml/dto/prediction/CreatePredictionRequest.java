@@ -10,5 +10,5 @@ import java.time.LocalDateTime;
 public record CreatePredictionRequest(@NotNull LocalDateTime predictionDate,
                                       @NotNull @Positive Long estimatedAmount,
                                       @NotNull @DecimalMin("0.0") Double reliability,
-                                      @NotNull Long productId) {
+                                      @NotNull Long inventoryId) {
 }
