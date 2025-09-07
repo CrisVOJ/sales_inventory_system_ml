@@ -30,21 +30,12 @@ public class PaymentService {
     @Autowired
     private PaymentRepository paymentRepository;
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private SaleRepository saleRepository;
     @Autowired
     private PaymentMethodRepository paymentMethodRepository;
 
     public Object createPayment(CreatePaymentRequest request) {
         try {
-            UserEntity user = userRepository.findById(request.userId())
-                    .orElse(null);
-
-            if (user == null) {
-                return new UnsuccessfulResponse("404", "Usuario no encontrado", null);
-            }
-
             SaleEntity sale = saleRepository.findById(request.saleId())
                     .orElse(null);
 
@@ -63,7 +54,6 @@ public class PaymentService {
             payment.setAmount(request.amount());
             payment.setDate(request.date());
             payment.setReference(request.reference());
-            payment.setUser(user);
             payment.setSale(sale);
             payment.setPaymentMethod(paymentMethod);
 
@@ -83,7 +73,6 @@ public class PaymentService {
                             paymentResponse.getDate(),
                             paymentResponse.getReference(),
                             paymentResponse.isActive(),
-                            UserSaleResponse.from(paymentResponse.getUser()),
                             SaleSummary.from(paymentResponse.getSale()),
                             PaymentMethodSummary.from(paymentResponse.getPaymentMethod())
                     ));
@@ -107,7 +96,6 @@ public class PaymentService {
                             paymentResponse.getDate(),
                             paymentResponse.getReference(),
                             paymentResponse.isActive(),
-                            UserSaleResponse.from(paymentResponse.getUser()),
                             SaleSummary.from(paymentResponse.getSale()),
                             PaymentMethodSummary.from(paymentResponse.getPaymentMethod())
                     ))
@@ -132,13 +120,6 @@ public class PaymentService {
                 return new UnsuccessfulResponse("404", "Pago no encontrado", null);
             }
 
-            UserEntity user = userRepository.findById(request.userId())
-                    .orElse(null);
-
-            if (user == null) {
-                return new UnsuccessfulResponse("404", "Usuario no encontrado", null);
-            }
-
             SaleEntity sale = saleRepository.findById(request.saleId())
                     .orElse(null);
 
@@ -157,7 +138,6 @@ public class PaymentService {
             payment.setDate(request.date());
             payment.setReference(request.reference());
             payment.setActive(request.active());
-            payment.setUser(user);
             payment.setSale(sale);
             payment.setPaymentMethod(paymentMethod);
             payment.setUpdatedAt(LocalDateTime.now());

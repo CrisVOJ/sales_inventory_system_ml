@@ -11,7 +11,6 @@ public record UpdatePaymentRequest(@NotNull Long paymentId,
                                    @NotNull LocalDate date,
                                    String reference,
                                    @NotNull boolean active,
-                                   @NotNull Long userId,
                                    @NotNull Long saleId,
                                    @NotNull Long paymentMethodId) {
 }

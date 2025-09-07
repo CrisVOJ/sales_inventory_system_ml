@@ -17,7 +17,7 @@ public class UnitEntity {
     @Column(name = "unit_id")
     private Long unitId;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
     @Column(name = "active")
     private boolean active;

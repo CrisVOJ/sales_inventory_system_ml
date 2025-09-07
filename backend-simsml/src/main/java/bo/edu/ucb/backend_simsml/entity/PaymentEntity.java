@@ -38,8 +38,6 @@ public class PaymentEntity {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private UserEntity user;
-    @ManyToOne(fetch = FetchType.LAZY)
     private SaleEntity sale;
     @ManyToOne(fetch = FetchType.LAZY)
     private PaymentMethodEntity paymentMethod;

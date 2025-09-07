@@ -19,7 +19,7 @@ public class PaymentMethodEntity {
     @Column(name = "payment_method_id")
     private Long paymentMethodId;
 
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     private String name;
     @Column(name = "active")
     private boolean active;

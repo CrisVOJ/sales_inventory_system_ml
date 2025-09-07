@@ -13,7 +13,6 @@ public record PaymentResponse(
         LocalDate date,
         String reference,
         boolean active,
-        UserSaleResponse user,
         SaleSummary sale,
         PaymentMethodSummary paymentMethod
 ) {

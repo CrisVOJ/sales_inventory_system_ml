@@ -19,7 +19,7 @@ public class SaleStatusEntity {
     @Column(name = "sale_status_id")
     private Long saleStatusId;
 
-    @Column(name = "name")
+    @Column(name = "name", unique = true)
     private String name;
     @Column(name = "active")
     private boolean active;

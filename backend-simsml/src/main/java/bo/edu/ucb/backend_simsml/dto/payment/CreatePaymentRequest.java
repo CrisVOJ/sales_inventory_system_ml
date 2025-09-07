@@ -9,7 +9,6 @@ import java.time.LocalDate;
 public record CreatePaymentRequest(@NotNull @DecimalMin("0.0")BigDecimal amount,
                                    @NotNull LocalDate date,
                                    String reference,
-                                   @NotNull Long userId,
                                    @NotNull Long saleId,
                                    @NotNull Long paymentMethodId) {
 }
