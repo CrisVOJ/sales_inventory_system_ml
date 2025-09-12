@@ -46,6 +46,11 @@ INSERT INTO sale_statuses (name, active) VALUES
                                              ('ACTIVO',true),('DEUDA',true),('PAGADO',true),('ANULADO',true)
 ON CONFLICT (name) DO NOTHING;
 
+-- PURCHASE STATUSES
+INSERT INTO purchase_statuses (name, active) VALUES
+                                             ('ACTIVO',true),('DEUDA',true),('PAGADO',true),('ANULADO',true)
+ON CONFLICT (name) DO NOTHING;
+
 -- PAYMENT METHODS
 INSERT INTO payment_methods (name, active) VALUES
                                                ('QR',true),('Efectivo',true),('Transferencia',true)
