@@ -1,0 +1,24 @@
+.app-shell{
+  display:grid;
+  grid-template-rows:var(--layout-header-height) 1fr;height:100dvh;width:100%}
+
+.app-body{
+  position:relative;display:grid;
+  grid-template-columns:var(--layout-sidebar-width) 1fr;
+  transition:grid-template-columns .35s ease-in-out; /* antes .2s */
+  min-height:0;
+}
+
+.app-body.collapsed{
+  grid-template-columns:var(--layout-sidebar-width-collapsed) 1fr
+}
+
+/* 🟩 La columna del grid: aquí va SIEMPRE el borde negro fino */
+.app-sidebar{
+  height:calc(100dvh - var(--layout-header-height));
+  border-right:1px solid #000 !important; /* más delgado */
+  background:var(--p-surface-0);
+  min-width:0;overflow:hidden;position:relative;z-index:1;
+}
+
+.app-content{min-width:0;padding:1rem;overflow:auto;background:var(--layout-bg)}

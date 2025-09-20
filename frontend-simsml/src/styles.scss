@@ -1,1 +1,36 @@
-/* You can add global styles to this file, and also import other style files */
+@import "primeicons/primeicons.css";
+
+/* utilidades layout */
+:root{
+  --layout-header-height: 64px;
+  --layout-sidebar-width: 250px;
+  --layout-sidebar-width-collapsed: 72px;
+  --layout-bg:#203338;
+}
+html,body{height:100%}
+body{margin:0;background:var(--layout-bg);font-family:Inter,system-ui,Segoe UI,Roboto,Arial}
+
+/* Layout base */
+.app-shell { display: grid; grid-template-rows: 64px 1fr; height: 100vh; }
+.app-shell__main {
+  grid-template-columns: var(--layout-sidebar-width) 1fr; /* antes: --layout-sidebar-w */
+}
+.app-shell__main.collapsed {
+  grid-template-columns: var(--layout-sidebar-width-collapsed) 1fr; /* antes: --layout-sidebar-w-collapsed */
+}
+
+/* Header */
+.app-header .p-toolbar { border-radius: 0; }
+.app-header .p-inputtext { width: 260px; }
+
+/* Contenido */
+.app-content { padding: 1rem; }
+
+/* Tabla compartida */
+.data-table-caption { display: flex; gap: .75rem; align-items: center; justify-content: space-between; padding: .5rem; }
+.data-table-caption .left, .data-table-caption .right { display: flex; align-items: center; gap: .5rem; }
+
+
+/* Ícono hamburguesa más visible */
+.header-trigger { cursor: pointer; padding: .5rem; border-radius: .5rem; }
+.header-trigger:hover { background: rgba(0,0,0,.05); }

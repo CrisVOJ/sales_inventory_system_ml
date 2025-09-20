@@ -1,0 +1,10 @@
+<aside class="sidebar" [class.is-collapsed]="collapsed">
+  <div class="menu">
+    <p-panelMenu
+      [model]="menuItems()"
+      [multiple]="false"
+      [transitionOptions]="'0ms'"
+      [styleClass]="'app-panelmenu' + (collapsed ? ' is-collapsed' : '')">
+    </p-panelMenu>
+  </div>
+</aside>

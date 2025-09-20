@@ -1,0 +1,14 @@
+<div class="app-shell">
+    <app-header (menuClick)="toggleSidebar()"></app-header>
+
+    <div class="app-body" [class.collapsed]="sidebarCollapsed()">
+    <app-sidebar class="app-sidebar"
+                    [collapsed]="sidebarCollapsed()"
+                    (toggle)="toggleSidebar()">
+    </app-sidebar>
+
+    <main class="app-content">
+        <router-outlet></router-outlet>
+    </main>
+    </div>
+</div>

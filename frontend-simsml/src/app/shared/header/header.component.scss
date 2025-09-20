@@ -1,0 +1,178 @@
+:host {
+  /* Paleta azul estilo Figma */
+  --header-c1: #0e3a5b;   /* navy */
+  --header-c2: #0b6aa7;   /* blue */
+  --header-c3: #16a3d5;   /* cyan */
+  --header-text: #000000;
+
+  --tile-bg: rgba(255, 255, 255, 0.06);
+  --tile-brd: rgba(255, 255, 255, 0.18);
+  --tile-bg-hover: rgba(255, 255, 255, 0.12);
+}
+
+/* Tamaños base con clamp para que escalen suave */
+:root {
+  --hdr-height: clamp(48px, 7vw, 64px);
+  --icon-size: clamp(32px, 6vw, 42px);
+  --gap: clamp(0.4rem, 1.2vw, 0.75rem);
+  --badge-shift-x: 2px;
+  --badge-shift-y: -6px;
+}
+
+.app-header {
+  //height: var(--layout-header-height, 64px);
+  height: var(--hdr-height, 64px);
+  padding: 0 .75rem;
+  border-radius: 0;
+  border: 0;
+  border-bottom: 1px solid #000000;
+  background: #345861;
+  color: var(--header-text);
+  //box-shadow: 0 6px 16px rgba(4, 29, 51, 0.35);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  .p-toolbar-group-start,
+  .p-toolbar-group-end {
+    gap: .75rem;
+  }
+}
+
+.left, .right { display: flex; align-items: center; }
+
+.brand {
+  display: flex; align-items: center; gap: .6rem;
+  padding-left: .25rem;
+
+  &__dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: #5de2ff;
+    box-shadow: 0 0 12px 2px rgba(93, 226, 255, .8);
+  }
+  &__title {
+    font-weight: 700;
+    letter-spacing: .3px;
+    color: var(--header-text);
+  }
+}
+
+.menu-btn,
+.icon-btn { padding: 0; }
+
+.profile-btn {
+  //display: inline-flex; align-items: center; gap: .5rem; padding: 0 .6rem;
+  display: relative;
+
+  .avatar {
+    width: 28px; height: 28px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: .75rem; font-weight: 700;
+    background: rgba(255,255,255,.2);
+    color: var(--header-text);
+    border: 1px solid var(--tile-brd);
+  }
+  .user-name {
+    color: var(--header-text);
+    font-weight: 600;
+    opacity: .95;
+  }
+  i { opacity: .85; }
+}
+
+/* Asegurar contraste de badge en botones */
+.p-badge.p-badge-danger {
+  transform: translate(2px, -6px);
+}
+
+/* Botón especial para notificaciones */
+.notification-btn {
+  height: 42px;
+  width: 42px;
+  border-radius: 50%;
+  background: #2E798B !important;
+  border: 1px solid #000000 !important;
+  color: #000000 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+
+  &:hover,
+  &:focus-visible {
+    background: darken(#2E798B, 2%) !important;
+    transform: translateY(-0.5px) translateX(-0.5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .25);
+  }
+}
+
+/* Botón especial para el usuario */
+.profile-icon-btn {
+  height: 42px;
+  width: 42px;
+  border-radius: 50%;
+  background: #2E798B !important;
+  border: 1px solid #000000 !important;
+  color: #000000 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+
+  &:hover,
+  &:focus-visible {
+    background: darken(#2E798B, 2%) !important;
+    transform: translateY(-0.5px) translateX(-0.5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .25);
+  }
+}
+
+/* Tablet (≤ 768px): reduce altura y gaps un poco */
+@media (max-width: 768px) {
+  :root {
+    --hdr-height: clamp(48px, 6.5vw, 56px);
+    --icon-size: clamp(32px, 5.5vw, 38px);
+    --gap: 0.6rem;
+    --badge-shift-x: 1px;
+    --badge-shift-y: -5px;
+  }
+
+  .app-header {
+    padding: 0 .5rem;
+  }
+}
+
+/* Mobile (≤ 480px): compacto y cómodo para el dedo */
+@media (max-width: 480px) {
+  :root {
+    --hdr-height: 48px;
+    --icon-size: 34px;
+    --gap: 0.5rem;
+    --badge-shift-x: 0px;
+    --badge-shift-y: -4px;
+  }
+
+  /* Evita desbordes: que cada grupo ocupe su lado sin empujar */
+  .p-toolbar-group-start { margin-right: auto; }
+  .p-toolbar-group-end   { margin-left: auto; }
+
+  /* Ajuste de sombra para no recargar en pantallas chicas */
+  .app-header { box-shadow: 0 4px 10px rgba(4, 29, 51, 0.28); }
+}
+
+/* Mejor foco visible en teclado */
+.notification-btn:focus-visible,
+.profile-icon-btn:focus-visible {
+  outline: 2px solid rgba(255,255,255,.85);
+  outline-offset: 2px;
+}
+
+/* Respeta usuarios con “reducir animaciones” */
+@media (prefers-reduced-motion: reduce) {
+  .tile-btn,
+  .notification-btn,
+  .profile-icon-btn {
+    transition: none !important;
+    transform: none !important;
+  }
+}

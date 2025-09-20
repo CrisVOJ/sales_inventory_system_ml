@@ -1,0 +1,210 @@
+/* ================== Variables del componente ================== */
+:host {
+  /* Colores */
+  --sb-text: #000;                 /* texto e íconos */
+  --sb-hover-bg: #2E798B;          /* fondo al pasar el cursor */
+  --sb-active-bg: rgba(0,0,0,.12); /* fondo activo/expandido */
+
+  /* Estética del “tile” */
+  --tile-bg: transparent;
+  --tile-brd: rgba(0,0,0,.28);
+
+  /* Layout del item */
+  --pad-x: .8rem;      /* padding horizontal expandido */
+  --gap: .65rem;       /* espacio icono-texto expandido */
+  --icon-w: 1.25rem;   /* ancho visual del icono */
+  --caret-w: 1rem;     /* ancho del caret (expandido) */
+}
+
+/* ================== Contenedor ================== */
+.sidebar{
+  width:100%;
+  height:100%;
+  display:grid;
+  grid-template-rows: 1fr auto;
+  overflow:hidden;
+  background:#345861;
+  color:var(--sb-text);
+  position:relative;
+  z-index:2;
+  box-sizing:border-box;
+}
+
+/* Scroll del listado */
+.menu{ overflow:auto; padding:.5rem; }
+.menu::-webkit-scrollbar{ width:8px; }
+.menu::-webkit-scrollbar-thumb{ background:rgba(0,0,0,.25); border-radius:8px; }
+
+/* ================== PrimeNG PanelMenu ================== */
+:host ::ng-deep .app-panelmenu {
+
+  /* Reset visual del tema */
+  .p-panelmenu-panel,
+  .p-panelmenu-content,
+  .p-panelmenu-header{
+    background:transparent !important;
+    border:0 !important;
+    box-shadow:none !important;
+  }
+
+  /* Colores NEGROS (texto e íconos, incluyendo SVG) */
+  .p-menuitem-content,
+  .p-panelmenu-header-content,
+  .p-menuitem-link,
+  .p-menuitem-text,
+  .p-menuitem-label,
+  .p-panelmenu-header-label,
+  .p-menuitem-icon,
+  .p-submenu-icon,
+  .p-menuitem-icon.pi,
+  .p-submenu-icon.pi,
+  .p-menuitem-icon.pi::before,
+  .p-submenu-icon.pi::before,
+  .pi::before,
+  .p-icon,
+  .p-menuitem-icon .p-icon,
+  .p-submenu-icon .p-icon,
+  .p-icon > svg,
+  .p-menuitem-icon .p-icon > svg,
+  .p-submenu-icon .p-icon > svg,
+  .p-icon svg{
+    color:var(--sb-text) !important;
+    fill:var(--sb-text) !important;
+    stroke:var(--sb-text) !important;
+    opacity:1 !important;
+  }
+
+  /* --- Item (“pill”) con GRID y transiciones suaves --- */
+  .p-menuitem-link{
+    display:grid !important;
+    grid-template-columns: var(--icon-w) 1fr var(--caret-w);
+    align-items:center;
+    column-gap: var(--gap);
+    width:100%;
+    margin:6px 0;
+    padding:.58rem var(--pad-x) !important;   /* padding simétrico */
+    border-radius:12px;
+    background:var(--tile-bg) !important;
+    border:1px solid var(--tile-brd) !important;
+    box-sizing:border-box;
+    transition:
+      padding .32s ease,
+      column-gap .32s ease,
+      background .18s ease,
+      box-shadow .18s ease;
+  }
+
+  /* Texto: elipsis y animación (se encoge/desvanece al colapsar) */
+  .p-menuitem-text,
+  .p-menuitem-label,
+  .p-panelmenu-header-label{
+    max-width:160px;
+    opacity:1;
+    transform: translateX(0);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    font-weight:600; letter-spacing:.2px;
+    transition:
+      max-width .32s ease,
+      opacity .28s ease,
+      transform .32s ease,
+      margin .32s ease;
+  }
+
+  /* Icono: caja consistente (centrado en su celda) */
+  .p-menuitem-icon,
+  .p-panelmenu-header .p-menuitem-icon,
+  .p-icon{
+    width:var(--icon-w);
+    min-width:var(--icon-w);
+    text-align:center;
+    justify-self:center;
+    transition: transform .32s ease;
+  }
+
+  /* Caret: celda propia (desaparece suave al colapsar) */
+  .p-submenu-icon{
+    justify-self:end;
+    width: var(--caret-w);
+    min-width: var(--caret-w);
+    opacity: 1;
+    transition: width .28s ease, opacity .28s ease, margin .28s ease;
+  }
+
+  /* Hover / Focus */
+  .p-menuitem > .p-menuitem-content:hover,
+  .p-panelmenu-header > .p-panelmenu-header-content:hover,
+  .p-menuitem-link:hover,
+  .p-menuitem-link:focus-visible,
+  .p-menuitem-content:focus-within{
+    background:var(--sb-hover-bg) !important;
+  }
+
+  /* Activo / expandido */
+  .router-link-active,
+  .p-menuitem-link[aria-expanded="true"],
+  .p-panelmenu-header[aria-expanded="true"] > .p-panelmenu-header-content{
+    background:var(--sb-active-bg) !important;
+  }
+}
+
+/* ================== Estado COLAPSADO (animado y centrado perfecto) ================== */
+:host ::ng-deep .app-panelmenu.is-collapsed {
+
+  /* Item compacto y sin gap; caret desaparece sin desbalancear */
+  .p-menuitem-link{
+    --pad-x: .58rem;
+    --gap: 0;
+    --caret-w: 0;
+    grid-template-columns: 1fr; /* solo icono */
+    position: relative !important; /* para centrar icono de forma absoluta */
+  }
+
+  /* Texto: encoge y desvanece (sin display:none) */
+  .p-menuitem-text,
+  .p-menuitem-label,
+  .p-panelmenu-header-label{
+    max-width: 0 !important;
+    opacity: 0 !important;
+    transform: translateX(-6px);
+    margin: 0 !important;
+    pointer-events: none;
+  }
+
+  /* Caret: fuera sin empujar */
+  .p-submenu-icon{
+    width: 0 !important;
+    min-width: 0 !important;
+    opacity: 0 !important;
+    margin: 0 !important;
+    pointer-events: none;
+  }
+
+  /* Icono: centrado absoluto (ignora padding/gaps) */
+  .p-menuitem-icon,
+  .p-panelmenu-header .p-menuitem-icon,
+  .p-icon {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: var(--icon-w) !important;
+    height: var(--icon-w) !important;
+    margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .p-icon > svg {
+    width: var(--icon-w) !important;
+    height: var(--icon-w) !important;
+    display: block !important;
+  }
+}
+
+/* Accesibilidad: respeta usuarios con reducción de movimiento */
+@media (prefers-reduced-motion: reduce){
+  :host ::ng-deep .app-panelmenu *{
+    transition: none !important;
+  }
+}

@@ -1,0 +1,31 @@
+.table-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5rem;
+  padding: .5rem;
+}
+.left {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+}
+.rows-select {
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--p-content-border-color, #e5e7eb);
+  padding: 0 .5rem;
+  background: var(--p-surface-0);
+}
+.right {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+}
+.actions-col {
+  width: 132px;
+  text-align: center;
+}
+:host ::ng-deep .p-table .p-datatable-thead > tr > th {
+  white-space: nowrap;
+}

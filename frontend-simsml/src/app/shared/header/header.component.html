@@ -1,0 +1,37 @@
+<p-toolbar class="app-header">
+  <div class="p-toolbar-group-start left">
+    <button 
+    pButton 
+    type="button" 
+    class="profile-icon-btn"
+    icon="pi pi-bars" 
+    (click)="menuClick.emit()" 
+    aria-label="Abrir menú">
+    </button>
+  </div>
+
+  <div class="p-toolbar-group-end right">
+    <!-- Notificaciones con badge superpuesto -->
+    <span class="p-overlay-badge">
+      <button
+        pButton
+        type="button"
+        class="notification-btn"
+        icon="pi pi-bell"
+        aria-label="Notificaciones">
+      </button>
+      <p-badge *ngIf="notifCount" [value]="notifCount" severity="danger"></p-badge>
+    </span>
+
+    <button 
+      pButton 
+      type="button" 
+      class="profile-icon-btn" 
+      icon="pi pi-user" 
+      aria-label="Perfil"
+    >
+      <!-- <span class="avatar">A</span>
+      <span class="user-name">{{ userName || 'Admin' }}</span> -->
+    </button>
+  </div>
+</p-toolbar>
