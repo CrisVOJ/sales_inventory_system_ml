@@ -57,7 +57,6 @@ export interface CrudAction<T = any> {
               <option [value]="10">10</option>
               <option [value]="15">15</option>
             </select>
-            <!-- <svg viewBox="0 0 24 24" class="chev"><path d="M7 10l5 5 5-5"/></svg> -->
           </div>
           <p-iconfield iconPosition="left" class="search">
             <p-inputicon class="pi pi-search" style="color: #00B4E0;"/>
@@ -84,7 +83,7 @@ export interface CrudAction<T = any> {
                 {{ c.header }}
               </th>
               <th *ngIf="actions?.length" 
-                  class="actions-head">
+                  class="head-actions">
                   Acciones
               </th>
             </tr>

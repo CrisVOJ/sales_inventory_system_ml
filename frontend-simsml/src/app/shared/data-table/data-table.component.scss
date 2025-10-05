@@ -149,11 +149,13 @@ td.right,  th.right { text-align:right;  }
 
 td.empty{ text-align:center; color: var(--txt-2); padding: 24px; }
 
-/* ─── Acciones redondas ───────────────────────────────────────────────── */
+/* ─── Acciones ───────────────────────────────────────────────── */
 td.actions{
   padding: 14px;
   vertical-align: middle;
+  text-align: center;
 }
+
 .act{
   width:36px; 
   height:36px; 
@@ -172,13 +174,15 @@ td.actions{
 .act:disabled{ opacity:.55; cursor:not-allowed; }
 .i{ font-size: 18px; line-height: 1; }
 
-.action-container {
-  display: flex;
+.actions-container {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
   gap: 10px;
+  flex-wrap: nowrap;
 }
 
-td.actions .action-container {
+td.actions .actions-container {
   display: flex;
   flex-direction: row;
   justify-content: center;
