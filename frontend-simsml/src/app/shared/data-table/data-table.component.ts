@@ -1,127 +1,196 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
+import { FormsModule } from '@angular/forms';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
+import { RippleModule } from 'primeng/ripple';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip'
 
-export interface ColumnDef {
-  field: string;
+export interface CrudColumn<T = any> {
+  key: keyof T | string;
   header: string;
-  sortable?: boolean;
+  width?: string;
+  align?: 'left'|'center'|'right';
+  format?: (row: T, index: number) => string;
+}
+
+export interface CrudAction<T = any> {
+  id: string; // 'view' | 'edit' | 'delete'
+  label: string;
+  icon?: string;
+  class?: 'primary' | 'ghost' | 'danger' | 'warn';
+  show?: (row: T) => boolean;
+  disabled?: (row: T) => boolean;
+  tooltip?: (row: T) => string;
+  color?: (row: T) => string;
 }
 
 @Component({
   selector: 'app-data-table',
-  templateUrl: './data-table.component.html',
-  styleUrl: './data-table.component.scss',
+  standalone: true,
   imports: [
-    CommonModule,
-    TableModule,
     ButtonModule,
-    InputTextModule,
+    CommonModule,
     FormsModule,
-    TooltipModule
+    IconFieldModule,
+    InputIconModule,
+    InputTextModule,
+    RippleModule,
+    TooltipModule,
+    TableModule,
+    NgFor,
+    NgIf
   ],
+  styleUrls: ['./data-table.component.scss'],
   template: `
-    <p-table #dt
-             [value]="data"
-             [columns]="columns"
-             [paginator]="true"
-             [rows]="rows"
-             [rowsPerPageOptions]="[5,10,25,50]"
-             [totalRecords]="totalRecords ?? data?.length ?? 0"
-             [lazy]="lazy"
-             [loading]="loading"
-             [globalFilterFields]="columns?.map(c => c.field)"
-             (onPage)="onPageChange($event)"
-             (onSort)="onSort($event)">
-      
-      <ng-template pTemplate="caption">
-        <div class="table-caption">
-          <div class="left">
-            <span class="rows-label">Mostrar</span>
-            <select class="rows-select" [ngModel]="rows" (ngModelChange)="onRowsChange($event)">
-              <option [ngValue]="5">5</option>
-              <option [ngValue]="10">10</option>
-              <option [ngValue]="25">25</option>
-              <option [ngValue]="50">50</option>
+    <div class="table-content-bg">
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="left">
+          <div>
+            <span style="font-size: var(--p);">Mostrar </span>
+            <select class="select-box" [(ngModel)]="pageSize" (ngModelChange)="pageSizeChange(1)">
+              <option [value]="5">5</option>
+              <option [value]="10">10</option>
+              <option [value]="15">15</option>
             </select>
-            <span>filas</span>
+            <!-- <svg viewBox="0 0 24 24" class="chev"><path d="M7 10l5 5 5-5"/></svg> -->
           </div>
-
-          <div class="right">
-            <span class="p-input-icon-left">
-              <i class="pi pi-search"></i>
-              <input pInputText type="text" (input)="dt.filterGlobal(($event.target as HTMLInputElement).value, 'contains')" placeholder="Buscar...">
-            </span>
-            <button pButton label="Agregar" icon="pi pi-plus" class="p-button-success" (click)="onAdd()"></button>
-          </div>
+          <p-iconfield iconPosition="left" class="search">
+            <p-inputicon class="pi pi-search" style="color: #00B4E0;"/>
+            <input  pInputText type="search" 
+                    [placeholder]="searchPlaceholder"
+                    [(ngModel)]="query" 
+                    (input)="onSearch.emit(query)" />
+          </p-iconfield>
         </div>
-      </ng-template>
+        <div class="right">
+          <button class="btn add" (click)="create.emit()">Agregar {{entityName}}</button>
+        </div>
+      </div>
 
-      <ng-template pTemplate="header" let-columns>
-        <tr>
-          <th *ngFor="let col of columns" [pSortableColumn]="col.sortable ? col.field : null">
-            {{ col.header }}
-            <p-sortIcon *ngIf="col.sortable" [field]="col.field"></p-sortIcon>
-          </th>
-          <th class="actions-col">Acciones</th>
-        </tr>
-      </ng-template>
+      <!-- Tabla -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th *ngFor="let c of columns" 
+                  [style.width]="c.width" 
+                  [class.center]="c.align==='center'" 
+                  [class.right]="c.align==='right'">
+                {{ c.header }}
+              </th>
+              <th *ngIf="actions?.length" 
+                  class="actions-head">
+                  Acciones
+              </th>
+            </tr>
+          </thead>
 
-      <ng-template pTemplate="body" let-rowData let-columns="columns">
-        <tr>
-          <td *ngFor="let col of columns">{{ rowData?.[col.field] }}</td>
-          <td class="actions-col">
-            <button pButton icon="pi pi-eye" class="p-button-text" (click)="onView(rowData)" pTooltip="Ver"></button>
-            <button pButton icon="pi pi-pencil" class="p-button-text p-button-success" (click)="onEdit(rowData)" pTooltip="Editar"></button>
-            <button pButton icon="pi pi-trash" class="p-button-text p-button-danger" (click)="onDelete(rowData)" pTooltip="Eliminar"></button>
-          </td>
-        </tr>
-      </ng-template>
+          <tbody>
+            <tr *ngFor="let row of rows; let i = index">
+              <td *ngFor="let c of columns" 
+                  [class.center]="c.align==='center'" 
+                  [class.right]="c.align==='right'">
+                {{ c.format ? c.format(row, i) : $any(row)[c.key] }}
+              </td>
 
-      <ng-template pTemplate="emptymessage">
-        <tr>
-          <td [attr.colspan]="(columns?.length ?? 0) + 1">
-            No hay datos.
-          </td>
-        </tr>
-      </ng-template>
+              <td *ngIf="actions?.length" class="actions">
+                <div class="actions-container">
+                  <ng-container *ngFor="let a of actions">
+                    <button *ngIf="!a.show || a.show(row)"
+                            class="act" [ngClass]="a.class || 'ghost'"
+                            [title]="a.tooltip ? a.tooltip(row) : a.label"
+                            [disabled]="a.disabled ? a.disabled(row) : false"
+                            (click)="emitAction(a.id, row)"
+                            pButton pRipple
+                            [pTooltip]="a.tooltip ? a.tooltip(row) : a.label"
+                            tooltipPosition="bottom"
+                    >
+                      <span class="pi" [class]="a.icon"
+                            [style.color]="a.color ? a.color(row) : null"
+                            >
+                      </span>
+                    </button>
+                  </ng-container>
+                </div>
+              </td>
+            </tr>
 
-      <ng-template pTemplate="paginatorleft" let-state>
-        Mostrando {{ state.first + 1 }} – {{ Math.min(state.first + state.rows, state.totalRecords) }}
-        de {{ state.totalRecords }} registros
-      </ng-template>
-    </p-table>
+            <tr *ngIf="!rows?.length">
+              <td [attr.colspan]="columns.length + 1" class="empty">Sin datos</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <div class="pager" *ngIf="total > 0">
+        <span class="hint">Mostrando {{startIndex()+1}} a {{endIndex()}} de {{total}} registros</span>
+        <div>
+          <button class="nav" (click)="pageSizeChange(1)" [disabled]="page<=1">«</button>
+          <button class="nav" (click)="pageSizeChange(page-1)" [disabled]="page<=1">‹</button>
+
+          <button *ngFor="let p of pages()" 
+                  class="page" [class.isActive]="p===page" 
+                  (click)="pageSizeChange(p)">{{p}}</button>
+          
+          <button class="nav" (click)="pageSizeChange(page+1)" [disabled]="page>=pageCount()">›</button>
+          <button class="nav" (click)="pageSizeChange(pageCount())" [disabled]="page>=pageCount()">»</button>
+        </div>
+      </div>
+    </div>
   `
 })
 
-export class DataTableComponent {
-  @Input() data: any[] = [];
-  @Input() columns: ColumnDef[] = [];
-  @Input() rows = 10;
-  @Input() totalRecords?: number;
-  @Input() lazy = false;
-  @Input() loading = false;
+export class DataTableComponent<T> {
+  @Input() entityName = 'Registro';
+  @Input() columns: CrudColumn<T>[] = [];
+  @Input() rows: T[] = [];
+  @Input() total = 0;
+  @Input() page = 1;
+  @Input() pageSize = 5;
+  @Input() searchPlaceholder = 'Buscar...';
+  @Input() actions: CrudAction<T>[] = [];
+  
+  // @Output() onCreate = new EventEmitter<void>();
+  // @Output() onView = new EventEmitter<T>();
+  // @Output() onEdit = new EventEmitter<T>();
+  // @Output() onDelete = new EventEmitter<T>();
+  // @Output() onPage = new EventEmitter<{page:number,pageSize:number}>();
+  @Output() create = new EventEmitter<void>();
+  @Output() onSearch = new EventEmitter<string>();
+  @Output() pageChange = new EventEmitter<{page:number,pageSize:number}>();
+  @Output() action = new EventEmitter<{id:string,row:T}>();
 
-  @Output() addEvent = new EventEmitter<void>();
-  @Output() editEvent = new EventEmitter<any>();
-  @Output() deleteEvent = new EventEmitter<any>();
-  @Output() viewEvent = new EventEmitter<any>();
-  @Output() pageEvent = new EventEmitter<any>();
-  @Output() sortEvent = new EventEmitter<any>();
-  @Output() rowsChange = new EventEmitter<number>();
+  query = '';
 
-  onAdd() { this.addEvent.emit(); }
-  onEdit(row: any) { this.editEvent.emit(row); }
-  onDelete(row: any) { this.deleteEvent.emit(row); }
-  onView(row: any) { this.viewEvent.emit(row); }
-  onPageChange(e: any) { this.pageEvent.emit(e); }
-  onSort(e: any) { this.sortEvent.emit(e); }
-  onRowsChange(n: number) {
-    this.rows = n;
-    this.rowsChange.emit(n);
+  pageCount(){ return Math.max(1, Math.ceil(this.total / this.pageSize)); }
+  pages(){ return Array.from({length: this.pageCount()}, (_,i)=>i+1).slice(0, 6); }
+  pageSizeChange(p:number){
+    const np = Math.min(Math.max(1,p), this.pageCount());
+    this.page = np;
+    this.pageChange.emit({page: np, pageSize: this.pageSize});
   }
+  startIndex(){ return (this.page-1)*this.pageSize; }
+  endIndex(){ return Math.min(this.total, this.page*this.pageSize); }
+
+  emitAction(id:string, row:T){ this.action.emit({ id, row }); }
+
+  // displayCell(row: any, c: CrudColumn<any>) {
+  //   if (c.format) return c.format(row);
+  //   return this.readByKey(row, c.key);
+  // }
+
+  // private readByKey(obj: any, key: string | number | symbol) {
+  //   if (obj == null || key == null) return '';
+  //   // Si alguna vez quieres soportar claves anidadas con "a.b.c":
+  //   if (typeof key === 'string' && key.includes('.')) {
+  //     return key.split('.').reduce((acc, k) => acc?.[k], obj) ?? '';
+  //   }
+  //   return (obj as any)?.[key] ?? '';
+  // }
 }

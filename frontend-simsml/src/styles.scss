@@ -1,4 +1,12 @@
+@use 'app/theme/tokens';
 @import "primeicons/primeicons.css";
+
+body { 
+  background: var(--bg-1); 
+  color: var(--txt-1); 
+  font-family: Inter, system-ui, sans-serif; 
+  margin: 0;
+}
 
 /* utilidades layout */
 :root{
@@ -6,9 +14,27 @@
   --layout-sidebar-width: 250px;
   --layout-sidebar-width-collapsed: 72px;
   --layout-bg:#203338;
+  --app-bg: #29474f;         /* fondo app */
+  --panel-bg: #2f5660;       /* tarjetas/paneles */
+  --panel-bg-2:#254a52;      /* hover fila */
+  --header-cyan:#00B4E0;     /* cabecera tabla / acento */
+  --txt-1:#e9f1f2;           /* texto principal */
+  --txt-2:#b8c8cc;           /* texto muted */
+  --line: rgba(255,255,255,.06);
+  --muted: rgba(0,0,0,.28);
+  --shadow: 0 14px 40px rgba(0,0,0,.28);
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --h1: 61px;
+  --h2: 49px;
+  --h3: 39px;
+  --h4: 31px;
+  --h5: 25px;
+  --h6: 20px;
+  --p: 16px;
+  --small: 13px;
 }
 html,body{height:100%}
-body{margin:0;background:var(--layout-bg);font-family:Inter,system-ui,Segoe UI,Roboto,Arial}
 
 /* Layout base */
 .app-shell { display: grid; grid-template-rows: 64px 1fr; height: 100vh; }
@@ -29,7 +55,6 @@ body{margin:0;background:var(--layout-bg);font-family:Inter,system-ui,Segoe UI,R
 /* Tabla compartida */
 .data-table-caption { display: flex; gap: .75rem; align-items: center; justify-content: space-between; padding: .5rem; }
 .data-table-caption .left, .data-table-caption .right { display: flex; align-items: center; gap: .5rem; }
-
 
 /* Ícono hamburguesa más visible */
 .header-trigger { cursor: pointer; padding: .5rem; border-radius: .5rem; }

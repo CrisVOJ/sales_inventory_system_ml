@@ -1,0 +1,15 @@
+/* src/app/theme/_tokens.scss */
+:root {
+  --bg-1: #29474f;   /* fondo app */
+  --bg-2: #2f5660;   /* panel */
+  --bg-3: #0fb0c7;   /* header tabla / acento */
+  --txt-1: #e9f1f2;
+  --txt-2: #b8c8cc;
+  --muted: rgba(0,0,0,.28);
+  --hover: #2e798b;
+  --danger: #f05a4f;
+  --ok: #13c2a3;
+  --focus: #4fd1c5;
+  --shadow: 0 10px 30px rgba(0,0,0,.25);
+  --radius: 14px;
+}
