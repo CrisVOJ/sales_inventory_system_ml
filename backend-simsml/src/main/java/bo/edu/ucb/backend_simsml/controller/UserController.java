@@ -21,7 +21,8 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(Globals.baseApi + "user")
-@PreAuthorize("hasRole('ADMIN')")
+//@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("permitAll()")
 public class UserController {
 
     @Autowired
