@@ -1,0 +1,70 @@
+/* src/app/shared/ui/modal/modal.component.scss */
+.backdrop{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(2px);
+  z-index: 60;
+}
+
+/* TARJETA */
+.sheet{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  /* tamaño y layout */
+  width: min(920px, 92vw);
+  max-height: 80vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 1rem;
+
+  /* estilos */
+  background: var(--panel-bg, #2f5660);
+  color: var(--txt-1, #e9f1f2);
+  border-radius: var(--radius, 14px);
+  box-shadow: var(--shadow, 0 10px 30px rgba(0,0,0,.25));
+  z-index: 70;
+  overflow: hidden; /* evitar que el contenido sobresalga */
+}
+
+/* Tamaños opcionales via clase */
+.sheet.sm{ width: min(520px, 92vw); max-height: 70vh; }
+.sheet.md{ width: min(760px, 92vw); max-height: 80vh; } /* default implícita */
+.sheet.lg{ width: min(1100px, 96vw); max-height: 85vh; }
+
+.sheet__header,
+.sheet__footer{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--panel-bg, #2f5660);
+}
+
+.sheet__header h3{
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.icon{
+  border: 0;
+  background: transparent;
+  color: var(--txt-2, #b8c8cc);
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+/* OJO: en grid, para que el scroll funcione, min-height:0 */
+.sheet__body{
+  padding: 1rem 1.25rem;
+  background: var(--panel-bg, #2f5660);
+  min-height: 0;
+  overflow: auto;
+}
+
+/* Limpiezas del SCSS anterior */
+.sheet > *{ max-width: none; width: auto; } /* ya no limitamos hijos */

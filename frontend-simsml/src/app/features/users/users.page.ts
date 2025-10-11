@@ -2,7 +2,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataTableComponent, CrudColumn, CrudAction } from '../../shared/data-table/data-table.component';
-// import { ModalComponent } from '../../shared/ui/modal/modal.component';
+import { ModalComponent } from '../../shared/modal/modal.component';
 // import { ConfirmComponent } from '../../shared/ui/confirm/confirm.component';
 // import { ConfirmService } from '../../shared/ui/confirm/confirm.service';
 import { UsersService } from './users.service';
@@ -12,7 +12,11 @@ import { User } from './users.types';
 
 @Component({
   selector: 'users-page',
-  imports: [CommonModule, DataTableComponent],
+  imports: [
+    CommonModule, 
+    DataTableComponent,
+    ModalComponent
+  ],
   template: `
     <section class="page">
       <header class="page__header">
@@ -34,12 +38,12 @@ import { User } from './users.types';
         (action)="onRowAction($event)"
       />
 
-      <!-- Modal Crear/Editar
-      <ui-modal [open]="formOpen" [title]="formTitle" [hasFooter]="false" (close)="closeForm()">
-      <user-form [value]="editing" (cancel)="closeForm()" (submit)="save($event)"></user-form>
-      </ui-modal>
+      <!-- Modal Crear/Editar -->
+      <app-modal [open]="formOpen" [title]="formTitle" [hasFooter]="false" (close)="closeForm()">
+      <!-- <user-form [value]="editing" (cancel)="closeForm()" (submit)="save($event)"></user-form> -->
+      </app-modal>
 
-        Modal Detalle
+        <!-- Modal Detalle
       <ui-modal [open]="detailOpen" title="Detalle Usuario" (close)="detailOpen=false">
       <user-details [u]="selected"></user-details>
       </ui-modal>
@@ -110,7 +114,14 @@ export class UsersPage {
   paginate(p: {page:number, pageSize:number}){ this.page = p.page; this.pageSize = p.pageSize; this.load(); }
 
   openCreate() {
-    alert('Modal para crear usuario')
+    this.formTitle = 'Agregar Usuario';
+    this.editing = null;
+    this.formOpen = true;
+  }
+
+  closeForm(){ 
+    this.formOpen = false; 
+    this.editing = null; 
   }
 
   onRowAction(ev:{id:string,row:User}) {
@@ -120,9 +131,8 @@ export class UsersPage {
     }
   }
 
-//   openCreate(){ this.formTitle = 'Agregar Usuario'; this.editing = null; this.formOpen = true; }
 //   openEdit(row: User){ this.formTitle = 'Editar Usuario'; this.editing = row; this.formOpen = true; }
-//   closeForm(){ this.formOpen = false; this.editing = null; }
+//   
 
 //   save(payload: Partial<User>){
 //     const action = this.editing?.id
