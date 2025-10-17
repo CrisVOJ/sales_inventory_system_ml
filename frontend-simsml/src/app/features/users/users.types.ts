@@ -11,5 +11,5 @@ export interface User {
   password?: string;
   isEnabled: boolean;
   accountNoLocked: boolean;
-  role: string[];
+  roles: string[];
 }

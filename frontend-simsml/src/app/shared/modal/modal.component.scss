@@ -1,4 +1,3 @@
-/* src/app/shared/ui/modal/modal.component.scss */
 .backdrop{
   position: fixed;
   inset: 0;
@@ -41,13 +40,16 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem 1.25rem;
+  padding: 1rem 1.5rem;
   background: var(--panel-bg, #2f5660);
+}
+.sheet__header{
+  padding-bottom: 0;
 }
 
 .sheet__header h3{
   margin: 0;
-  font-size: 1.4rem;
+  font-size: var(--h5);
 }
 
 .icon{
@@ -60,7 +62,7 @@
 
 /* OJO: en grid, para que el scroll funcione, min-height:0 */
 .sheet__body{
-  padding: 1rem 1.25rem;
+  padding: .5rem 1.25rem;
   background: var(--panel-bg, #2f5660);
   min-height: 0;
   overflow: auto;

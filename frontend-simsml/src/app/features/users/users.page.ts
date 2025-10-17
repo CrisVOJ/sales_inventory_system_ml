@@ -3,20 +3,18 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DataTableComponent, CrudColumn, CrudAction } from '../../shared/data-table/data-table.component';
 import { ModalComponent } from '../../shared/modal/modal.component';
-// import { ConfirmComponent } from '../../shared/ui/confirm/confirm.component';
-// import { ConfirmService } from '../../shared/ui/confirm/confirm.service';
 import { UsersService } from './users.service';
 import { User } from './users.types';
-// import { UserFormComponent } from './user-form.component';
-// import { UserDetailsComponent } from './user-details.component';
+import { UserFormComponent } from "./user-form.component";
 
 @Component({
   selector: 'users-page',
   imports: [
-    CommonModule, 
+    CommonModule,
     DataTableComponent,
-    ModalComponent
-  ],
+    ModalComponent,
+    UserFormComponent
+],
   template: `
     <section class="page">
       <header class="page__header">
@@ -39,8 +37,26 @@ import { User } from './users.types';
       />
 
       <!-- Modal Crear/Editar -->
-      <app-modal [open]="formOpen" [title]="formTitle" [hasFooter]="false" (close)="closeForm()">
-      <!-- <user-form [value]="editing" (cancel)="closeForm()" (submit)="save($event)"></user-form> -->
+      <app-modal 
+        [open]="formOpen" 
+        [title]="formTitle" 
+        [hasFooter]="false" 
+        (close)="closeForm()"
+      >
+        <user-form 
+          [value]="editing" 
+          (cancel)="closeForm()" 
+          (submit)="onSubmitForm($event)"
+        />
+      </app-modal>
+
+      <app-modal 
+        [open]="detailOpen"
+        [title]="formTitle"
+        [hasFooter]="false"
+        (close)="detailOpen=false"
+      >
+
       </app-modal>
 
         <!-- Modal Detalle
@@ -96,9 +112,31 @@ export class UsersPage {
   q = '';
 
   constructor(
-    private api: UsersService 
-    //private confirm: ConfirmService
+    private users: UsersService 
   ){
+    this.load();
+  }
+
+  load(){ 
+    this.users.list({ 
+      q: this.q, 
+      page: this.page, 
+      pageSize: this.pageSize 
+    }).subscribe(r => { 
+      this.rows = r.rows; 
+      this.total = r.total; 
+    }); 
+  }
+  
+  search(s: string){ 
+    this.q = s; 
+    this.page = 1; 
+    this.load(); 
+  }
+
+  paginate(p: {page:number, pageSize:number}){ 
+    this.page = p.page;
+    this.pageSize = p.pageSize;
     this.load();
   }
 
@@ -109,13 +147,15 @@ export class UsersPage {
   detailOpen = false;
   selected: User | null = null;
 
-  load(){ this.api.list({ q: this.q, page: this.page, pageSize: this.pageSize }).subscribe(r => { this.rows = r.rows; this.total = r.total; }); }
-  search(s: string){ this.q = s; this.page = 1; this.load(); }
-  paginate(p: {page:number, pageSize:number}){ this.page = p.page; this.pageSize = p.pageSize; this.load(); }
-
   openCreate() {
     this.formTitle = 'Agregar Usuario';
     this.editing = null;
+    this.formOpen = true;
+  }
+
+  openEdit(row: User) {
+    this.formTitle = 'Actualizar Usuario';
+    this.editing = row;
     this.formOpen = true;
   }
 
@@ -127,19 +167,49 @@ export class UsersPage {
   onRowAction(ev:{id:string,row:User}) {
     switch(ev.id) {
       case 'view':    return alert(`Detalle de ${ev.row.username}`);
-      case 'edit':    return alert(`Editar ${ev.row.username}`);
+      case 'edit':    return this.openEdit(ev.row);
     }
   }
 
-//   openEdit(row: User){ this.formTitle = 'Editar Usuario'; this.editing = row; this.formOpen = true; }
-//   
+  onSubmitForm(payload: Partial<User>) {
+    const req$ = this.editing?.userId
+      ? this.users.update(this.editing.userId, payload)
+      : this.users.create(payload);
+    
+    req$.subscribe({
+      next: ok => {
+        if(ok) {
+          this.closeForm();
+          this.load();
+        } else {
+          alert('No autorizado o datos invalidos');
+        }
+      },
+      error: e => {
+        if (e.status === 403) alert('403: sin permisos suficientes');
+        else alert('Error inesperado');
+      }
+    })
+  }
 
-//   save(payload: Partial<User>){
-//     const action = this.editing?.id
-//       ? this.api.update(this.editing.id, payload)
-//       : this.api.create(payload as User);
-//     action.subscribe(() => { this.closeForm(); this.load(); });
-//   }
+  create(payload: Partial<User>){
+    this.users.create(payload).subscribe(ok => {
+      if(ok) this.load();
+    })
+  }
+
+  update(id: number, patch: Partial<User>){
+    this.users.update(id, patch).subscribe(ok => {
+      if(ok) this.load();
+    })
+  }
+
+  remove(id: number){
+    this.users.remove(id).subscribe(ok => {
+      if(ok) this.load();
+    })
+  }
+
 
 //   openDetails(row: User){ this.selected = row; this.detailOpen = true; }
 

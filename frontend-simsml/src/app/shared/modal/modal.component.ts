@@ -1,16 +1,22 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgIf, NgClass } from '@angular/common';
+import { Button } from "primeng/button";
 
 @Component({
   selector: 'app-modal',
-  imports: [NgIf, NgClass],
+  imports: [NgIf, NgClass, Button],
   styleUrls: ['./modal.component.scss'],
   template: `
     <div class="backdrop" *ngIf="open" (click)="backdropClose ? close.emit() : null"></div>
     <div class="sheet" *ngIf="open" [ngClass]="size">
       <header class="sheet__header">
         <h3>{{ title }}</h3>
-        <button class="icon" (click)="close.emit()">✕</button>
+        <p-button 
+          icon="pi pi-times" 
+          [rounded]="true" 
+          severity="danger"
+          (click)="close.emit()"
+        />
       </header>
 
       <section class="sheet__body">
