@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(Globals.baseApi + "user")
 //@PreAuthorize("hasRole('ADMIN')")
-@PreAuthorize("permitAll()")
+@PreAuthorize("hasRole('ADMIN')")
 public class UserController {
 
     @Autowired
@@ -48,7 +48,7 @@ public class UserController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Object> updateUser(@RequestBody @Valid UpdateUserRequest request) {
+    public ResponseEntity<Object> updateUser(@Valid @RequestBody UpdateUserRequest request) {
         try {
             Object response = userService.updateUser(request);
             return generateResponse(response);

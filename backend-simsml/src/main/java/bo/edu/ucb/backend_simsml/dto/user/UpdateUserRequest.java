@@ -13,10 +13,7 @@ public record UpdateUserRequest(@NotNull Long userId,
                                 @NotBlank String name,
                                 @NotBlank String paternalSurname,
                                 String maternalSurname,
-                                @NotBlank @Email String email,
                                 @NotBlank String username,
-                                @NotBlank String password,
-                                @NotNull boolean isEnabled,
-                                @NotNull boolean accountNoLocked,
+                                @NotBlank @Email String email,
                                 Set<@NotBlank String> roles) {
 }

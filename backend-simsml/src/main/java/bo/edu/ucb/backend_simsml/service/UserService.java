@@ -9,6 +9,7 @@ import bo.edu.ucb.backend_simsml.entity.RoleEntity;
 import bo.edu.ucb.backend_simsml.entity.UserEntity;
 import bo.edu.ucb.backend_simsml.repository.RolesRepository;
 import bo.edu.ucb.backend_simsml.repository.UserRepository;
+import bo.edu.ucb.backend_simsml.util.PasswordGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,6 +34,8 @@ public class UserService {
     // Create new user
     public Object createUser(CreateUserRequest request) {
         try {
+            String rawPassword = PasswordGenerator.generatePassword();
+
             Set<RoleEntity> roles = resolveRolesOrDefault(request.roles());
 
             UserEntity user = new UserEntity();
@@ -42,10 +45,10 @@ public class UserService {
             user.setName(request.name().trim());
             user.setPaternalSurname(request.paternalSurname().trim());
             user.setMaternalSurname(request.maternalSurname().trim());
-            user.setEmail(request.email().trim().toLowerCase());
             user.setUsername(request.username().trim().toLowerCase());
-            user.setPassword(passwordEncoder.encode(request.password().trim()));
+            user.setEmail(request.email().trim().toLowerCase());
             user.setRoles(roles);
+            user.setPassword(passwordEncoder.encode(rawPassword));
 
             userRepository.save(user);
             return new SuccessfulResponse("201", "Usuario creado exitosamente", user.getUsername());
@@ -65,23 +68,14 @@ public class UserService {
                 return new UnsuccessfulResponse("404", "Usuario no encontrado", request.username());
             }
 
-            String pass = user.getPassword();
-
-            if (!passwordEncoder.matches(request.password(), pass)) {
-                pass = passwordEncoder.encode(request.password().trim());
-            }
-
             user.setIdentityDoc(request.identityDoc().trim());
             user.setPhone(request.phone().trim());
             user.setAddress(request.address().trim());
             user.setName(request.name().trim());
             user.setPaternalSurname(request.paternalSurname().trim());
             user.setMaternalSurname(request.maternalSurname().trim());
-            user.setEmail(request.email().trim().toLowerCase());
             user.setUsername(request.username().trim().toLowerCase());
-            user.setPassword(pass);
-            user.setEnabled(request.isEnabled());
-            user.setAccountNoLocked(request.accountNoLocked());
+            user.setEmail(request.email().trim().toLowerCase());
 
             user.getRoles().clear();
             user.getRoles().addAll(roles);

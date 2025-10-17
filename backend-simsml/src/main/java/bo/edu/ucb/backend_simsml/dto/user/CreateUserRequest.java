@@ -11,8 +11,7 @@ public record CreateUserRequest(@NotBlank String identityDoc,
                                 @NotBlank String name,
                                 @NotBlank String paternalSurname,
                                 String maternalSurname,
-                                @Email @NotBlank String email,
                                 @NotBlank String username,
-                                @NotBlank String password,
+                                @Email @NotBlank String email,
                                 Set<@NotBlank String> roles) {
 }
