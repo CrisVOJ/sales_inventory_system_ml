@@ -12,8 +12,10 @@ export class AuthService {
     constructor(private http: HttpClient) {}
 
     login(username: string, password: string) {
+        this.logout();
+
         const body: AuthLoginRequest = { username, password };
-        console.log('Estamos dentro de login', body);
+        
         return this.http.post<AuthResponse>(environment.apiUrl + 'user/login', body).pipe(
             tap(res => {
                 console.log('AuthResponse', res);
