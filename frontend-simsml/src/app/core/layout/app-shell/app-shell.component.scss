@@ -13,10 +13,10 @@
   grid-template-columns:var(--layout-sidebar-width-collapsed) 1fr
 }
 
-/* 🟩 La columna del grid: aquí va SIEMPRE el borde negro fino */
+/* La columna del grid: aquí va SIEMPRE el borde negro fino */
 .app-sidebar{
   height:calc(100dvh - var(--layout-header-height));
-  border-right:1px solid #000 !important; /* más delgado */
+  border-right:1px solid #000 !important;
   background:var(--p-surface-0);
   min-width:0;overflow:hidden;position:relative;z-index:1;
 }

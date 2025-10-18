@@ -16,7 +16,7 @@ import { SidebarComponent } from '../../../shared/sidebar/sidebar.component';
   ]
 })
 export class AppShellComponent {
-  private _sidebarCollapsed = signal(false);
+  private _sidebarCollapsed = signal(true);
   sidebarCollapsed = this._sidebarCollapsed.asReadonly();
   toggleSidebar(){ this._sidebarCollapsed.update(v => !v); }
 }
