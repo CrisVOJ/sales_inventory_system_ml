@@ -44,6 +44,7 @@ import { UserFormComponent } from "./user-form.component";
         (close)="closeForm()"
       >
         <user-form 
+          *ngIf="formOpen"
           [value]="editing" 
           (cancel)="closeForm()" 
           (submit)="onSubmitForm($event)"
