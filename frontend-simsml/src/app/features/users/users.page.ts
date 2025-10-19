@@ -7,6 +7,8 @@ import { UsersService } from './users.service';
 import { User } from './users.types';
 import { UserFormComponent } from "./user-form.component";
 import { UserDetailsComponent } from "./user-details.component";
+import { ConfirmComponent } from '../../shared/confirm/confirm.component';
+import { ConfirmService } from '../../shared/confirm/confirm.service';
 
 @Component({
   selector: 'users-page',
@@ -15,7 +17,8 @@ import { UserDetailsComponent } from "./user-details.component";
     DataTableComponent,
     ModalComponent,
     UserFormComponent,
-    UserDetailsComponent
+    UserDetailsComponent,
+    ConfirmComponent
 ],
   template: `
     <section class="page">
@@ -62,13 +65,7 @@ import { UserDetailsComponent } from "./user-details.component";
         <user-details [u]="selected"/>
       </app-modal>
 
-        <!-- Modal Detalle
-      <ui-modal [open]="detailOpen" title="Detalle Usuario" (close)="detailOpen=false">
-      <user-details [u]="selected"></user-details>
-      </ui-modal>
-
-      Confirm global
-      <ui-confirm></ui-confirm> -->
+      <app-confirm/>
     </section>
   `,
   styles:[`
@@ -82,7 +79,7 @@ export class UsersPage {
   cols: CrudColumn<User>[] = [
     { key:'identityDoc', header:'Doc. Identidad',     width:'160px' },
     { key:'username',    header:'Nombre Usuario',  width:'220px' },
-    { key:'role',        header:'Rol',                width:'150px' },
+    { key:'roles',        header:'Rol',                width:'150px' },
     { key:'name',        header:'Nombre',
       format: (u) => [u.name, u.paternalSurname, u.maternalSurname].filter(Boolean).join(' ')
      },
@@ -115,7 +112,8 @@ export class UsersPage {
   q = '';
 
   constructor(
-    private users: UsersService 
+    private users: UsersService,
+    private confirm: ConfirmService
   ){
     this.load();
   }
@@ -168,6 +166,13 @@ export class UsersPage {
     this.detailOpen = true;
   }
 
+  async confirmDelete(row: User) {
+    const ok = await this.confirm.ask('Eliminar Usuario', `¿Está seguro de eliminar al Usuario: ${row.username}?`);
+    if (ok) {
+      this.remove(row.userId);
+    }
+  }
+
   closeForm(){ 
     this.formOpen = false; 
     this.editing = null; 
@@ -177,6 +182,7 @@ export class UsersPage {
     switch(ev.id) {
       case 'view':    return this.openDetail(ev.row);
       case 'edit':    return this.openEdit(ev.row);
+      case 'delete':  return this.confirmDelete(ev.row);
     }
   }
 

@@ -26,7 +26,8 @@ export abstract class BaseCrudService<TList, TSingle = TList> {
     let hp = new HttpParams()
       .set('page', String(Math.max(0, page - 1)))
       .set('size', String(pageSize))
-      .set('sort', sort || this.sortDefault);
+      .set('sort', sort || this.sortDefault)
+      .set('status', Boolean(true));
     if (q) hp = hp.set('filter', q);
     if (typeof status === 'boolean') hp = hp.set('status', String(status));
 
@@ -68,7 +69,7 @@ export abstract class BaseCrudService<TList, TSingle = TList> {
   }
 
   remove(id: string | number): Observable<boolean> {
-    return this.http.delete<ApiEnvelope<any>>(`${this.baseUrl}/${id}`).pipe(
+    return this.http.delete<ApiEnvelope<any>>(`${this.baseUrl}/disable?userId=${id}`).pipe(
       map(raw => !isUnsuccessful(raw) && String(raw.status).startsWith('2')),
       catchError(() => of(false))
     );

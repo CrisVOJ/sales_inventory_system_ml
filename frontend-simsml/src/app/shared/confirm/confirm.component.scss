@@ -1,0 +1,60 @@
+.backdrop { 
+    position:fixed; 
+    inset:0; 
+    background:rgba(0,0,0,.55); 
+    z-index:60; 
+}
+
+.dialog {
+    position: fixed; 
+    left:50%; 
+    top:50%; 
+    transform: translate(-50%,-50%);
+    background: var(--bg-2); 
+    color: var(--txt-1); 
+    padding: 1.25rem; 
+    border-radius: var(--radius);
+    box-shadow: var(--shadow); 
+    z-index:70; 
+    display: flex;
+    flex-direction: column;
+    gap: .75rem;
+    box-sizing: border-box;
+}
+.dialog h3 {
+    margin: 0;
+    text-align: center;
+    font-weight: 500;
+    line-height: 1.2;
+    font-size: var(--h5);
+}
+.dialog p {
+    margin: 0;
+    text-align: center;
+    font-weight: 400;
+    line-height: 1.45;
+    font-size: var(--p);
+}
+
+.row { 
+    display: flex; 
+    gap: .75rem; 
+    justify-content: center; 
+    margin-top: .25rem; 
+}
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;   
+    border: 0; 
+    padding: .5rem 1rem; 
+    border-radius: .5rem; 
+    cursor: pointer;
+    font-weight: 500;
+    font-size: var(--p);
+    background: #043248; 
+    color: var(--txt-1);
+}
+.btn.ghost{ 
+    background: var(--header-cyan);
+}

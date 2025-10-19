@@ -84,7 +84,7 @@ public class UserController {
         }
     }
 
-    @PutMapping("/disable")
+    @DeleteMapping("/disable")
     public ResponseEntity<Object> disableUser(@RequestParam("userId") Long userId) {
         try {
             Object response = userService.disableUser(userId);

@@ -1,11 +1,9 @@
 import { Component, Input } from "@angular/core";
-import { NgIf } from "@angular/common";
 import { User } from "./users.types";
 
 @Component({
     selector: 'user-details',
     standalone: true,
-    imports: [NgIf],
     template: `
         <div class="detail">
             <div><strong>Doc. Identidad: </strong> {{ u?.identityDoc || '-' }}</div>
