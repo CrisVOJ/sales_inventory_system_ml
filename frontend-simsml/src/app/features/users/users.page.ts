@@ -9,6 +9,7 @@ import { UserFormComponent } from "./user-form.component";
 import { UserDetailsComponent } from "./user-details.component";
 import { ConfirmComponent } from '../../shared/confirm/confirm.component';
 import { ConfirmService } from '../../shared/confirm/confirm.service';
+import { roleListLabel } from '../../shared/roles/role-labels';
 
 @Component({
   selector: 'users-page',
@@ -79,7 +80,9 @@ export class UsersPage {
   cols: CrudColumn<User>[] = [
     { key:'identityDoc', header:'Doc. Identidad',     width:'160px' },
     { key:'username',    header:'Nombre Usuario',  width:'220px' },
-    { key:'roles',        header:'Rol',                width:'150px' },
+    { key:'roles',        header:'Rol',                width:'150px', 
+      format: (u) => roleListLabel(u.roles)
+    },
     { key:'name',        header:'Nombre',
       format: (u) => [u.name, u.paternalSurname, u.maternalSurname].filter(Boolean).join(' ')
      },
@@ -224,12 +227,4 @@ export class UsersPage {
       if(ok) this.load();
     })
   }
-
-
-//   openDetails(row: User){ this.selected = row; this.detailOpen = true; }
-
-//   async confirmDelete(row: User){
-//     const ok = await this.confirm.ask('Eliminar Usuario', `¿Está seguro de eliminar al usuario: ${row.username}?`);
-//     if(ok){ this.api.remove(row.id).subscribe(()=> this.load()); }
-//   }
 }

@@ -6,10 +6,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { MultiSelectModule } from 'primeng/multiselect'
 
-interface Role {
-  name: string;
-  value: string;
-}
+type RoleOption = { name: string, value: string };
 
 export type UserFormValue = Omit<User, 'userId'>;
 
@@ -72,7 +69,7 @@ export type UserFormValue = Omit<User, 'userId'>;
         <p-multiselect
           id="roles"
           formControlName="roles"
-          [options]="roles"
+          [options]="rolesOptions"
           optionLabel="name"
           optionValue="value"
           display="chip"
@@ -153,16 +150,15 @@ export class UserFormComponent {
   @Output() submit = new EventEmitter<UserFormValue>();
   @Output() cancel = new EventEmitter<void>();
 
-  roles: Role[] = [
-      { name: 'Administrador', value: 'ADMIN' },
-      { name: 'Empleado', value: 'SELLER' }
-  ];
+  rolesOptions: RoleOption[] = [];
   
   form!: FormGroup;
 
   constructor(private fb: NonNullableFormBuilder) {}
 
   ngOnInit() {
+    this.rolesOptions = this.buildRoleOptions();
+    
     this.form = this.fb.group({
         identityDoc: this.fb.control(''),
         phone: this.fb.control(''),
@@ -184,6 +180,35 @@ export class UserFormComponent {
   ngOnChanges(){
     if (!this.form || !this.value) return;
     this.patchFromValue(this.value);
+  }
+
+  private buildRoleOptions(): RoleOption[] {
+    let allowedCodes: string[] = [];
+    try {
+      allowedCodes = JSON.parse(localStorage.getItem('roles') || '[]');
+    } catch {
+      allowedCodes = [];
+    }
+
+    if (!allowedCodes.length) allowedCodes = ['ADMIN', 'SELLER'];
+
+    const defaultLabels: Record<string, string> = {
+      ADMIN: 'Administrador',
+      SELLER: 'Vendedor',
+    };
+
+    let customLabels: Record<string, string> = {};
+    try {
+      customLabels = JSON.parse(localStorage.getItem('roles') || '{}');
+    } catch {
+      customLabels = {};
+    }
+    
+    const labels = { ...defaultLabels, ...customLabels };
+    return allowedCodes.map(code => ({ 
+      value: code, 
+      name: labels[code] 
+    }));
   }
 
   private patchFromValue(v: Partial<User>){

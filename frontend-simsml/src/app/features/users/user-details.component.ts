@@ -1,5 +1,6 @@
 import { Component, Input } from "@angular/core";
 import { User } from "./users.types";
+import { roleListLabel } from "../../shared/roles/role-labels";
 
 @Component({
     selector: 'user-details',
@@ -14,7 +15,7 @@ import { User } from "./users.types";
             <div><strong>Direccion: </strong> {{ u?.address || '-' }}</div>
             <div><strong>Nombre de Usuario: </strong> {{ u?.username || '-' }}</div>
             <div><strong>Correo Electrónico: </strong> {{ u?.email || '-' }}</div>
-            <div><strong>Roles: </strong> {{ u?.roles?.join(', ') || '-' }}</div>
+            <div><strong>Roles: </strong> {{ roleListLabel(u?.roles) || '-' }}</div>
         </div>
     `,
     styles: [`
@@ -31,4 +32,6 @@ import { User } from "./users.types";
 })
 export class UserDetailsComponent {
     @Input() u!: User | null;
+
+    roleListLabel = roleListLabel
 }
