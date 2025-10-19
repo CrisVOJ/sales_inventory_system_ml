@@ -191,7 +191,7 @@ export class UsersPage {
 
   onSubmitForm(payload: Partial<User>) {
     const req$ = this.editing?.userId
-      ? this.users.update(this.editing.userId, payload)
+      ? this.users.update({ ...payload, userId: this.editing.userId })
       : this.users.create(payload);
     
     req$.subscribe({
@@ -217,13 +217,13 @@ export class UsersPage {
   }
 
   update(id: number, patch: Partial<User>){
-    this.users.update(id, patch).subscribe(ok => {
+    this.users.update({ ...patch, userId: id }).subscribe(ok => {
       if(ok) this.load();
     })
   }
 
   remove(id: number){
-    this.users.remove(id).subscribe(ok => {
+    this.users.remove(id, 'userId').subscribe(ok => {
       if(ok) this.load();
     })
   }

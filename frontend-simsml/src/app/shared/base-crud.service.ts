@@ -60,16 +60,15 @@ export abstract class BaseCrudService<TList, TSingle = TList> {
     );
   }
 
-  update(id: string | number, dto: Partial<TSingle>): Observable<boolean> {
-    const body: any = { ...dto, userId: id };
-    return this.http.put<ApiEnvelope<any>>(`${this.baseUrl}/update`, body).pipe(
+  update(dto: Partial<TSingle>): Observable<boolean> {
+    return this.http.put<ApiEnvelope<any>>(`${this.baseUrl}/update`, dto).pipe(
       map(raw => !isUnsuccessful(raw) && String(raw.status).startsWith('2')),
       catchError(() => of(false))
     );
   }
 
-  remove(id: string | number): Observable<boolean> {
-    return this.http.delete<ApiEnvelope<any>>(`${this.baseUrl}/disable?userId=${id}`).pipe(
+  remove(id: string | number, entityName?: string): Observable<boolean> {
+    return this.http.delete<ApiEnvelope<any>>(`${this.baseUrl}/disable?${entityName}=${id}`).pipe(
       map(raw => !isUnsuccessful(raw) && String(raw.status).startsWith('2')),
       catchError(() => of(false))
     );

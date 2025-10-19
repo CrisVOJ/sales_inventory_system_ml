@@ -9,6 +9,5 @@ public record UpdateCustomerRequest(@NotNull Long customerId,
                                     String address,
                                     @NotBlank String name,
                                     @NotBlank String paternalSurname,
-                                    String maternalSurname,
-                                    boolean active) {
+                                    String maternalSurname) {
 }

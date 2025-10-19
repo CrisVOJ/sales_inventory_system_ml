@@ -100,7 +100,6 @@ public class CustomerService {
             customer.setName(request.name().trim());
             customer.setPaternalSurname(request.paternalSurname().trim());
             customer.setMaternalSurname(request.maternalSurname().trim());
-            customer.setActive(request.active());
             customer.setUpdatedAt(LocalDateTime.now());
 
             customerRepository.save(customer);
