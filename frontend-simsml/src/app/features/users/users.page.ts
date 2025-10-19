@@ -6,6 +6,7 @@ import { ModalComponent } from '../../shared/modal/modal.component';
 import { UsersService } from './users.service';
 import { User } from './users.types';
 import { UserFormComponent } from "./user-form.component";
+import { UserDetailsComponent } from "./user-details.component";
 
 @Component({
   selector: 'users-page',
@@ -13,7 +14,8 @@ import { UserFormComponent } from "./user-form.component";
     CommonModule,
     DataTableComponent,
     ModalComponent,
-    UserFormComponent
+    UserFormComponent,
+    UserDetailsComponent
 ],
   template: `
     <section class="page">
@@ -57,7 +59,7 @@ import { UserFormComponent } from "./user-form.component";
         [hasFooter]="false"
         (close)="detailOpen=false"
       >
-
+        <user-details [u]="selected"/>
       </app-modal>
 
         <!-- Modal Detalle
@@ -160,6 +162,12 @@ export class UsersPage {
     this.formOpen = true;
   }
 
+  openDetail(row: User) {
+    this.formTitle = 'Detalles de Usuario';
+    this.selected = row;
+    this.detailOpen = true;
+  }
+
   closeForm(){ 
     this.formOpen = false; 
     this.editing = null; 
@@ -167,7 +175,7 @@ export class UsersPage {
 
   onRowAction(ev:{id:string,row:User}) {
     switch(ev.id) {
-      case 'view':    return alert(`Detalle de ${ev.row.username}`);
+      case 'view':    return this.openDetail(ev.row);
       case 'edit':    return this.openEdit(ev.row);
     }
   }
