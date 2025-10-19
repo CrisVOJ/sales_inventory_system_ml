@@ -72,7 +72,7 @@ public class ProductController {
         }
     }
 
-    @PutMapping("/disable")
+    @DeleteMapping("/disable")
     public ResponseEntity<Object> disable(@RequestParam("productId") Long productId) {
         try {
             Object response = productService.disableProduct(productId);

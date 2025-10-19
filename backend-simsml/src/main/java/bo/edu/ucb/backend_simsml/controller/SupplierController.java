@@ -72,7 +72,7 @@ public class SupplierController {
         }
     }
 
-    @PutMapping("/disable")
+    @DeleteMapping("/disable")
     public ResponseEntity<Object> disableSupplier(@RequestParam("supplierId") Long supplierId) {
         try {
             Object response = supplierService.disableSupplier(supplierId);

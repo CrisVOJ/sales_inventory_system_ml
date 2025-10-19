@@ -72,7 +72,7 @@ public class CustomerController {
         }
     }
 
-    @PutMapping("/disable")
+    @DeleteMapping("/disable")
     public ResponseEntity<Object> disableCustomer(@RequestParam("customerId") Long customerId) {
         try {
             Object response = customerService.disableCustomer(customerId);

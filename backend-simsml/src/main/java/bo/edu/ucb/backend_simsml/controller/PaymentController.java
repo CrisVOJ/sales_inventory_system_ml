@@ -75,7 +75,7 @@ public class PaymentController {
         }
     }
 
-    @PutMapping("/disable")
+    @DeleteMapping("/disable")
     public ResponseEntity<Object> disablePayment(@RequestParam("paymentId") Long paymentId) {
         try {
             Object response = paymentService.disablePayment(paymentId);

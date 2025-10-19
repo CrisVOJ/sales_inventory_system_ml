@@ -71,7 +71,7 @@ public class InventoryController {
         }
     }
 
-    @PutMapping("/disable")
+    @DeleteMapping("/disable")
     public ResponseEntity<Object> disableInventory(@RequestParam("inventoryId") Long inventoryId) {
         try {
             Object response = inventoryService.disableInventory(inventoryId);

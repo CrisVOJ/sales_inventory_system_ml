@@ -51,7 +51,7 @@ public class CategoryController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Object> getUser(@RequestParam("categoryId") Long categoryId) {
+    public ResponseEntity<Object> getCategory(@RequestParam("categoryId") Long categoryId) {
         try {
             Object response = categoryService.getCategoryById(categoryId);
             return generateResponse(response);
@@ -72,8 +72,8 @@ public class CategoryController {
         }
     }
 
-    @PutMapping("/disable")
-    public ResponseEntity<Object> disableUser(@RequestParam("categoryId") Long categoryId) {
+    @DeleteMapping("/disable")
+    public ResponseEntity<Object> disableCategory(@RequestParam("categoryId") Long categoryId) {
         try {
             Object response = categoryService.disableCategory(categoryId);
             return generateResponse(response);
