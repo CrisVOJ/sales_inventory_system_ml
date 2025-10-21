@@ -22,6 +22,7 @@ export class SidebarComponent {
     { label: 'Inicio',       icon: 'pi pi-home',          routerLink: ['/'],            routerLinkActiveOptions: { exact: true } },
     { label: 'Ventas',       icon: 'pi pi-shopping-cart', routerLink: ['/sales'],       routerLinkActiveOptions: { exact: true } },
     { label: 'Productos',    icon: 'pi pi-inbox',         routerLink: ['/products'],    routerLinkActiveOptions: { exact: true } },
+    { label: 'Categorias',   icon: 'pi pi-table',         routerLink: ['/categories'],  routerLinkActiveOptions: { exact: true } },
     { label: 'Clientes',     icon: 'pi pi-users',         routerLink: ['/customers'],   routerLinkActiveOptions: { exact: true } },
     { label: 'Predicciones', icon: 'pi pi-lightbulb',     routerLink: ['/predictions'], routerLinkActiveOptions: { exact: true } },
     { label: 'Usuarios',     icon: 'pi pi-user',          routerLink: ['/users'],       routerLinkActiveOptions: { exact: true } }
