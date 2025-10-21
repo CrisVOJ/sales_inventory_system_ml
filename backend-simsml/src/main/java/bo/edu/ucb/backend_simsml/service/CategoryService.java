@@ -81,7 +81,6 @@ public class CategoryService {
 
             category.setName(request.name().trim());
             category.setDescription(request.description().trim());
-            category.setActive(request.active());
 
             categoryRepository.save(category);
             return new SuccessfulResponse("200", "Categoria actualizada", category.getName());

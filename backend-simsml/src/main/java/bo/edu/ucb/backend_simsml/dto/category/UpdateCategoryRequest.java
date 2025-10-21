@@ -5,6 +5,5 @@ import jakarta.validation.constraints.NotNull;
 
 public record UpdateCategoryRequest(@NotNull Long categoryId,
                                     @NotBlank String name,
-                                    String description,
-                                    @NotNull boolean active) {
+                                    String description) {
 }
