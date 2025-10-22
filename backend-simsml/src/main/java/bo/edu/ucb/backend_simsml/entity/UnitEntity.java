@@ -22,4 +22,8 @@ public class UnitEntity {
     @Column(name = "active")
     private boolean active;
 
+    @PrePersist
+    protected void onCreate() {
+        active = true;
+    }
 }
