@@ -3,6 +3,7 @@ package bo.edu.ucb.backend_simsml.service;
 import bo.edu.ucb.backend_simsml.dto.SuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.UnsuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.category.CategoryResponse;
+import bo.edu.ucb.backend_simsml.dto.category.CategorySummary;
 import bo.edu.ucb.backend_simsml.dto.category.CreateCategoryRequest;
 import bo.edu.ucb.backend_simsml.dto.category.UpdateCategoryRequest;
 import bo.edu.ucb.backend_simsml.entity.CategoryEntity;
@@ -10,7 +11,10 @@ import bo.edu.ucb.backend_simsml.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class CategoryService {
@@ -48,6 +52,24 @@ public class CategoryService {
             return new UnsuccessfulResponse("404", "No hay categorias registradas", null);
         } catch (Exception e) {
             return new UnsuccessfulResponse("500", "Error al obtener categorias", e.getMessage());
+        }
+    }
+
+    public Object getCategoriesSummary() {
+        try {
+            List<CategorySummary> categories = categoryRepository.findAllCategoriesSummary()
+                    .stream().map(categorySummary -> new CategorySummary(
+                            categorySummary.getCategoryId(),
+                            categorySummary.getName()
+                    )).toList();
+
+            if (!categories.isEmpty()) {
+                return new SuccessfulResponse("200", "Resumen de categorias encontradas", categories);
+            }
+
+            return new UnsuccessfulResponse("404", "No hay categorias registradas", null);
+        } catch (Exception e) {
+            return new UnsuccessfulResponse("500", "Error al obtener resumen de categorias", e.getMessage());
         }
     }
 

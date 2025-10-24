@@ -50,6 +50,17 @@ public class CategoryController {
         }
     }
 
+    @GetMapping("/allSummary")
+    public ResponseEntity<Object> getCategoriesSummary() {
+        try {
+            Object response = categoryService.getCategoriesSummary();
+            return generateResponse(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UnsuccessfulResponse("400", "Error al obtener resumen de categorias", e.getMessage()));
+        }
+    }
+
     @GetMapping("/")
     public ResponseEntity<Object> getCategory(@RequestParam("categoryId") Long categoryId) {
         try {
