@@ -10,7 +10,6 @@ public record UpdateProductRequest(@NotNull Long productId,
                                    String description,
                                    @NotBlank String code,
                                    @NotNull @DecimalMin("0.0") BigDecimal suggestedPrice,
-                                   @NotNull Boolean active,
                                    @NotEmpty Set<@NotNull Long> categories,
-                                   @NotNull Long unitId) {
+                                   @NotNull Long unit) {
 }

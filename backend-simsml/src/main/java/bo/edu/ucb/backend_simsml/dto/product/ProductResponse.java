@@ -6,7 +6,7 @@ import bo.edu.ucb.backend_simsml.dto.unit.UnitResponse;
 import java.math.BigDecimal;
 import java.util.Set;
 
-public record ProductResponse(
+public record   ProductResponse(
         Long productId,
         String name,
         String description,

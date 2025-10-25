@@ -10,5 +10,5 @@ public record CreateProductRequest(@NotBlank String name,
                                    @NotBlank String code,
                                    @NotNull @DecimalMin("0.0") BigDecimal suggestedPrice,
                                    @NotEmpty Set<@NotNull Long> categories,
-                                   @NotNull Long unitId) {
+                                   @NotNull Long unit) {
 }

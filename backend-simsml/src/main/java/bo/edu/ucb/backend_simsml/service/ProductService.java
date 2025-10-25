@@ -48,7 +48,7 @@ public class ProductService {
                 throw new BadRequestException("Categorias inexistentes" + missing);
             }
 
-            UnitEntity unit = unitRepository.findById(request.unitId()).orElse(null);
+            UnitEntity unit = unitRepository.findById(request.unit()).orElse(null);
 
             if (unit == null) {
                 return new UnsuccessfulResponse("404", "Unidad no encontrada", null);
@@ -137,7 +137,7 @@ public class ProductService {
                 throw new BadRequestException("Categorias inexistentes" + missing);
             }
 
-            UnitEntity unit = unitRepository.findById(request.unitId()).orElse(null);
+            UnitEntity unit = unitRepository.findById(request.unit()).orElse(null);
 
             if (unit == null) {
                 return new UnsuccessfulResponse("404", "Unidad no encontrada", null);
@@ -154,7 +154,6 @@ public class ProductService {
             product.setDescription(request.description().trim());
             product.setCode(request.code().trim());
             product.setSuggestedPrice(request.suggestedPrice());
-            product.setActive(request.active());
             product.getCategories().clear();
             product.getCategories().addAll(found);
             product.setUnit(unit);
