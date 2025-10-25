@@ -4,3 +4,8 @@ export interface Category {
     description?: string;
     active: boolean;
 }
+
+export interface CategorySummary {
+    categoryId: number;
+    name: string;
+}
