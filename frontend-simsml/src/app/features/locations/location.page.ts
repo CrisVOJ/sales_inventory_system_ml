@@ -203,18 +203,6 @@ export class LocationsPage {
         })
     }
 
-    // create(payload: Partial<Category>) {
-    //     this.categories.create(payload).subscribe(ok => {
-    //         if(ok) this.load();
-    //     })
-    // }
-
-    // update(id: number, patch: Partial<Category>) {
-    //     this.categories.update({ ...patch, categoryId: id }).subscribe(ok => {
-    //         if(ok) this.load();
-    //     })
-    // }
-
     remove(id: number) {
         this.locations.remove(id, 'locationId').subscribe(ok => {
             if(ok) this.load();
