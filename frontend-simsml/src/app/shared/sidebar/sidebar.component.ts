@@ -21,6 +21,7 @@ export class SidebarComponent {
   private _menu = signal<MenuItem[]>([
     { label: 'Inicio',       icon: 'pi pi-home',          routerLink: ['/'],            routerLinkActiveOptions: { exact: true } },
     { label: 'Ventas',       icon: 'pi pi-shopping-cart', routerLink: ['/sales'],       routerLinkActiveOptions: { exact: true } },
+    { label: 'Ubicaciones',  icon: 'pi pi-map-marker',    routerLink: ['/locations'],   routerLinkActiveOptions: { exact: true } },
     { label: 'Productos',    icon: 'pi pi-inbox',         routerLink: ['/products'],    routerLinkActiveOptions: { exact: true } },
     { label: 'Categorias',   icon: 'pi pi-table',         routerLink: ['/categories'],  routerLinkActiveOptions: { exact: true } },
     { label: 'Clientes',     icon: 'pi pi-users',         routerLink: ['/customers'],   routerLinkActiveOptions: { exact: true } },
