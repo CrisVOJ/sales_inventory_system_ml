@@ -10,15 +10,15 @@ import { Category } from "./categories.types";
 import { CategoriesService } from "./categories.service";
 
 @Component({
-    selector: 'customers-page',
+    selector: 'categories-page',
     imports: [
-    CommonModule,
-    DataTableComponent,
-    ModalComponent,
-    CategoryFormComponent,
-    ConfirmComponent,
-    CategoryDetailsComponent
-],
+        CommonModule,
+        DataTableComponent,
+        ModalComponent,
+        CategoryFormComponent,
+        ConfirmComponent,
+        CategoryDetailsComponent
+    ],
     template: `
         <section class="page">
             <header class="page__header">
@@ -46,7 +46,7 @@ import { CategoriesService } from "./categories.service";
                 [hasFooter]="false"
                 (close)="closeForm()"
             >
-                <customer-form
+                <category-form
                     *ngIf="formOpen"
                     [value]="editing"
                     (cancel)="closeForm()"
@@ -60,7 +60,7 @@ import { CategoriesService } from "./categories.service";
                 [hasFooter]="false"
                 (close)="detailOpen = false"
             >
-                <customer-details [c]="selected"/>
+                <cateogory-details [c]="selected"/>
             </app-modal>
 
             <app-confirm/>

@@ -2,7 +2,7 @@ import { Component, Input } from "@angular/core";
 import { Category } from "./categories.types";
 
 @Component({
-    selector: 'customer-details',
+    selector: 'cateogory-details',
     standalone: true,
     template: `
         <div class="detail">

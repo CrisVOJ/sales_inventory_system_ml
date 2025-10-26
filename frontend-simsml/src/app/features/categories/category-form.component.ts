@@ -7,7 +7,7 @@ import { FloatLabelModule } from "primeng/floatlabel";
 export type CategoryFormValue = Omit<Category, 'categoryId'>
 
 @Component({
-    selector: 'customer-form',
+    selector: 'category-form',
     standalone: true,
     imports: [
         ReactiveFormsModule,
