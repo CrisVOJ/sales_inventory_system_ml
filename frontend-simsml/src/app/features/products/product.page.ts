@@ -10,15 +10,15 @@ import { ProductFormComponent } from "./product-form.component";
 import { ProductDetailsComponent } from "./product-details.component";
 
 @Component({
-    selector: 'customers-page',
+    selector: 'products-page',
     imports: [
-    CommonModule,
-    DataTableComponent,
-    ModalComponent,
-    ConfirmComponent,
-    ProductFormComponent,
-    ProductDetailsComponent
-],
+        CommonModule,
+        DataTableComponent,
+        ModalComponent,
+        ConfirmComponent,
+        ProductFormComponent,
+        ProductDetailsComponent
+    ],
     template: `
         <section class="page">
             <header class="page__header">
@@ -80,7 +80,7 @@ import { ProductDetailsComponent } from "./product-details.component";
         }
     `]
 })
-export class CategoriesPage {
+export class ProductsPage {
     cols: CrudColumn<Product>[] = [
         {   key: 'code',            header: 'Código'                },
         {   key: 'name',            header: 'Nombre'                },
