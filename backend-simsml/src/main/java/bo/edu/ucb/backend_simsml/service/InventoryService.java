@@ -32,14 +32,14 @@ public class InventoryService {
 
     public Object createInventory(CreateInventoryRequest request) {
         try {
-            ProductEntity product = productRepository.findById(request.productId())
+            ProductEntity product = productRepository.findById(request.product())
                     .orElse(null);
 
             if (product == null) {
                 return new UnsuccessfulResponse("404", "No se pudo encontrar el producto", null);
             }
 
-            LocationEntity location = locationRepository.findById(request.locationId())
+            LocationEntity location = locationRepository.findById(request.location())
                     .orElse(null);
 
             if (location == null) {
@@ -105,7 +105,7 @@ public class InventoryService {
 
     public Object updateInventory(UpdateInventoryRequest request) {
         try {
-            ProductEntity product = productRepository.findById(request.productId())
+            ProductEntity product = productRepository.findById(request.product())
                     .orElse(null);
 
             if (product == null) {
@@ -119,7 +119,7 @@ public class InventoryService {
                 return new UnsuccessfulResponse("404", "No se pudo encontrar el inventario", null);
             }
 
-            LocationEntity location = locationRepository.findById(request.locationId())
+            LocationEntity location = locationRepository.findById(request.location())
                     .orElse(null);
 
             if (location == null) {
@@ -130,7 +130,6 @@ public class InventoryService {
             inventory.setMinimumStock(request.minimumStock());
             inventory.setProduct(product);
             inventory.setLocation(location);
-            inventory.setActive(request.active());
             inventory.setUpdatedAt(LocalDateTime.now());
 
             inventoryRepository.save(inventory);

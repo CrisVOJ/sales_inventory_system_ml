@@ -50,8 +50,19 @@ public class ProductController {
         }
     }
 
+    @GetMapping("/allSummary")
+    public ResponseEntity<Object> getProductsSummary() {
+        try {
+            Object response = productService.getProductsSummary();
+            return generateResponse(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UnsuccessfulResponse("400", "Error al obtener resumen de productos", e.getMessage()));
+        }
+    }
+
     @GetMapping("/")
-    public ResponseEntity<Object> getInventory(@RequestParam("productId") Long productId) {
+    public ResponseEntity<Object> getProduct(@RequestParam("productId") Long productId) {
         try {
             Object response = productService.getProduct(productId);
             return generateResponse(response);

@@ -5,6 +5,7 @@ import bo.edu.ucb.backend_simsml.dto.UnsuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.category.CategorySummary;
 import bo.edu.ucb.backend_simsml.dto.product.CreateProductRequest;
 import bo.edu.ucb.backend_simsml.dto.product.ProductResponse;
+import bo.edu.ucb.backend_simsml.dto.product.ProductSummary;
 import bo.edu.ucb.backend_simsml.dto.product.UpdateProductRequest;
 import bo.edu.ucb.backend_simsml.dto.unit.UnitResponse;
 import bo.edu.ucb.backend_simsml.entity.CategoryEntity;
@@ -93,6 +94,24 @@ public class ProductService {
             return new SuccessfulResponse("200", "Productos encontrados exitosamente", products);
         } catch (Exception e) {
             return new UnsuccessfulResponse("500", "Error al obtener los productos", e.getMessage());
+        }
+    }
+
+    public Object getProductsSummary() {
+        try {
+            List<ProductSummary> productsSummary = productRepository.findAllProductsSummary()
+                    .stream().map(productSummary -> new ProductSummary(
+                            productSummary.getProductId(),
+                            productSummary.getName()
+                    )).toList();
+
+            if (productsSummary.isEmpty()) {
+                return new UnsuccessfulResponse("404", "No se encontró resumen de productos", null);
+            }
+
+            return new SuccessfulResponse("200", "Resumen de roductos encontrados exitosamente", productsSummary);
+        } catch (Exception e) {
+            return new UnsuccessfulResponse("500", "Error al obtener resumen de productos", e.getMessage());
         }
     }
 

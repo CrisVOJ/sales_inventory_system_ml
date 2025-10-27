@@ -7,6 +7,5 @@ public record UpdateInventoryRequest(@NotNull Long inventoryId,
                                      @NotNull @Min(0) Long currentStock,
                                      @Min(0) Long minimumStock,
                                      @NotNull Long product,
-                                     @NotNull Long location,
-                                     @NotNull boolean active) {
+                                     @NotNull Long location) {
 }

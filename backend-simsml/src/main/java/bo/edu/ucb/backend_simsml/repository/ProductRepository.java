@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 
     @Query(value = "SELECT p FROM products p " +
@@ -18,5 +20,11 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             "(:status IS NULL OR p.active = :status)"
     )
     Page<ProductEntity> findAllProducts(@Param("filter") String filter, @Param("status") Boolean status, Pageable pageable);
+
+    @Query(value = "SELECT p FROM products p " +
+            "WHERE (" +
+            "p.active = true) " +
+            "ORDER BY p.name ASC")
+    List<ProductEntity> findAllProductsSummary();
 
 }
