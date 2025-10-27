@@ -1,8 +1,10 @@
 import { Injectable } from "@angular/core";
 import { BaseCrudService } from "../../shared/base-crud.service";
-import { Product } from "./products.types";
+import { Product, ProductSummary } from "./products.types";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
+import { catchError, map, Observable, of } from "rxjs";
+import { ApiEnvelope, isUnsuccessful } from "../../shared/api.types";
 
 @Injectable({ providedIn: 'root' })
 export class ProductsService extends BaseCrudService<Product> {
@@ -24,5 +26,15 @@ export class ProductsService extends BaseCrudService<Product> {
                 : (p.categories ? [p.categories] : []),
             unit: p.unit ?? null
         }
+    }
+
+    productSummayList(): Observable<ProductSummary[] | null> {
+        return this.http.get<ApiEnvelope<any>>(`${this.baseUrl}/allSummary`).pipe(
+            map(raw => {
+                if (isUnsuccessful(raw)) return null;
+                return Array.isArray(raw.result) ? raw.result.map(x => this.normalize(x)) : [];
+            }),
+            catchError(() => of(null))
+        )
     }
 }

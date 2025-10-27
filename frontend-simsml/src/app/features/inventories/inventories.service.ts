@@ -1,29 +1,31 @@
 import { Injectable } from "@angular/core";
 import { BaseCrudService } from "../../shared/base-crud.service";
-import { Location, Locationsummary } from "./locations.types";
+import { Inventory } from "./inventories.types";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
 import { catchError, map, Observable, of } from "rxjs";
 import { ApiEnvelope, isUnsuccessful } from "../../shared/api.types";
+import { Product } from "../products/products.types";
 
 @Injectable({ providedIn: 'root' })
-export class LocationsService extends BaseCrudService<Location> {
-
+export class InventoriesService extends BaseCrudService<Inventory> {
 
     constructor(http: HttpClient) {
-        super(http, environment.apiUrl + 'location');
+        super(http, environment.apiUrl + 'inventory');
     }
 
-    protected override normalize(l: any): Location {
+    protected override normalize(i: any): Inventory {
         return {
-            locationId: l.locationId ?? l.id ?? l.location_id,
-            code: l.code ?? '',
-            name: l.name ?? '',
-            active: typeof l.active === 'boolean' ? l.active : !!l.active
+            inventoryId: i.inventoryId ?? i.id ?? i.inventory_id,
+            currentStock: i.currentStock ?? i.current_stock,
+            minimumStock: i.minimumStock ?? i.minimum_stock,
+            product: i.product ?? i.product_id,
+            location: i.location ?? i.location_id,
+            active: typeof i.active === 'boolean' ? i.active : !!i.active
         }
     }
 
-    locationsSummaryList(): Observable<Locationsummary[] | null> {
+    productsSummaryList(): Observable<Inventory[] | null> {
         return this.http.get<ApiEnvelope<any>>(`${this.baseUrl}/allSummary`).pipe(
             map(raw => {
                 if (isUnsuccessful(raw)) return null;
