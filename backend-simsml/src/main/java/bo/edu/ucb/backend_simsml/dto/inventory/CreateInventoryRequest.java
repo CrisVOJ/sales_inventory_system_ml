@@ -5,6 +5,6 @@ import jakarta.validation.constraints.NotNull;
 
 public record CreateInventoryRequest(@NotNull @Min(0) Long currentStock,
                                      @Min(0) Long minimumStock,
-                                     @NotNull Long productId,
-                                     @NotNull Long locationId) {
+                                     @NotNull Long product,
+                                     @NotNull Long location) {
 }
