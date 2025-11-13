@@ -9,5 +9,6 @@ export const routes: Routes = [
     { path: 'products', canActivate: [authGuard], loadComponent: () => import('./features/products/product.page').then(m => m.ProductsPage) },
     { path: 'locations', canActivate: [authGuard], loadComponent: () => import('./features/locations/location.page').then(m => m.LocationsPage) },
     { path: 'inventories', canActivate: [authGuard], loadComponent: () => import('./features/inventories/inventory.page').then(m => m.InventoriesPage) },
+    { path: 'sales', canActivate: [authGuard], loadComponent: () => import('./features/sales/sale.page').then(m => m.SalesPage) },
     { path: '**', redirectTo: '' },
 ];

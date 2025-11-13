@@ -15,4 +15,5 @@ export interface Product {
 export interface ProductSummary {
     productId: number;
     name: string;
+    suggestedPrice: number;
 }

@@ -13,3 +13,11 @@ export interface User {
   accountNoLocked: boolean;
   roles: string[];
 }
+
+
+export interface UserSummary {
+  userId: number;
+  name: string;
+  paternalSurname: string;
+  username: string;
+}

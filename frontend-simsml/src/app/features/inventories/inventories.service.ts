@@ -25,13 +25,23 @@ export class InventoriesService extends BaseCrudService<Inventory> {
         }
     }
 
-    productsSummaryList(): Observable<Inventory[] | null> {
+    inventorySummaryList(): Observable<Inventory[] | null> {
         return this.http.get<ApiEnvelope<any>>(`${this.baseUrl}/allSummary`).pipe(
             map(raw => {
                 if (isUnsuccessful(raw)) return null;
                 return Array.isArray(raw.result) ? raw.result.map(x => this.normalize(x)) : [];
             }),
             catchError(() => of(null))
+        )
+    }
+
+    inventoryByLocation(locationId: number): Observable<Inventory[]> {
+        return this.http.get<ApiEnvelope<any>>(`${this.baseUrl}/location?locationId=${locationId}`).pipe(
+            map(raw => {
+                if (isUnsuccessful(raw)) return [] as Inventory[];
+                return Array.isArray(raw.result) ? raw.result.map(x => this.normalize(x)) : [];
+            }),
+            catchError(() => of([] as Inventory[])) 
         )
     }
 }

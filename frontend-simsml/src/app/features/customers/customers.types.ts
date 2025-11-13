@@ -8,3 +8,11 @@ export interface Customer {
     maternalSurname?: string;
     active: boolean;
 }
+
+export interface CustomerSummary {
+    customerId: number;
+    identityDocument?: string;
+    name: string;
+    paternalSurname: string;
+    maternalSurname?: string;
+}
