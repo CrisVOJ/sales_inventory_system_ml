@@ -6,6 +6,6 @@ import java.math.BigDecimal;
 
 public record CreatePurchaseDetailRequest(@NotNull Integer productQuantity,
                                           BigDecimal unitPrice,
-                                          @NotNull Long purchaseId,
-                                          @NotNull Long productId) {
+                                          @NotNull Long purchase,
+                                          @NotNull Long inventory) {
 }

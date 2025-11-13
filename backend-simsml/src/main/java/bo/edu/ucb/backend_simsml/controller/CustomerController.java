@@ -50,6 +50,18 @@ public class CustomerController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
+    @GetMapping("/allSummary")
+    public ResponseEntity<Object> getCustomersSummary() {
+        try {
+            Object response = customerService.getCutomersSummary();
+            return generateResponse(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UnsuccessfulResponse("400", "Error al obtener resumen de clientes", e.getMessage()));
+        }
+    }
+
     @GetMapping("/")
     public ResponseEntity<Object> getCustomer(@RequestParam("customerId") Long customerId) {
         try {

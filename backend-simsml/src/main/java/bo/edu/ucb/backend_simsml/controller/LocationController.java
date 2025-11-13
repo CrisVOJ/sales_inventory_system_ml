@@ -51,6 +51,7 @@ public class LocationController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @GetMapping("/allSummary")
     public ResponseEntity<Object> getLocationsSummary() {
         try {

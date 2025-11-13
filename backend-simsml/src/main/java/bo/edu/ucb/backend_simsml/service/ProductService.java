@@ -100,10 +100,7 @@ public class ProductService {
     public Object getProductsSummary() {
         try {
             List<ProductSummary> productsSummary = productRepository.findAllProductsSummary()
-                    .stream().map(productSummary -> new ProductSummary(
-                            productSummary.getProductId(),
-                            productSummary.getName()
-                    )).toList();
+                    .stream().map(ProductSummary::from).toList();
 
             if (productsSummary.isEmpty()) {
                 return new UnsuccessfulResponse("404", "No se encontró resumen de productos", null);

@@ -4,6 +4,7 @@ import bo.edu.ucb.backend_simsml.dto.SuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.UnsuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.customer.CreateCustomerRequest;
 import bo.edu.ucb.backend_simsml.dto.customer.CustomerResponse;
+import bo.edu.ucb.backend_simsml.dto.customer.CustomerSummary;
 import bo.edu.ucb.backend_simsml.dto.customer.UpdateCustomerRequest;
 import bo.edu.ucb.backend_simsml.entity.CustomerEntity;
 import bo.edu.ucb.backend_simsml.repository.CustomerRepository;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class CustomerService {
@@ -58,6 +60,23 @@ public class CustomerService {
             return new SuccessfulResponse("200", "Clientes obtenidos exitosamente", customers);
         } catch (Exception e) {
             return new UnsuccessfulResponse("500", "Error al obtener clientes", e.getMessage());
+        }
+    }
+
+    public Object getCutomersSummary() {
+        try {
+            List<CustomerSummary> customerSummaries = customerRepository.findAllCustomersSummary()
+                    .stream()
+                    .map(CustomerSummary::from)
+                    .toList();
+
+            if (!customerSummaries.isEmpty()) {
+                return new SuccessfulResponse("200", "Resumen de clientes obtenidos exitosamente", customerSummaries);
+            }
+
+            return new UnsuccessfulResponse("404", "No se encontraron clientes registrados", null);
+        } catch (Exception e) {
+            return new UnsuccessfulResponse("500", "Error al obtener resumen de clientes", e.getMessage());
         }
     }
 

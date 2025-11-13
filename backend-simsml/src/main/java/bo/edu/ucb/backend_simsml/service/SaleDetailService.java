@@ -2,15 +2,15 @@ package bo.edu.ucb.backend_simsml.service;
 
 import bo.edu.ucb.backend_simsml.dto.SuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.UnsuccessfulResponse;
-import bo.edu.ucb.backend_simsml.dto.product.ProductSummary;
+import bo.edu.ucb.backend_simsml.dto.inventory.InventorySummary;
 import bo.edu.ucb.backend_simsml.dto.sale.SaleSummary;
 import bo.edu.ucb.backend_simsml.dto.saleDetail.CreateSaleDetailRequest;
 import bo.edu.ucb.backend_simsml.dto.saleDetail.SaleDetailResponse;
 import bo.edu.ucb.backend_simsml.dto.saleDetail.UpdateSaleDetailRequest;
-import bo.edu.ucb.backend_simsml.entity.ProductEntity;
+import bo.edu.ucb.backend_simsml.entity.InventoryEntity;
 import bo.edu.ucb.backend_simsml.entity.SaleDetailEntity;
 import bo.edu.ucb.backend_simsml.entity.SaleEntity;
-import bo.edu.ucb.backend_simsml.repository.ProductRepository;
+import bo.edu.ucb.backend_simsml.repository.InventoryRepository;
 import bo.edu.ucb.backend_simsml.repository.SaleDetailRepository;
 import bo.edu.ucb.backend_simsml.repository.SaleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,26 +28,21 @@ public class SaleDetailService {
     @Autowired
     private SaleRepository saleRepository;
     @Autowired
-    private ProductRepository productRepository;
-
-    public SaleDetailService(SaleRepository saleRepository, ProductRepository productRepository) {
-        this.saleRepository = saleRepository;
-        this.productRepository = productRepository;
-    }
+    private InventoryRepository inventoryRepository;
 
     public Object createSaleDetail(CreateSaleDetailRequest request) {
         try {
-            SaleEntity sale = saleRepository.findById(request.saleId())
+            SaleEntity sale = saleRepository.findById(request.sale())
                     .orElse(null);
 
             if (sale == null) {
                 return new UnsuccessfulResponse("404", "Venta no encontrada", null);
             }
 
-            ProductEntity product = productRepository.findById(request.productId())
+            InventoryEntity inventory = inventoryRepository.findById(request.inventory())
                     .orElse(null);
 
-            if (product == null) {
+            if (inventory == null) {
                 return new UnsuccessfulResponse("404", "Producto no encontrada", null);
             }
 
@@ -55,7 +50,7 @@ public class SaleDetailService {
             saleDetail.setProductQuantity(request.productQuantity());
             saleDetail.setUnitPrice(request.unitPrice());
             saleDetail.setSale(sale);
-            saleDetail.setProduct(product);
+            saleDetail.setInventory(inventory);
 
             saleDetailRepository.save(saleDetail);
             return new SuccessfulResponse("201", "Detalle de venta registrado exitosamente", saleDetail.getSaleDetailId());
@@ -73,7 +68,7 @@ public class SaleDetailService {
                             salesDetailsResponse.getUnitPrice(),
                             salesDetailsResponse.isActive(),
                             SaleSummary.from(salesDetailsResponse.getSale()),
-                            ProductSummary.from(salesDetailsResponse.getProduct())
+                            InventorySummary.from(salesDetailsResponse.getInventory())
                     ));
 
             if (salesDetails.isEmpty()) {
@@ -95,7 +90,7 @@ public class SaleDetailService {
                             saleDetailResponse.getUnitPrice(),
                             saleDetailResponse.isActive(),
                             SaleSummary.from(saleDetailResponse.getSale()),
-                            ProductSummary.from(saleDetailResponse.getProduct())
+                            InventorySummary.from(saleDetailResponse.getInventory())
                     ))
                     .orElse(null);
 
@@ -118,17 +113,17 @@ public class SaleDetailService {
                 return new UnsuccessfulResponse("404", "Detalle de venta no encontrada", null);
             }
 
-            SaleEntity sale = saleRepository.findById(request.saleId())
+            SaleEntity sale = saleRepository.findById(request.sale())
                     .orElse(null);
 
             if (sale == null) {
                 return new UnsuccessfulResponse("404", "Venta no encontrada", null);
             }
 
-            ProductEntity product = productRepository.findById(request.productId())
+            InventoryEntity inventory = inventoryRepository.findById(request.inventory())
                     .orElse(null);
 
-            if (product == null) {
+            if (inventory == null) {
                 return new UnsuccessfulResponse("404", "Producto no encontrada", null);
             }
 
@@ -136,7 +131,7 @@ public class SaleDetailService {
             saleDetail.setUnitPrice(request.unitPrice());
             saleDetail.setActive(request.active());
             saleDetail.setSale(sale);
-            saleDetail.setProduct(product);
+            saleDetail.setInventory(inventory);
             saleDetail.setUpdatedAt(LocalDateTime.now());
 
             saleDetailRepository.save(saleDetail);

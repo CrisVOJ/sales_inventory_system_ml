@@ -49,6 +49,20 @@ public class InventoryController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
+    @GetMapping("/location")
+    public ResponseEntity<Object> getInventoriesByLocation(
+            @RequestParam("locationId") Long locationId
+    ) {
+        try {
+            Object response = inventoryService.getInventoriesByLocation(locationId);
+            return generateResponse(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UnsuccessfulResponse("400", "Error al obtener inventarios por locacion", e.getMessage()));
+        }
+    }
+
     @GetMapping("/")
     public ResponseEntity<Object> getInventory(@RequestParam("inventoryId") Long inventoryId) {
         try {

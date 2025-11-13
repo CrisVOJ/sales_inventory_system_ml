@@ -2,15 +2,15 @@ package bo.edu.ucb.backend_simsml.service;
 
 import bo.edu.ucb.backend_simsml.dto.SuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.UnsuccessfulResponse;
-import bo.edu.ucb.backend_simsml.dto.product.ProductSummary;
+import bo.edu.ucb.backend_simsml.dto.inventory.InventorySummary;
 import bo.edu.ucb.backend_simsml.dto.purchase.PurchaseSummary;
 import bo.edu.ucb.backend_simsml.dto.purchaseDetail.CreatePurchaseDetailRequest;
 import bo.edu.ucb.backend_simsml.dto.purchaseDetail.PurchaseDetailResponse;
 import bo.edu.ucb.backend_simsml.dto.purchaseDetail.UpdatePurchaseDetailRequest;
-import bo.edu.ucb.backend_simsml.entity.ProductEntity;
+import bo.edu.ucb.backend_simsml.entity.InventoryEntity;
 import bo.edu.ucb.backend_simsml.entity.PurchaseDetailEntity;
 import bo.edu.ucb.backend_simsml.entity.PurchaseEntity;
-import bo.edu.ucb.backend_simsml.repository.ProductRepository;
+import bo.edu.ucb.backend_simsml.repository.InventoryRepository;
 import bo.edu.ucb.backend_simsml.repository.PurchaseDetailRepository;
 import bo.edu.ucb.backend_simsml.repository.PurchaseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,19 +28,19 @@ public class PurchaseDetailService {
     @Autowired
     private PurchaseRepository purchaseRepository;
     @Autowired
-    private ProductRepository productRepository;
+    private InventoryRepository inventoryRepository;
 
     public Object createPurchaseDetail(CreatePurchaseDetailRequest request) {
         try {
-            PurchaseEntity purchase = purchaseRepository.findById(request.productId())
+            PurchaseEntity purchase = purchaseRepository.findById(request.purchase())
                     .orElse(null);
             if (purchase == null) {
                 return new UnsuccessfulResponse("404", "Compra no encontrada", null);
             }
 
-            ProductEntity product = productRepository.findById(request.productId())
+            InventoryEntity inventory = inventoryRepository.findById(request.inventory())
                     .orElse(null);
-            if (product == null) {
+            if (inventory == null) {
                 return new UnsuccessfulResponse("404", "Producto no encontrada", null);
             }
 
@@ -48,7 +48,7 @@ public class PurchaseDetailService {
             purchaseDetail.setProductQuantity(request.productQuantity());
             purchaseDetail.setUnitPrice(request.unitPrice());
             purchaseDetail.setPurchase(purchase);
-            purchaseDetail.setProduct(product);
+            purchaseDetail.setInventory(inventory);
 
             purchaseDetailRepository.save(purchaseDetail);
             return new SuccessfulResponse("201", "Detalle de compra registrado exitosamente", purchaseDetail.getPurchaseDetailId());
@@ -66,7 +66,7 @@ public class PurchaseDetailService {
                             purchaseDetailResponse.getUnitPrice(),
                             purchaseDetailResponse.isActive(),
                             PurchaseSummary.from(purchaseDetailResponse.getPurchase()),
-                            ProductSummary.from(purchaseDetailResponse.getProduct())
+                            InventorySummary.from(purchaseDetailResponse.getInventory())
                     ));
             if (purchasesDetails.isEmpty()) {
                 return new UnsuccessfulResponse("404", "No se encontraron detalles de compras", null);
@@ -87,7 +87,7 @@ public class PurchaseDetailService {
                             purchaseDetailResponse.getUnitPrice(),
                             purchaseDetailResponse.isActive(),
                             PurchaseSummary.from(purchaseDetailResponse.getPurchase()),
-                            ProductSummary.from(purchaseDetailResponse.getProduct())
+                            InventorySummary.from(purchaseDetailResponse.getInventory())
                     ))
                     .orElse(null);
             if (purchaseDetail == null) {
@@ -108,22 +108,22 @@ public class PurchaseDetailService {
                 return new UnsuccessfulResponse("404", "Detalle de compra no encontrado", null);
             }
 
-            PurchaseEntity purchase = purchaseRepository.findById(request.productId())
+            PurchaseEntity purchase = purchaseRepository.findById(request.purchase())
                     .orElse(null);
             if (purchase == null) {
                 return new UnsuccessfulResponse("404", "Compra no encontrada", null);
             }
 
-            ProductEntity product = productRepository.findById(request.productId())
+            InventoryEntity inventory = inventoryRepository.findById(request.inventory())
                     .orElse(null);
-            if (product == null) {
+            if (inventory == null) {
                 return new UnsuccessfulResponse("404", "Producto no encontrada", null);
             }
 
             purchaseDetail.setProductQuantity(request.productQuantity());
             purchaseDetail.setUnitPrice(request.unitPrice());
             purchaseDetail.setPurchase(purchase);
-            purchaseDetail.setProduct(product);
+            purchaseDetail.setInventory(inventory);
             purchaseDetail.setActive(request.active());
             purchaseDetail.setUpdatedAt(LocalDateTime.now());
 

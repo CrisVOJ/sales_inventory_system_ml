@@ -7,7 +7,7 @@ import bo.edu.ucb.backend_simsml.dto.purchase.PurchaseResponse;
 import bo.edu.ucb.backend_simsml.dto.purchase.UpdatePurchaseRequest;
 import bo.edu.ucb.backend_simsml.dto.purchaseStatus.PurchaseStatusSummary;
 import bo.edu.ucb.backend_simsml.dto.supplier.SupplierSummary;
-import bo.edu.ucb.backend_simsml.dto.user.UserSaleResponse;
+import bo.edu.ucb.backend_simsml.dto.user.UserSummary;
 import bo.edu.ucb.backend_simsml.entity.PurchaseEntity;
 import bo.edu.ucb.backend_simsml.entity.PurchaseStatusEntity;
 import bo.edu.ucb.backend_simsml.entity.SupplierEntity;
@@ -75,7 +75,7 @@ public class PurchaseService {
                     .map(purchaseResponse -> new PurchaseResponse(
                             purchaseResponse.getPurchaseId(),
                             purchaseResponse.getDate(),
-                            UserSaleResponse.from(purchaseResponse.getUser()),
+                            UserSummary.from(purchaseResponse.getUser()),
                             SupplierSummary.fromEntity(purchaseResponse.getSupplier()),
                             PurchaseStatusSummary.from(purchaseResponse.getPurchaseStatus())
                     ));
@@ -95,7 +95,7 @@ public class PurchaseService {
                     .map(purchaseResponse -> new PurchaseResponse(
                             purchaseResponse.getPurchaseId(),
                             purchaseResponse.getDate(),
-                            UserSaleResponse.from(purchaseResponse.getUser()),
+                            UserSummary.from(purchaseResponse.getUser()),
                             SupplierSummary.fromEntity(purchaseResponse.getSupplier()),
                             PurchaseStatusSummary.from(purchaseResponse.getPurchaseStatus())
                     ))

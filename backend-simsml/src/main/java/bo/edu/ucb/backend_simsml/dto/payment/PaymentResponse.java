@@ -2,7 +2,6 @@ package bo.edu.ucb.backend_simsml.dto.payment;
 
 import bo.edu.ucb.backend_simsml.dto.paymentMethod.PaymentMethodSummary;
 import bo.edu.ucb.backend_simsml.dto.sale.SaleSummary;
-import bo.edu.ucb.backend_simsml.dto.user.UserSaleResponse;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

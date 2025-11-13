@@ -20,6 +20,7 @@ public class SaleStatusController {
     @Autowired
     private SaleStatusService saleStatusService;
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @GetMapping("/allSummary")
     public ResponseEntity<Object> getActiveSaleStatuses() {
         try {

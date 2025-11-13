@@ -37,7 +37,7 @@ public class PurchaseDetailEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private PurchaseEntity purchase;
     @ManyToOne(fetch = FetchType.LAZY)
-    private ProductEntity product;
+    private InventoryEntity inventory;
 
     @PrePersist
     protected void onCreate() {

@@ -1,5 +1,6 @@
 package bo.edu.ucb.backend_simsml.dto.saleDetail;
 
+import bo.edu.ucb.backend_simsml.dto.inventory.InventorySummary;
 import bo.edu.ucb.backend_simsml.dto.product.ProductSummary;
 import bo.edu.ucb.backend_simsml.dto.sale.SaleSummary;
 
@@ -11,6 +12,6 @@ public record SaleDetailResponse(
         BigDecimal unitPrice,
         boolean active,
         SaleSummary sale,
-        ProductSummary product
+        InventorySummary inventory
 ) {
 }

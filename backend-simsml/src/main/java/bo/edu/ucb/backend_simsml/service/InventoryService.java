@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class InventoryService {
@@ -78,6 +79,28 @@ public class InventoryService {
             return new SuccessfulResponse("200", "Inventarios encontrados", inventories);
         } catch (Exception e) {
             return new UnsuccessfulResponse("500", "Error al obtener los inventarios", e.getMessage());
+        }
+    }
+
+    public Object getInventoriesByLocation(Long locationId) {
+        try {
+            List<InventoryResponse> inventories = inventoryRepository.findInventoriesByLocation(locationId)
+                    .stream().map(inventoryResponse -> new InventoryResponse(
+                            inventoryResponse.getInventoryId(),
+                            inventoryResponse.getCurrentStock(),
+                            inventoryResponse.getMinimumStock(),
+                            ProductSummary.from(inventoryResponse.getProduct()),
+                            LocationResponse.from(inventoryResponse.getLocation()),
+                            inventoryResponse.isActive()
+                    )).toList();
+
+            if (inventories.isEmpty()) {
+                return new UnsuccessfulResponse("404", "No se encontraron inventarios registrados en la ubicación actual", null);
+            }
+
+            return new SuccessfulResponse("200", "Inventarios encontrados en la ubicación", inventories);
+        } catch (Exception e) {
+            return new UnsuccessfulResponse("500", "Error al obtener los inventarios en la ubicación actual", e.getMessage());
         }
     }
 

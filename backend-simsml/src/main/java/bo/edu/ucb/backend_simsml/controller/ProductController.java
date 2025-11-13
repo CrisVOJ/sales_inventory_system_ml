@@ -50,6 +50,7 @@ public class ProductController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     @GetMapping("/allSummary")
     public ResponseEntity<Object> getProductsSummary() {
         try {

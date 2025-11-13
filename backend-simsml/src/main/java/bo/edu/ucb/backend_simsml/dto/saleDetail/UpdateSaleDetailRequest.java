@@ -8,6 +8,6 @@ public record UpdateSaleDetailRequest(@NotNull Long saleDetailId,
                                       @NotNull Integer productQuantity,
                                       @NotNull BigDecimal unitPrice,
                                       @NotNull boolean active,
-                                      @NotNull Long saleId,
-                                      @NotNull Long productId) {
+                                      @NotNull Long sale,
+                                      @NotNull Long inventory) {
 }
