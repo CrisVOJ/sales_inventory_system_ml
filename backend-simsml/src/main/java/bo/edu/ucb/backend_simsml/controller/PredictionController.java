@@ -15,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping(Globals.baseApi + "prediction")
@@ -38,8 +38,8 @@ public class PredictionController {
 
     @GetMapping("/all")
     public ResponseEntity<Object> getPredictions(
-            @RequestParam(value = "startDate", required = false) LocalDateTime startDate,
-            @RequestParam(value = "endDate", required = false) LocalDateTime endDate,
+            @RequestParam(value = "startDate", required = false) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) LocalDate endDate,
             @PageableDefault(sort = "generationDate", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         try {

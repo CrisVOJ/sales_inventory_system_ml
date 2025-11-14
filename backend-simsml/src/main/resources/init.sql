@@ -55,3 +55,8 @@ ON CONFLICT (name) DO NOTHING;
 INSERT INTO payment_methods (name, active) VALUES
                                                ('QR',true),('Efectivo',true),('Transferencia',true)
 ON CONFLICT (name) DO NOTHING;
+
+-- Indice parcial para predicciones activas
+CREATE UNIQUE INDEX IF NOT EXISTS ux_predictions_unique_active
+ON "db-simsml".public.predictions (inventory_inventory_id, target_month)
+WHERE active = true;

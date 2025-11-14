@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -22,17 +23,17 @@ public class PredictionEntity {
     @Column(name = "prediction_id")
     private Long predictionId;
 
-    @Column(name = "prediction_date")
-    private LocalDateTime predictionDate;
     @Column(name = "estimated_amount")
     private Long estimatedAmount;
     @Column(name = "reliability")
     private Double reliability;
-    @Column(name = "generation_date")
-    private LocalDateTime generationDate;
+    @Column(name = "target_month", nullable = false)
+    private LocalDate targetMonth;
 
     @Column(name = "active")
-    private boolean active;
+    private boolean active = true;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
@@ -42,8 +43,7 @@ public class PredictionEntity {
     @PrePersist
     protected void onCreate() {
         active = true;
-        generationDate = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
+        createdAt = LocalDateTime.now();
     }
 
 }
