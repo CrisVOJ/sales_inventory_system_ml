@@ -40,7 +40,7 @@ public class PredictionController {
     public ResponseEntity<Object> getPredictions(
             @RequestParam(value = "startDate", required = false) LocalDate startDate,
             @RequestParam(value = "endDate", required = false) LocalDate endDate,
-            @PageableDefault(sort = "generationDate", direction = Sort.Direction.ASC) Pageable pageable
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         try {
             Object response = predictionService.getPredictions(startDate, endDate, pageable);
