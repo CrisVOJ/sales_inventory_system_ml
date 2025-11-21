@@ -1,5 +1,9 @@
 <div class="app-shell">
-    <app-header (menuClick)="toggleSidebar()"></app-header>
+    <app-header 
+        (menuClick)="toggleSidebar()"
+        (profileClick)="goToProfile()"
+        (logoutClick)="logout()"
+    ></app-header>
 
     <div class="app-body" [class.collapsed]="sidebarCollapsed()">
     <app-sidebar class="app-sidebar"

@@ -17,6 +17,7 @@ export function roleLabel(code: string): string {
     return labels[code] ?? code;
 }
 
-export function roleListLabel(code: string[] = []): string {
-    return code.map(roleLabel).join(', ');
+export function roleListLabel(roles: string[] | null | undefined): string {
+    if (!roles || !Array.isArray(roles)) return '-';
+    return roles.map(r => roleLabel(r)).join(', ');
 }

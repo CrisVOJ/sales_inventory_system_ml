@@ -165,7 +165,7 @@ export class UsersPage {
 
   openDetail(row: User) {
     this.formTitle = 'Detalles de Usuario';
-    this.selected = row;
+    this.selected = {...row, roles: row.roles ?? [] };
     this.detailOpen = true;
   }
 

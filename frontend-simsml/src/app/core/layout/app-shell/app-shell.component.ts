@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
 import { HeaderComponent } from '../../../shared/header/header.component';
 import { SidebarComponent } from '../../../shared/sidebar/sidebar.component';
+import { AuthService } from '../../../shared/auth/auth.service';
 
 @Component({
   selector: 'app-shell',
@@ -19,4 +20,18 @@ export class AppShellComponent {
   private _sidebarCollapsed = signal(true);
   sidebarCollapsed = this._sidebarCollapsed.asReadonly();
   toggleSidebar(){ this._sidebarCollapsed.update(v => !v); }
+
+  constructor(
+    private auth: AuthService,
+    private router: Router
+  ) {}
+
+  goToProfile(){
+    this.router.navigateByUrl('/profile');
+  }
+
+  logout(){
+    this.auth.logout();
+    this.router.navigateByUrl('/login');
+  }
 }

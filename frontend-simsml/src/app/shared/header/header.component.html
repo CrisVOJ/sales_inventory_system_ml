@@ -11,7 +11,6 @@
   </div>
 
   <div class="p-toolbar-group-end right">
-    <!-- Notificaciones con badge superpuesto -->
     <span class="p-overlay-badge">
       <button
         pButton
@@ -23,15 +22,21 @@
       <p-badge *ngIf="notifCount" [value]="notifCount" severity="danger"></p-badge>
     </span>
 
+    <p-menu 
+      #profileMenu 
+      [model]="profileItems" 
+      [popup]="true"
+      appendTo="body"
+    />
+    
     <button 
       pButton 
       type="button" 
       class="profile-icon-btn" 
       icon="pi pi-user" 
       aria-label="Perfil"
+      (click)="profileMenu.toggle($event)"
     >
-      <!-- <span class="avatar">A</span>
-      <span class="user-name">{{ userName || 'Admin' }}</span> -->
     </button>
   </div>
 </p-toolbar>
