@@ -4,7 +4,9 @@ import { AuthService } from './shared/auth/auth.service';
 
 @Component({
   selector: 'app-root',
-  imports: [AppShellComponent],
+  imports: [
+    AppShellComponent
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

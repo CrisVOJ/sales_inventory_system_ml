@@ -18,7 +18,6 @@ export class AuthService {
         
         return this.http.post<AuthResponse>(environment.apiUrl + 'user/login', body).pipe(
             tap(res => {
-                console.log('AuthResponse', res);
                 const token = res?.jwt;
                 const ok = res?.status === true;
 

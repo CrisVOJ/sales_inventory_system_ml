@@ -4,6 +4,7 @@ import { Router, RouterOutlet } from '@angular/router';
 import { HeaderComponent } from '../../../shared/header/header.component';
 import { SidebarComponent } from '../../../shared/sidebar/sidebar.component';
 import { AuthService } from '../../../shared/auth/auth.service';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-shell',
@@ -13,7 +14,8 @@ import { AuthService } from '../../../shared/auth/auth.service';
     CommonModule,
     RouterOutlet,
     HeaderComponent,
-    SidebarComponent
+    SidebarComponent,
+    ToastModule
   ]
 })
 export class AppShellComponent {

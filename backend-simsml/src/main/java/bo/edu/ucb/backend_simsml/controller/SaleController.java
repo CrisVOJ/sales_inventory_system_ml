@@ -39,7 +39,7 @@ public class SaleController {
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
             ) {
         try {
-            Long userId = extractUserId(authHeader)
+            Long userId = jwtUtils.extractUserId(authHeader)
                     .orElseThrow(() -> new JWTVerificationException("User ID not found in token"));
 
             Object response = saleService.createSale(request, userId);
@@ -96,19 +96,5 @@ public class SaleController {
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-    }
-
-    private Optional<Long> extractUserId(String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new JWTVerificationException("Authorization header is missing or invalid");
-        }
-
-        String token = authHeader.substring(7).trim();
-        DecodedJWT decodedJWT = jwtUtils.validateToken(token);
-
-        Long userId = decodedJWT.getClaim("userId").asLong();
-        if (userId != null) return Optional.of(userId);
-
-        return Optional.empty();
     }
 }

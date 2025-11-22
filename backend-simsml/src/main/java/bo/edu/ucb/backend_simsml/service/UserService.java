@@ -3,6 +3,7 @@ package bo.edu.ucb.backend_simsml.service;
 import bo.edu.ucb.backend_simsml.dto.SuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.UnsuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.user.CreateUserRequest;
+import bo.edu.ucb.backend_simsml.dto.user.UpdatePasswordProfile;
 import bo.edu.ucb.backend_simsml.dto.user.UpdateUserRequest;
 import bo.edu.ucb.backend_simsml.dto.user.UserResponse;
 import bo.edu.ucb.backend_simsml.entity.RoleEntity;
@@ -150,6 +151,27 @@ public class UserService {
         }
     }
 
+    // Update password
+    public Object updatePassword(Long userId, UpdatePasswordProfile request) {
+        try {
+            UserEntity user = userRepository.findById(userId).orElse(null);
+
+            if (user == null) {
+                return new UnsuccessfulResponse("404", "Usuario no encontrado", null);
+            }
+
+            if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
+                return new UnsuccessfulResponse("400", "Contraseña actual incorrecta", null);
+            }
+
+            user.setPassword(passwordEncoder.encode(request.newPassword()));
+            userRepository.save(user);
+
+            return new SuccessfulResponse("200", "Contraseña actualizada exitosamente", user.getUsername());
+        } catch (Exception e) {
+            return  new UnsuccessfulResponse("500", "Error al actualizar contraseña de usuario", e.getMessage());
+        }
+    }
     // Disable user
     public Object disableUser(Long userId) {
         try {

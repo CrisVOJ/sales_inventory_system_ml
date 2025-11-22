@@ -8,7 +8,6 @@ export interface User {
   maternalSurname?: string;
   email: string;
   username: string;
-  password?: string;
   isEnabled: boolean;
   accountNoLocked: boolean;
   roles: string[];

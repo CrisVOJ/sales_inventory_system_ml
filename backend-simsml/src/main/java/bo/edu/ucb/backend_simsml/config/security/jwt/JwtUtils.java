@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -85,5 +86,19 @@ public class JwtUtils {
 
     public Map<String, Claim> returnAllClaims(DecodedJWT decodedJWT) {
         return decodedJWT.getClaims();
+    }
+
+    public Optional<Long> extractUserId(String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new JWTVerificationException("Authorization header is missing or invalid");
+        }
+
+        String token = authHeader.substring(7).trim();
+        DecodedJWT decodedJWT = validateToken(token);
+
+        Long userId = decodedJWT.getClaim("userId").asLong();
+        if (userId != null) return Optional.of(userId);
+
+        return Optional.empty();
     }
 }
