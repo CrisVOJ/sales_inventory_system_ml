@@ -11,6 +11,8 @@ import bo.edu.ucb.backend_simsml.dto.saleStatus.SaleStatusSummary;
 import bo.edu.ucb.backend_simsml.dto.user.UserSummary;
 import bo.edu.ucb.backend_simsml.entity.*;
 import bo.edu.ucb.backend_simsml.repository.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
 @Service
 public class SaleService {
 
+    private static final Logger log = LoggerFactory.getLogger(SaleService.class);
+
     @Autowired
     private SaleRepository saleRepository;
     @Autowired
@@ -36,6 +40,8 @@ public class SaleService {
     private SaleStatusRepository saleStatusRepository;
     @Autowired
     private InventoryRepository inventoryRepository;
+    @Autowired
+    private EmailService emailService;
 
     @Transactional(rollbackFor = Exception.class)
     public Object createSale(CreateSaleRequest request, Long userId) {
@@ -85,6 +91,8 @@ public class SaleService {
                 total = total.add(subtotal);
 
                 inventory.setCurrentStock(inventory.getCurrentStock() - saleItem.productQuantity());
+
+                checkAndNotifyLowStock(inventory);
             }
 
             sale.setTotal(total);
@@ -251,11 +259,15 @@ public class SaleService {
                             return new UnsuccessfulResponse("400", "Stock insuficiente en inventario", null);
                         }
                         newInventory.setCurrentStock(newInventory.getCurrentStock() - newQuantity);
+
+                        checkAndNotifyLowStock(newInventory);
                     } else {
                         if (delta > 0) {
                             if (newInventory.getCurrentStock() < delta)
                                 return new UnsuccessfulResponse("400", "Stock insuficiente en inventario", null);
                             newInventory.setCurrentStock(newInventory.getCurrentStock() - delta);
+
+                            checkAndNotifyLowStock(newInventory);
                         } else if (delta < 0) {
                             newInventory.setCurrentStock(newInventory.getCurrentStock() + (-delta));
                         }
@@ -276,6 +288,8 @@ public class SaleService {
                     }
 
                     inventory.setCurrentStock(inventory.getCurrentStock() - item.productQuantity());
+
+                    checkAndNotifyLowStock(inventory);
 
                     SaleDetailEntity saleDetail = new SaleDetailEntity();
                     saleDetail.setInventory(inventory);
@@ -304,6 +318,28 @@ public class SaleService {
             return new SuccessfulResponse("200", "Venta actualizada exitosamente", sale.getSaleId());
         } catch (Exception e) {
             return new UnsuccessfulResponse("500", "Error al actualizar venta", e.getMessage());
+        }
+    }
+
+    private void checkAndNotifyLowStock(InventoryEntity inventory) {
+        try {
+            Long minimumStock = inventory.getMinimumStock();
+            if (minimumStock == null) {
+                log.debug("Inventario {} no tiene minimo configurado.",
+                        inventory.getInventoryId());
+                return;
+            }
+
+            String sendTo = String.valueOf(userRepository.findById(1L).get().getEmail());
+
+            if (inventory.getCurrentStock() <= minimumStock) {
+                log.info("Stock bajo detectado. Inventario {}: current={}, min={}",
+                        inventory.getInventoryId(), inventory.getCurrentStock(), minimumStock);
+                emailService.sendLowStockAlert(inventory, sendTo);
+            }
+        } catch (Exception e) {
+            log.error("Error al verifica/enviar alerta de stock bajo para ingentario {}: {}",
+                    inventory.getInventoryId(), e.getMessage(), e);
         }
     }
 }

@@ -20,6 +20,26 @@ spring:
     init:
       data-locations: classpath:init.sql
       mode: always
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: cristopheroliverajimenez@gmail.com
+    password: aaxpjalnhxsctnah
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writeTimeout: 5000
+
+app:
+  mail:
+    from: "Sistema de Ventas y Inventario <no-reply>"
+    low-stock:
+      to: "cristopheroliverajimenez@gmail.com"
 
 security:
   jwt:
