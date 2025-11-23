@@ -10,6 +10,7 @@ export const routes: Routes = [
     { path: 'locations', canActivate: [authGuard], loadComponent: () => import('./features/locations/location.page').then(m => m.LocationsPage) },
     { path: 'inventories', canActivate: [authGuard], loadComponent: () => import('./features/inventories/inventory.page').then(m => m.InventoriesPage) },
     { path: 'sales', canActivate: [authGuard], loadComponent: () => import('./features/sales/sale.page').then(m => m.SalesPage) },
+    { path: 'predictions', canActivate: [authGuard], loadComponent: () => import('./features/predictions/predictions.page').then(m => m.PredictionPage) },
     { path: 'users', canActivate: [authGuard], loadComponent: () => import('./features/users/users.page').then(m => m.UsersPage) },
     { path: 'profile', canActivate: [authGuard], loadComponent: () => import('./features/profile/profile.page').then(m => m.ProfilePage) },
     { path: '**', redirectTo: '' },

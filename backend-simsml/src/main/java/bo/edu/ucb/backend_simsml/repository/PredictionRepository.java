@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PredictionRepository extends JpaRepository<PredictionEntity, Long> {
@@ -18,7 +17,8 @@ public interface PredictionRepository extends JpaRepository<PredictionEntity, Lo
     @Query(value = "SELECT p FROM predictions p " +
             "WHERE " +
             "p.targetMonth >= COALESCE(:startDate, p.targetMonth) " +
-            "AND p.targetMonth <= COALESCE(:endDate,   p.targetMonth)"
+            "AND p.targetMonth <= COALESCE(:endDate,   p.targetMonth) " +
+            "AND p.active = true"
     )
     Page<PredictionEntity> findAllPredictions(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, Pageable pageable);
 
