@@ -8,3 +8,9 @@ export interface Prediction {
     inventory: InventorySummary;
     active: boolean;
 }
+
+export interface DemandVsPredictionPoint {
+    monthLabel: string;
+    prediction: number;
+    demand: number;
+}

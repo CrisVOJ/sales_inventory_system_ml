@@ -6,6 +6,7 @@ import { Prediction } from "./predictions.types";
 import { PredictionsService } from "./predictions.service";
 import { MessageService } from "primeng/api";
 import { PredictionFormComponent } from "./prediction-form.component";
+import { PredictionChartComponent } from "./prediction-chart.component";
 
 @Component({
     selector: 'predictions-page',
@@ -13,26 +14,48 @@ import { PredictionFormComponent } from "./prediction-form.component";
     CommonModule,
     DataTableComponent,
     ModalComponent,
-    PredictionFormComponent
+    PredictionFormComponent,
+    PredictionChartComponent
 ],
     template: `
         <section class="page">
             <header class="page__header">
                 <h1>Predicciones</h1>
+
+                <div class="tabs">
+                  <button
+                    class="tab"
+                    [class.is-active]="viewMode === 'table'"
+                    (click)="viewMode = 'table'">
+                    Tabla
+                  </button>
+                  <button
+                    class="tab"
+                    [class.is-active]="viewMode === 'chart'"
+                    (click)="viewMode = 'chart'">
+                    Gráfica
+                  </button>
+                </div>
             </header>
 
-            <app-data-table
-                [entityName]="'Predicción'"
-                [columns]="cols"
-                [rows]="rows"
-                [total]="total"
-                [page]="page"
-                [pageSize]="pageSize"
-                [searchPlaceholder]="'Buscar ...'"
-                (create)="openCreate()"
-                (onSearch)="search($event)"
-                (pageChange)="paginate($event)"
-            />
+            <ng-container *ngIf="viewMode === 'table'">
+                <app-data-table
+                    [entityName]="'Predicción'"
+                    [columns]="cols"
+                    [rows]="rows"
+                    [total]="total"
+                    [page]="page"
+                    [pageSize]="pageSize"
+                    [searchPlaceholder]="'Buscar ...'"
+                    (create)="openCreate()"
+                    (onSearch)="search($event)"
+                    (pageChange)="paginate($event)"
+                />
+            </ng-container>
+
+            <ng-container *ngIf="viewMode === 'chart'">
+                <prediction-chart/>
+            </ng-container>
 
             <app-modal
                 [open]="formOpen"
@@ -56,6 +79,27 @@ import { PredictionFormComponent } from "./prediction-form.component";
             color: var(--txt-1); 
         }
         .page{ background: transparent; }
+        .tabs {
+            display: inline-flex;
+            background: rgba(15, 23, 42, .6);
+            border-radius: 999px;
+            padding: .15rem;
+        }
+        .tab {
+            border: none;
+            background: transparent;
+            color: #9ca3af;
+            padding: .3rem .9rem;
+            border-radius: 999px;
+            font-size: .85rem;
+            cursor: pointer;
+            transition: background .15s, color .15s;
+        }
+        .tab.is-active {
+            background: #0ea5e9;
+            color: #0f172a;
+            font-weight: 600;
+        }
     `]
 })
 export class PredictionPage {
@@ -72,6 +116,8 @@ export class PredictionPage {
     total = 0;
     page = 1; pageSize = 5;
     q = '';
+
+    viewMode: 'table' | 'chart' = 'table';
 
     constructor(
         private predictions: PredictionsService,

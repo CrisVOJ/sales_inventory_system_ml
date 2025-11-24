@@ -3,10 +3,7 @@ package bo.edu.ucb.backend_simsml.service;
 import bo.edu.ucb.backend_simsml.dto.SuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.UnsuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.inventory.InventorySummary;
-import bo.edu.ucb.backend_simsml.dto.prediction.CreatePredictionRequest;
-import bo.edu.ucb.backend_simsml.dto.prediction.MlForecastItem;
-import bo.edu.ucb.backend_simsml.dto.prediction.MlForecastResponse;
-import bo.edu.ucb.backend_simsml.dto.prediction.PredictionResponse;
+import bo.edu.ucb.backend_simsml.dto.prediction.*;
 import bo.edu.ucb.backend_simsml.entity.InventoryEntity;
 import bo.edu.ucb.backend_simsml.entity.PredictionEntity;
 import bo.edu.ucb.backend_simsml.repository.InventoryRepository;
@@ -116,6 +113,21 @@ public class PredictionService {
             return new UnsuccessfulResponse("404", "No se encontraron predicciones registradas", null);
         } catch (Exception e) {
             return new UnsuccessfulResponse("500", "Error al obtener predicciones", e.getMessage());
+        }
+    }
+
+    public Object getDemandVsPrediction(Long inventoryId) {
+        try {
+            List<DemandVsPredictionResponse> demandVsPrediction = predictionRepository.findDemandVsPredictionByInventory(inventoryId)
+                    .stream().map(p -> new DemandVsPredictionResponse(
+                            p.getMonthlabel(),
+                            p.getPrediction(),
+                            p.getDemand()
+                    )).toList();
+
+            return new SuccessfulResponse("200", "Demanda vs Predicción obtenida correctamente", demandVsPrediction);
+        } catch (Exception e) {
+            return new UnsuccessfulResponse("500", "Error al obtener la comparación de demanda vs predicción del inventario", e.getMessage());
         }
     }
 

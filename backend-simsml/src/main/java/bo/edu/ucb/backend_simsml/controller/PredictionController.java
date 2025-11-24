@@ -51,6 +51,19 @@ public class PredictionController {
         }
     }
 
+    @GetMapping("/demand-vs-prediction")
+    public ResponseEntity<Object> getDemandVsPrediction(
+            @RequestParam(value = "inventoryId") Long inventoryId
+    ) {
+        try {
+            Object response = predictionService.getDemandVsPrediction(inventoryId);
+            return generateResponse(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UnsuccessfulResponse("400", "Error al obtener predicciones", e.getMessage()));
+        }
+    }
+
     private ResponseEntity<Object> generateResponse(Object response) {
         if (response instanceof SuccessfulResponse) {
             return ResponseEntity.ok(response);

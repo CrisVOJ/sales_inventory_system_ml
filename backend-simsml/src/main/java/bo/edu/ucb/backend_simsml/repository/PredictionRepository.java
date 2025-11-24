@@ -1,5 +1,7 @@
 package bo.edu.ucb.backend_simsml.repository;
 
+import bo.edu.ucb.backend_simsml.dto.prediction.DemandVsPredictionProjection;
+import bo.edu.ucb.backend_simsml.dto.prediction.DemandVsPredictionResponse;
 import bo.edu.ucb.backend_simsml.entity.PredictionEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +30,39 @@ public interface PredictionRepository extends JpaRepository<PredictionEntity, Lo
             "AND p.active = true"
     )
     List<PredictionEntity> findActiveByInventoryAndTargetMonth(@Param("inventoryId") Long inventoryId, @Param("targetMonth") LocalDate targetMonth);
+
+    @Query(value = """
+            WITH pred_month AS (
+                SELECT
+                    date_trunc('month', p.target_month) AS month_key,
+                    SUM(p.estimated_amount)            AS prediction
+                FROM predictions p
+                WHERE p.inventory_inventory_id = :inventoryId
+                  AND p.active = true
+                GROUP BY date_trunc('month', p.target_month)
+            ),
+            sales_month AS (
+                SELECT
+                    date_trunc('month', s.registration_date) AS month_key,
+                    SUM(sd.product_quantity)                 AS demand
+                FROM sales_details sd
+                JOIN sales s
+                    ON s.sale_id = sd.sale_id
+                WHERE sd.inventory_id = :inventoryId
+                GROUP BY date_trunc('month', s.registration_date)
+            )
+            SELECT
+                to_char(pm.month_key, 'MM/YYYY') AS monthLabel,
+                pm.prediction,
+                COALESCE(sm.demand, 0)           AS demand
+            FROM pred_month pm
+            LEFT JOIN sales_month sm
+                ON sm.month_key = pm.month_key
+            ORDER BY pm.month_key ASC
+            """,
+            nativeQuery = true
+    )
+    List<DemandVsPredictionProjection> findDemandVsPredictionByInventory(@Param("inventoryId") Long inventoryId);
 
     @Transactional
     @Modifying
