@@ -39,6 +39,17 @@ export class AuthService {
         localStorage.removeItem(this.key);
     }
 
+    requestPasswordReset(email: string) {
+        return this.http.post<void>(environment.apiUrl + 'user/forgot-password', { email });
+    }
+
+    resetPassword(token: string, newPassword: string) {
+        return this.http.post<void>(environment.apiUrl + 'user/reset-password', {
+            token,
+            newPassword
+        })
+    }
+
     get token(): string | null {
         return localStorage.getItem(this.key);
     }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, signal } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { HeaderComponent } from '../../../shared/header/header.component';
 import { SidebarComponent } from '../../../shared/sidebar/sidebar.component';
@@ -8,6 +8,7 @@ import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-shell',
+  standalone: true,
   templateUrl: './app-shell.component.html',
   styleUrl: './app-shell.component.scss',
   imports: [
@@ -34,6 +35,6 @@ export class AppShellComponent {
 
   logout(){
     this.auth.logout();
-    this.router.navigateByUrl('/login');
+    this.router.navigateByUrl('/auth/login');
   }
 }
