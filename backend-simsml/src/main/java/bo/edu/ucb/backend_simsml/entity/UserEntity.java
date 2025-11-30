@@ -3,6 +3,7 @@ package bo.edu.ucb.backend_simsml.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,6 +38,10 @@ public class UserEntity {
     private String username;
     @Column(name = "password", nullable = false)
     private String password;
+    @Column(name = "reset_password_token")
+    private String resetPasswordToken;
+    @Column(name = "reset_password_token_expiration")
+    private LocalDateTime resetPasswordTokenExpiration;
 
     @Column(name = "is_enabled")
     private boolean isEnabled;

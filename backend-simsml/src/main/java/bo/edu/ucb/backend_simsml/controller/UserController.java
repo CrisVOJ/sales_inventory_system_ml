@@ -6,6 +6,8 @@ import bo.edu.ucb.backend_simsml.dto.SuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.UnsuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.auth.AuthLoginRequest;
 import bo.edu.ucb.backend_simsml.dto.auth.AuthResponse;
+import bo.edu.ucb.backend_simsml.dto.auth.ForgotPasswordRequest;
+import bo.edu.ucb.backend_simsml.dto.auth.ResetPasswordRequest;
 import bo.edu.ucb.backend_simsml.dto.user.CreateUserRequest;
 import bo.edu.ucb.backend_simsml.dto.user.UpdatePasswordProfile;
 import bo.edu.ucb.backend_simsml.dto.user.UpdateUserRequest;
@@ -28,7 +30,6 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping(Globals.baseApi + "user")
-//@PreAuthorize("hasRole('ADMIN')")
 @PreAuthorize("hasRole('ADMIN')")
 public class UserController {
 
@@ -94,6 +95,7 @@ public class UserController {
     }
 
     @GetMapping("/me")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     public ResponseEntity<Object> getMyUser(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
     ) {
@@ -110,6 +112,7 @@ public class UserController {
     }
 
     @PutMapping("/updatePassword")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     public ResponseEntity<Object> updatePassword(
             @Valid @RequestBody UpdatePasswordProfile request,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader
@@ -134,6 +137,30 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new UnsuccessfulResponse("400", "Error al deshabilitar usuario", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<Object> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        try {
+            Object response = userService.forgotPassword(request);
+            return generateResponse(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UnsuccessfulResponse("400", "Error al solicitar reseteo de contraseña", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<Object> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        try {
+            Object response = userService.resetPassword(request);
+            return generateResponse(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UnsuccessfulResponse("400", "Error al resetear contraseña", e.getMessage()));
         }
     }
 

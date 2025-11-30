@@ -2,6 +2,8 @@ package bo.edu.ucb.backend_simsml.service;
 
 import bo.edu.ucb.backend_simsml.dto.SuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.UnsuccessfulResponse;
+import bo.edu.ucb.backend_simsml.dto.auth.ForgotPasswordRequest;
+import bo.edu.ucb.backend_simsml.dto.auth.ResetPasswordRequest;
 import bo.edu.ucb.backend_simsml.dto.user.CreateUserRequest;
 import bo.edu.ucb.backend_simsml.dto.user.UpdatePasswordProfile;
 import bo.edu.ucb.backend_simsml.dto.user.UpdateUserRequest;
@@ -17,9 +19,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +34,8 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private RolesRepository rolesRepository;
+    @Autowired
+    private EmailService emailService;
 
     // Create new user
     public Object createUser(CreateUserRequest request) {
@@ -189,6 +194,54 @@ public class UserService {
             return new SuccessfulResponse("200", "Usuario deshabilitado exitosamente", user.getUsername());
         } catch (Exception e) {
             return new UnsuccessfulResponse("500", "Error al desabilitar usuario", e.getMessage());
+        }
+    }
+
+    public Object forgotPassword(ForgotPasswordRequest request) {
+        try {
+            UserEntity user = userRepository.findByEmail(request.email().trim().toLowerCase()).orElse(null);
+
+            if (user == null) {
+                return new UnsuccessfulResponse("404", "Usuario no encontrado", null);
+            }
+
+            String token = UUID.randomUUID().toString();
+            user.setResetPasswordToken(token);
+            user.setResetPasswordTokenExpiration(LocalDateTime.now().plusHours(1));
+
+            userRepository.save(user);
+
+            emailService.sendPasswordResetEmail(user.getEmail(), token);
+
+            return new SuccessfulResponse("200", "Correo enviado correctamente", null);
+        } catch (Exception e) {
+            return new UnsuccessfulResponse("500", "Error al procesar la solicitud de reseteo de contraseña", e.getMessage());
+        }
+    }
+
+    public Object resetPassword(ResetPasswordRequest request) {
+        try {
+            UserEntity user = userRepository.findByResetPasswordToken(request.token()).orElse(null);
+
+            if (user == null) {
+                return new UnsuccessfulResponse("404", "Token invalido o no encontrado", null);
+            }
+
+            if (user.getResetPasswordTokenExpiration() == null ||
+                    user.getResetPasswordTokenExpiration().isBefore(LocalDateTime.now())) {
+                return new UnsuccessfulResponse("400", "Token invalido o expirado", null);
+            }
+
+            user.setPassword(passwordEncoder.encode(request.newPassword()));
+
+            user.setResetPasswordToken(null);
+            user.setResetPasswordTokenExpiration(null);
+
+            userRepository.save(user);
+
+            return  new SuccessfulResponse("200", "Contraseña restablecida exitosamente", user.getUsername());
+        } catch (Exception e) {
+            return new UnsuccessfulResponse("500", "Error al restablecer la contraseña", e.getMessage());
         }
     }
 

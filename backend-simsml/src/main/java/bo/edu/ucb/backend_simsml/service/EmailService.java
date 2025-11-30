@@ -18,6 +18,9 @@ public class EmailService {
     @Value("${app.mail.from:no-reply@simsml.com}")
     private String from;
 
+    @Value("${app.frontend.base-url}")
+    private String frontendBaseUrl;
+
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
@@ -65,6 +68,35 @@ public class EmailService {
         } catch (Exception e) {
             log.error("Error al enviar correo de stock bajo para inventario {}: {}",
                     inventory.getInventoryId(), e.getMessage(), e);
+        }
+    }
+
+    public void sendPasswordResetEmail(String to, String token) {
+        try {
+            String subject = "Restablecer contraseña";
+
+            String resetUrl = frontendBaseUrl + "/auth/reset-password/" + token;
+
+            String text = """
+                Hola,
+                
+                Has solicitado restablecer tu contraseña.
+                Por favor haz clic en el siguiente enlace (o cópialo en tu navegador):
+                %s
+
+                Si no solicitaste este cambio, simplemente ignora este correo.
+                """.formatted(resetUrl);
+
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(to);
+            message.setSubject(subject);
+            message.setText(text);
+
+            mailSender.send(message);
+
+            log.info("Correo de restauración enviado correctamente");
+        } catch (Exception e) {
+            log.error("Error al enviar el correo para resetear contraseña");
         }
     }
 }

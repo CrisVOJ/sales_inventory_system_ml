@@ -40,6 +40,8 @@ app:
     from: "Sistema de Ventas y Inventario <no-reply>"
     low-stock:
       to: "cristopheroliverajimenez@gmail.com"
+  frontend:
+    base-url: http://localhost:4200
 
 security:
   jwt:
