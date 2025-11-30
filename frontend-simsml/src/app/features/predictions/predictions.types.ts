@@ -14,3 +14,14 @@ export interface DemandVsPredictionPoint {
     prediction: number;
     demand: number;
 }
+
+export enum PredictionModelType {
+    PROPHET = 1,
+    RNN = 2
+}
+
+export interface CreatePredictionRequest {
+    inventory: number;
+    months: number;
+    modelType: PredictionModelType;
+}

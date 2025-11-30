@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { Prediction } from "./predictions.types";
+import { CreatePredictionRequest, Prediction, PredictionModelType } from "./predictions.types";
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { FloatLabelModule } from "primeng/floatlabel";
 import { DatePickerModule } from "primeng/datepicker";
@@ -61,6 +61,18 @@ export type PredictionFormValue = Omit<Prediction, 'predictionId'>
                     [minDate]="minMonth"
                 />
                 <label for="name">Mes Límite*</label>
+            </p-floatlabel>
+
+            <p-floatlabel variant="on">
+                <p-select
+                    id="modelType"
+                    formControlName="modelType"
+                    [options]="modelTypeOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    appendTo="body"
+                />
+                <label for="modelType">Tipo de predicción</label>
             </p-floatlabel>
         </form>
 
@@ -137,11 +149,15 @@ export type PredictionFormValue = Omit<Prediction, 'predictionId'>
 })
 export class PredictionFormComponent {
     @Input() value: any | null = null;
-    @Output() submit = new EventEmitter<{ inventory: number; months: number; }>();
+    @Output() submit = new EventEmitter<CreatePredictionRequest>();
     @Output() cancel = new EventEmitter<void>();
 
     locationOptions: Locationsummary[] = [];
     inventoryProductsOptions: Inventory[] = [];
+    modelTypeOptions = [
+        { label: 'Serie de tiempo', value: PredictionModelType.PROPHET },
+        { label: 'Red Neuronal', value: PredictionModelType.RNN },
+    ]
 
     minMonth!: Date;
 
@@ -159,6 +175,7 @@ export class PredictionFormComponent {
             location: p.location ?? '',
             inventory: p.inventory ?? '',
             targetMonth: p.targetMonth ?? '',
+            modelType: p.modelType ?? PredictionModelType.PROPHET
         });
 
         if (p.location) {
@@ -180,6 +197,9 @@ export class PredictionFormComponent {
             location: this.fb.control('', { validators: [Validators.required] }),
             inventory: this.fb.control('', { validators: [Validators.required] }),
             targetMonth: this.fb.control('', { validators: [Validators.required] }),
+            modelType: this.fb.control<PredictionModelType | ''>(PredictionModelType.PROPHET, 
+                { validators: [Validators.required] }
+            ),
         });
 
         this.form.get('location')!.valueChanges.subscribe((locationId) => {
@@ -255,7 +275,7 @@ export class PredictionFormComponent {
         this.form.markAllAsTouched();
         if (this.form.invalid) return;
 
-        const { inventory, targetMonth } = this.form.getRawValue();
+        const { inventory, targetMonth, modelType } = this.form.getRawValue();
 
         const selected = new Date(targetMonth);
         if (isNaN(selected.getTime())) {
@@ -287,16 +307,11 @@ export class PredictionFormComponent {
 
         const months = diffMonths + 1;
 
-        const payload = {
+        const payload: CreatePredictionRequest = {
             inventory: Number(inventory),
-            months
+            months,
+            modelType: modelType as PredictionModelType,
         }
-
-        this.messageService.add({
-            severity: 'info',
-            summary: 'Inventario y cantidad de meses',
-            detail: `Inventario: ${payload.inventory}, Meses: ${payload.months}`
-        });
 
         this.submit.emit(payload);
     }

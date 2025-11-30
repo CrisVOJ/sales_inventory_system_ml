@@ -54,7 +54,13 @@ public class PredictionService {
                 return new UnsuccessfulResponse("404", "No hay datos de ventas para el inventario especificado", null);
             }
 
-            MlForecastResponse mlResponse = predictDemand(request.inventory(), monthlyData, request.months());
+            String url = switch (request.modelType()) {
+                case 1 -> "/predict/demand";
+                case 2 -> "/predict/demand_rnn";
+                default -> "/predict/demand";
+            };
+
+            MlForecastResponse mlResponse = predictDemand(request.inventory(), monthlyData, request.months(), url);
 
             if (mlResponse == null || mlResponse.forecasts() == null || mlResponse.forecasts().isEmpty()) {
                 return new UnsuccessfulResponse("500", "Error al obtener la predicción del modelo de ML", null);
@@ -131,14 +137,14 @@ public class PredictionService {
         }
     }
 
-    public MlForecastResponse predictDemand(Long inventoryId, List<Map<String, Object>> monthlyData, int months) {
+    public MlForecastResponse predictDemand(Long inventoryId, List<Map<String, Object>> monthlyData, int months, String url) {
         Map<String, Object> payload = new HashMap<>();
         payload.put("inventory_id", inventoryId);
         payload.put("data", monthlyData);
         payload.put("months", months);
 
         return webClient.post()
-                .uri("/predict/demand")
+                .uri(url)
                 .bodyValue(payload)
                 .retrieve()
                 .bodyToMono(MlForecastResponse.class)

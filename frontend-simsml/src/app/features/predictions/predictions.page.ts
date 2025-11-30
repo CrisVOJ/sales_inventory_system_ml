@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { Component } from "@angular/core";
 import { CrudColumn, DataTableComponent } from "../../shared/data-table/data-table.component";
 import { ModalComponent } from "../../shared/modal/modal.component";
-import { Prediction } from "./predictions.types";
+import { CreatePredictionRequest, Prediction } from "./predictions.types";
 import { PredictionsService } from "./predictions.service";
 import { MessageService } from "primeng/api";
 import { PredictionFormComponent } from "./prediction-form.component";
@@ -161,14 +161,14 @@ export class PredictionPage {
         this.formOpen = false;
     }
 
-    save(payload: { inventory: number, months: number }){
+    save(payload: CreatePredictionRequest){
         this.predictions.createPrediction(payload).subscribe(() => {
             this.closeForm();
             this.load();
             this.messageService.add({ 
                 severity: 'success',
                 summary: 'Operación Exitosa',
-                detail: `Predicción creada exitosamente. Inventario ${payload.inventory} y Meses ${payload.months}`
+                detail: `Predicción creada exitosamente. Inventario ${payload.inventory}, Meses ${payload.months} y Tipo ${payload.modelType}`
             });
         });
     }

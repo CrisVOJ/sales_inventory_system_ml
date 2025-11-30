@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BaseCrudService } from "../../shared/base-crud.service";
-import { DemandVsPredictionPoint, Prediction } from "./predictions.types";
+import { CreatePredictionRequest, DemandVsPredictionPoint, Prediction } from "./predictions.types";
 import { HttpClient } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
 import { ApiEnvelope, isUnsuccessful } from "../../shared/api.types";
@@ -24,7 +24,7 @@ export class PredictionsService extends BaseCrudService<Prediction> {
         }
     }
 
-    createPrediction(dto: { inventory: number; months: number }) {
+    createPrediction(dto: CreatePredictionRequest) {
         return this.http.post<ApiEnvelope<any>>(`${this.baseUrl}/create`, dto).pipe(
             map(raw => !isUnsuccessful(raw) && String(raw.status).startsWith('2')),
             catchError(() => of(false))

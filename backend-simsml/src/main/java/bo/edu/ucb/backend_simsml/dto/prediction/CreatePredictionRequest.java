@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 
 public record CreatePredictionRequest(
         @NotNull Long inventory,
-        @NotNull Integer months
+        @NotNull Integer months,
+        Integer modelType
 ) {
 }
