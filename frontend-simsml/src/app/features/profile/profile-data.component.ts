@@ -4,6 +4,8 @@ import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } fr
 import { FloatLabelModule } from "primeng/floatlabel";
 import { InputTextModule } from "primeng/inputtext";
 import { User } from "../users/users.types";
+import { MessageModule } from "primeng/message";
+import { MessageService } from "primeng/api";
 
 @Component({
     selector: 'app-profile-data',
@@ -12,49 +14,101 @@ import { User } from "../users/users.types";
         CommonModule,
         ReactiveFormsModule,
         InputTextModule,
-        FloatLabelModule
+        FloatLabelModule,
+        MessageModule
     ],
     template: `
         <form [formGroup]="form" class="form-grid">
 
-            <p-floatlabel variant="on">
-                <input pInputText id="identityDoc" formControlName="identityDoc" autocomplete="off"/>
-                <label for="identityDoc">Doc. Identidad</label>
-            </p-floatlabel>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <input pInputText id="identityDoc" formControlName="identityDoc" autocomplete="off"/>
+                    <label for="identityDoc">Doc. Identidad</label>
+                </p-floatlabel>
+                @if (isInvalid('identityDoc')) {
+                    <p-message 
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >Campo requerido.</p-message>
+                }
+            </div>    
 
-            <p-floatlabel variant="on">
-                <input pInputText id="phone" formControlName="phone" autocomplete="off"/>
-                <label for="phone">Teléfono</label>
-            </p-floatlabel>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <input pInputText id="phone" formControlName="phone" autocomplete="off"/>
+                    <label for="phone">Teléfono</label>
+                </p-floatlabel>
+            </div>
 
-            <p-floatlabel variant="on">
-                <input pInputText id="address" formControlName="address" autocomplete="off"/>
-                <label for="address">Dirección</label>
-            </p-floatlabel>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <input pInputText id="address" formControlName="address" autocomplete="off"/>
+                    <label for="address">Dirección</label>
+                </p-floatlabel>
+            </div>
 
-            <p-floatlabel variant="on">
-                <input pInputText id="name" formControlName="name" autocomplete="off"/>
-                <label for="name">Nombre</label>
-            </p-floatlabel>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <input pInputText id="name" formControlName="name" autocomplete="off"/>
+                    <label for="name">Nombre</label>
+                </p-floatlabel>
+                @if (isInvalid('name')) {
+                    <p-message 
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >Campo requerido.</p-message>
+                }
+            </div>
 
-            <p-floatlabel variant="on">
-                <input pInputText id="paternalSurname" formControlName="paternalSurname" autocomplete="off"/>
-                <label for="paternalSurname">Apellido Paterno</label>
-            </p-floatlabel>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <input pInputText id="paternalSurname" formControlName="paternalSurname" autocomplete="off"/>
+                    <label for="paternalSurname">Apellido Paterno</label>
+                </p-floatlabel>
+                @if (isInvalid('paternalSurname')) {
+                    <p-message 
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >Campo requerido.</p-message>
+                }
+            </div>
 
-            <p-floatlabel variant="on">
-                <input pInputText id="maternalSurname" formControlName="maternalSurname" autocomplete="off"/>
-                <label for="maternalSurname">Apellido Materno</label>
-            </p-floatlabel>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <input pInputText id="maternalSurname" formControlName="maternalSurname" autocomplete="off"/>
+                    <label for="maternalSurname">Apellido Materno</label>
+                </p-floatlabel>
+            </div>
 
-            <p-floatlabel variant="on">
-                <input pInputText id="email" formControlName="email" autocomplete="off"/>
-                <label for="email">Email</label>
-            </p-floatlabel>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <input pInputText id="email" formControlName="email" autocomplete="off"/>
+                    <label for="email">Correo</label>
+                </p-floatlabel>
+                @if (isInvalid('email')) {
+                    @if (this.form.get('email')?.errors?.['required']) {
+                        <p-message 
+                            severity="error"
+                            size="small"
+                            variant="simple"
+                        >Campo requerido.</p-message>
+                    }
+                    @if (this.form.get('email')?.errors?.['email']) {
+                        <p-message 
+                            severity="error"
+                            size="small"
+                            variant="simple"
+                        >Correo invalido.</p-message>
+                    }
+                }
+            </div>
         </form>
 
         <div class="actions">
-            <button class="btn" (click)="save()" [disabled]="form.invalid">Actualizar</button>
+            <button class="btn" (click)="save()">Actualizar</button>
         </div>
     `,
     styles: [`
@@ -90,7 +144,12 @@ export class ProfileDataComponent implements OnChanges {
 
     form!: FormGroup;
 
-    constructor(private fb: NonNullableFormBuilder) {}
+    formSubmitted = false;
+
+    constructor(
+        private fb: NonNullableFormBuilder,
+        private messageService: MessageService
+    ) {}
 
     ngOnInit() {
         this.form = this.fb.group({
@@ -120,7 +179,24 @@ export class ProfileDataComponent implements OnChanges {
     }
 
     save() {
-        console.log(this.form.value);
+        this.formSubmitted = true;
+
+        if (this.form.invalid) {
+            this.messageService.add({
+                severity: 'info',
+                summary: 'Completar Campos Datos',
+                detail: 'Debe completar todos los campos.',
+            })
+            return
+        };
+
         this.submit.emit(this.form.value);
+
+        this.formSubmitted = false;
+    }
+
+    isInvalid(controlName: string) {
+        const control = this.form.get(controlName);
+        return control?.invalid && (control.touched || this.formSubmitted);
     }
 }

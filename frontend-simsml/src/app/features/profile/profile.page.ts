@@ -4,7 +4,6 @@ import { ProfileDataComponent } from "./profile-data.component";
 import { ProfilePasswordComponent } from "./profile-password.component";
 import { UsersService } from "../users/users.service";
 import { User } from "../users/users.types";
-import { Toast } from "primeng/toast";
 import { MessageService } from "primeng/api";
 
 @Component({
@@ -22,21 +21,21 @@ import { MessageService } from "primeng/api";
             </header>
 
             <div class="grid">
-            <div class="card">
-                <h2>Actualizar Datos</h2>
-                <app-profile-data 
-                    [value]="user"
-                    (submit)="updateData($event)"
-                />
-            </div>
+                <div class="card">
+                    <h2>Actualizar Datos</h2>
+                    <app-profile-data 
+                        [value]="user"
+                        (submit)="updateData($event)"
+                    />
+                </div>
 
-            <div class="card">
-                <h2>Actualizar Contraseña</h2>
-                <app-profile-password 
-                    #passwordForm
-                    (submit)="updatePassword($event, passwordForm)" 
-                />
-            </div>
+                <div class="card">
+                    <h2>Actualizar Contraseña</h2>
+                    <app-profile-password 
+                        #passwordForm
+                        (submit)="updatePassword($event, passwordForm)" 
+                    />
+                </div>
             </div>
         </section>
     `,
@@ -44,10 +43,10 @@ import { MessageService } from "primeng/api";
         .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 2rem;
+            gap: 1.5rem;
         }
         .card {
-            padding: 1.5rem;
+            padding: 0rem 0.5rem 1rem;
             border-radius: 10px;
             background: #345861;
             color: white;
@@ -76,7 +75,14 @@ export class ProfilePage {
 
     load() {
         this.users.getUserData().subscribe(u => {
-            if(!u) console.error('Error al obtener datos del usuario');
+            if(!u) {
+                this.messageService.add({ 
+                    severity: 'error',
+                    summary: 'Operación Fallida',
+                    detail: 'No se encontraron datos del usuario.'
+                });
+                return;
+            };
             this.user = u;
         });
     }
@@ -96,26 +102,41 @@ export class ProfilePage {
             ...dto
         }
         this.users.update(payload).subscribe(ok => {
-            if(ok) {
-                this.messageService.add({ 
-                    severity: 'success',
-                    summary: 'Operación Exitosa',
-                    detail: 'Datos actualizados exitosamente.'
+            if(!ok) {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Operación Fallida',
+                    detail: 'Error al actualizar los datos.'
                 });
+
+                return;
             };
+
+            this.messageService.add({ 
+                severity: 'success',
+                summary: 'Operación Exitosa',
+                detail: 'Datos actualizados exitosamente.'
+            });
         });
     }
 
     updatePassword(dto: any, passwordForm: any) {
         this.users.updatePassword(dto).subscribe(ok => {
-            if (ok) {
+            if (!ok) {
                 this.messageService.add({ 
-                    severity: 'success',
-                    summary: 'Operación Exitosa',
-                    detail: 'Contraseña actualizada exitosamente.'
+                    severity: 'error',
+                    summary: 'Operación Fallida',
+                    detail: 'Error al actualizar la contraseña.'
                 });
-                passwordForm.resetForm();
+
+                return;
             };
+            this.messageService.add({ 
+                severity: 'success',
+                summary: 'Operación Exitosa',
+                detail: 'Contraseña actualizada exitosamente.'
+            });
+            passwordForm.resetForm();
         });
     }
 }
