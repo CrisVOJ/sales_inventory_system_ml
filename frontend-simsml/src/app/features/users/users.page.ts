@@ -10,6 +10,7 @@ import { UserDetailsComponent } from "./user-details.component";
 import { ConfirmComponent } from '../../shared/confirm/confirm.component';
 import { ConfirmService } from '../../shared/confirm/confirm.service';
 import { roleListLabel } from '../../shared/roles/role-labels';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'users-page',
@@ -116,7 +117,8 @@ export class UsersPage {
 
   constructor(
     private users: UsersService,
-    private confirm: ConfirmService
+    private confirm: ConfirmService,
+    private messageService: MessageService
   ){
     this.load();
   }
@@ -196,35 +198,66 @@ export class UsersPage {
     
     req$.subscribe({
       next: ok => {
-        if(ok) {
-          this.closeForm();
-          this.load();
-        } else {
-          alert('No autorizado o datos invalidos');
+        if(!ok) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No autorizado o datos invalidos'
+          })
+
+          return;
         }
+        if(this.editing?.userId){
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Operación Exitosa',
+            detail: 'Usuario actualizado exitosamente'
+          });
+        } else {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Operación Exitosa',
+            detail: 'Usuario creado exitosamente'
+          });
+        }
+        this.closeForm();
+        this.load();
       },
       error: e => {
-        if (e.status === 403) alert('403: sin permisos suficientes');
-        else alert('Error inesperado');
+        if (e.status === 403) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: '403: sin permisos suficientes'
+          })
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error inesperado'
+          })
+        };
       }
-    })
-  }
-
-  create(payload: Partial<User>){
-    this.users.create(payload).subscribe(ok => {
-      if(ok) this.load();
-    })
-  }
-
-  update(id: number, patch: Partial<User>){
-    this.users.update({ ...patch, userId: id }).subscribe(ok => {
-      if(ok) this.load();
     })
   }
 
   remove(id: number){
     this.users.remove(id, 'userId').subscribe(ok => {
-      if(ok) this.load();
+      if(!ok) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No autorizado o datos invalidos'
+        });
+
+        return;
+      };
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Operación Exitosa',
+        detail: 'Usuario eliminado exitosamente'
+      })
+      this.load();
     })
   }
 }

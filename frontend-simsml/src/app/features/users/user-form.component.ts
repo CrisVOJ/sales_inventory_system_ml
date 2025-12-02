@@ -4,7 +4,9 @@ import { User } from './users.types';
 
 import { InputTextModule } from 'primeng/inputtext';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { MultiSelectModule } from 'primeng/multiselect'
+import { MultiSelectModule } from 'primeng/multiselect';
+import { MessageModule } from 'primeng/message';
+import { MessageService } from 'primeng/api';
 
 type RoleOption = { name: string, value: string };
 
@@ -17,75 +19,150 @@ export type UserFormValue = Omit<User, 'userId'>;
     ReactiveFormsModule,
     InputTextModule,
     FloatLabelModule,
-    MultiSelectModule
+    MultiSelectModule,
+    MessageModule
 ],
   template: `
     <form [formGroup]="form" class="grid">
 
       <!-- Fila 1 -->
-      <p-floatlabel variant="on">
-        <input pInputText id="identityDoc" formControlName="identityDoc" autocomplete="off"/>
-        <label for="identityDoc">Doc. Identidad</label>
-      </p-floatlabel>
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input pInputText id="identityDoc" formControlName="identityDoc" autocomplete="off"/>
+          <label for="identityDoc">Doc. Identidad*</label>
+        </p-floatlabel>
+        @if (isInvalid('identityDoc')) {
+          <p-message
+            severity="error"
+            size="small"
+            variant="simple"
+          >Campo requerido.</p-message>
+        }
+      </div>
 
-      <p-floatlabel variant="on">
-        <input pInputText id="name" formControlName="name" autocomplete="off"/>
-        <label for="name">Nombre*</label>
-      </p-floatlabel>
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input pInputText id="name" formControlName="name" autocomplete="off"/>
+          <label for="name">Nombre*</label>
+        </p-floatlabel>
+        @if (isInvalid('name')) {
+          <p-message
+            severity="error"
+            size="small"
+            variant="simple"
+          >Campo requerido.</p-message>
+        }
+      </div>
 
-      <p-floatlabel variant="on">
-        <input pInputText id="username" formControlName="username" autocomplete="off"/>
-        <label for="username">Nombre de Usuario*</label>
-      </p-floatlabel>
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input pInputText id="username" formControlName="username" autocomplete="off"/>
+          <label for="username">Nombre de Usuario*</label>
+        </p-floatlabel>
+        @if (isInvalid('username')) {
+          <p-message
+            severity="error"
+            size="small"
+            variant="simple"
+          >Campo requerido.</p-message>
+        }
+      </div>
 
       <!-- Fila 2 -->
-      <p-floatlabel variant="on">
-        <input pInputText id="phone" formControlName="phone" autocomplete="off"/>
-        <label for="phone">Teléfono*</label>
-      </p-floatlabel>
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input pInputText id="phone" formControlName="phone" autocomplete="off"/>
+          <label for="phone">Teléfono*</label>
+        </p-floatlabel>
+        @if (isInvalid('phone')) {
+          <p-message
+            severity="error"
+            size="small"
+            variant="simple"
+          >Campo requerido.</p-message>
+        }
+      </div>
 
-      <p-floatlabel variant="on">
-        <input pInputText id="paternalSurname" formControlName="paternalSurname" autocomplete="off"/>
-        <label for="paternalSurname">Apellido Paterno*</label>
-      </p-floatlabel>
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input pInputText id="paternalSurname" formControlName="paternalSurname" autocomplete="off"/>
+          <label for="paternalSurname">Apellido Paterno*</label>
+        </p-floatlabel>
+        @if (isInvalid('paternalSurname')) {
+          <p-message
+            severity="error"
+            size="small"
+            variant="simple"
+          >Campo requerido.</p-message>
+        }
+      </div>
 
-      <p-floatlabel variant="on">
-        <input pInputText id="email" formControlName="email" autocomplete="off"/>
-        <label for="email">Correo*</label>
-      </p-floatlabel>
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input pInputText id="email" formControlName="email" autocomplete="off"/>
+          <label for="email">Correo*</label>
+        </p-floatlabel>
+        @if (isInvalid('email')) {
+          @if (this.form.get('email')?.errors?.['required']) {
+            <p-message
+              severity="error"
+              size="small"
+              variant="simple"
+            >Campo requerido.</p-message>
+          }
+          @if (this.form.get('email')?.errors?.['email']) {
+            <p-message
+              severity="error"
+              size="small"
+              variant="simple"
+            >Correo invalido.</p-message>
+          }
+        }
+      </div>
 
       <!-- Fila 3 -->
-      <p-floatlabel variant="on">
-        <input pInputText id="address" formControlName="address" autocomplete="off"/>
-        <label for="address">Dirección</label>
-      </p-floatlabel>
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input pInputText id="address" formControlName="address" autocomplete="off"/>
+          <label for="address">Dirección</label>
+        </p-floatlabel>
+      </div>
 
-      <p-floatlabel variant="on">
-        <input pInputText id="maternalSurname" formControlName="maternalSurname" autocomplete="off"/>
-        <label for="maternalSurname">Apellido Materno</label>
-      </p-floatlabel>
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input pInputText id="maternalSurname" formControlName="maternalSurname" autocomplete="off"/>
+          <label for="maternalSurname">Apellido Materno</label>
+        </p-floatlabel>
+      </div>
 
-      <p-floatlabel variant="on">
-        <p-multiselect
-          id="roles"
-          formControlName="roles"
-          [options]="rolesOptions"
-          optionLabel="name"
-          optionValue="value"
-          display="chip"
-          appendTo="body"
-          panelStyleClass="multiselect-panel"
-        />
-        <label for="role">Rol*</label>
-      </p-floatlabel>
-
+      <div class="field">
+        <p-floatlabel variant="on">
+          <p-multiselect
+            id="roles"
+            formControlName="roles"
+            [options]="rolesOptions"
+            optionLabel="name"
+            optionValue="value"
+            display="chip"
+            appendTo="body"
+            panelStyleClass="multiselect-panel"
+          />
+          <label for="roles">Rol*</label>
+        </p-floatlabel>
+        @if (isInvalid('roles')) {
+          <p-message
+            severity="error"
+            size="small"
+            variant="simple"
+          >Campo requerido.</p-message>
+        }
+      </div>
     </form>
 
     <div class="actions full">
       <button 
         type="button" 
-        class="btn" 
-        [disabled]="form.invalid" 
+        class="btn"
         (click)="save()"
       >
         Guardar
@@ -154,14 +231,19 @@ export class UserFormComponent {
   
   form!: FormGroup;
 
-  constructor(private fb: NonNullableFormBuilder) {}
+  formSubmitted = false;
+
+  constructor(
+    private fb: NonNullableFormBuilder,
+    private messageService: MessageService
+  ) {}
 
   ngOnInit() {
     this.rolesOptions = this.buildRoleOptions();
     
     this.form = this.fb.group({
-        identityDoc: this.fb.control(''),
-        phone: this.fb.control(''),
+        identityDoc: this.fb.control('', { validators: [Validators.required] }),
+        phone: this.fb.control('', { validators: [Validators.required] }),
         address: this.fb.control(''),
         name: this.fb.control('', { validators: [Validators.required] }),
         paternalSurname: this.fb.control('', { validators: [Validators.required] }),
@@ -229,11 +311,28 @@ export class UserFormComponent {
   }
 
   save(){
+    this.formSubmitted = true;
+
     this.form.markAllAsTouched();
-    if (this.form.invalid) return;
+    
+    if (this.form.invalid) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Completar Campos',
+        detail: 'Debe completar todos los campos correctamente.',
+      })
+      return
+    };
 
     const dto = this.form.getRawValue() as UserFormValue;
 
     this.submit.emit(dto);
+
+    this.formSubmitted = false;
+  }
+
+  isInvalid(controlName: string) {
+    const control = this.form.get(controlName);
+    return control?.invalid && (control.touched || this.formSubmitted);
   }
 }
