@@ -24,7 +24,7 @@ import { SaleFormComponent } from "./sale-form.component";
             </header>
 
             <app-data-table
-                [entityName]="'Producto'"
+                [entityName]="'Venta'"
                 [columns]="cols"
                 [rows]="rows"
                 [total]="total"

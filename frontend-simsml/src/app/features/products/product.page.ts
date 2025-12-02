@@ -102,10 +102,6 @@ export class ProductsPage {
             id:'edit',  label:'Editar', icon:'pi-pen-to-square', 
             color: u => '#86E000'
         },
-        { 
-            id:'setMinPrice',  label:'Establecer Cantidad Minima', icon:'pi-pen-to-square', 
-            color: u => '#0C83FF'
-        },
         {
             id:'delete', label:'Eliminar', icon:'pi-trash',
             color: u => '#E04500'
