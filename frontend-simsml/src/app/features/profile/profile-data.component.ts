@@ -39,6 +39,13 @@ import { MessageService } from "primeng/api";
                     <input pInputText id="phone" formControlName="phone" autocomplete="off"/>
                     <label for="phone">Teléfono</label>
                 </p-floatlabel>
+                @if (isInvalid('phone')) {
+                    <p-message 
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >Campo requerido.</p-message>
+                }
             </div>
 
             <div class="field">
@@ -154,7 +161,7 @@ export class ProfileDataComponent implements OnChanges {
     ngOnInit() {
         this.form = this.fb.group({
             identityDoc: this.fb.control('', Validators.required),
-            phone: this.fb.control(''),
+            phone: this.fb.control('', Validators.required),
             address: this.fb.control(''),
             name: this.fb.control('', Validators.required),
             paternalSurname: this.fb.control('', Validators.required),
