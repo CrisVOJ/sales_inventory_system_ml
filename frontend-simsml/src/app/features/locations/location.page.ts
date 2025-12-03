@@ -8,6 +8,7 @@ import { LocationDetailsComponent } from "./location-details.component";
 import { Location } from "./locations.types";
 import { LocationsService } from "./locations.service";
 import { ConfirmService } from "../../shared/confirm/confirm.service";
+import { MessageService } from "primeng/api";
 
 @Component({
     selector: 'location-page',
@@ -106,9 +107,12 @@ export class LocationsPage {
     page = 1; pageSize = 5;
     q = '';
 
+    operationDetail = 'Ubicación creada exitosamente';
+
     constructor(
         private locations: LocationsService,
-        private confirm: ConfirmService
+        private confirm: ConfirmService,
+        private messageService: MessageService
     ) {
         this.load();
     }
@@ -188,24 +192,64 @@ export class LocationsPage {
             
         req$.subscribe({
             next: ok => {
-                if(ok) {
-                    this.closeForm();
-                    this.load();
-                } else {
-                    console.log('Payload: ', payload);
-                    alert('No autorizado o datos invalidos');
+                if(!ok) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'No autorizado o datos invalidos'
+                    })
+
+                    return;
                 }
+
+                if(this.editing?.locationId) this.operationDetail = 'Ubicación actualizada exitosamente';
+                else this.operationDetail = 'Ubicación creada exitosamente';
+                
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Operación Exitosa',
+                    detail: this.operationDetail
+                });
+
+                this.closeForm();
+                this.load();
             },
             error: e => {
-                if (e.status === 403) alert('403: sin permisos suficientes');
-                else alert('Error inesperado');
+                if (e.status === 403) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: '403: No autorizado'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error inesperado'
+                    });
+                };
             }
         })
     }
 
     remove(id: number) {
         this.locations.remove(id, 'locationId').subscribe(ok => {
-            if(ok) this.load();
+            if(!ok) {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'No autorizado o datos invalidos'
+                })
+
+                return;
+            } 
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Operación Exitosa',
+                detail: 'Ubicación eliminada exitosamente'
+            })
+
+            this.load();
         })
     }
 }

@@ -3,6 +3,8 @@ import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } fr
 import { InputTextModule } from "primeng/inputtext";
 import { FloatLabelModule } from "primeng/floatlabel";
 import { Location } from "./locations.types";
+import { MessageModule } from "primeng/message";
+import { MessageService } from "primeng/api";
 
 export type LocationFormValue = Omit<Location, 'locationId'>
 
@@ -12,25 +14,43 @@ export type LocationFormValue = Omit<Location, 'locationId'>
     imports: [
         ReactiveFormsModule,
         InputTextModule,
-        FloatLabelModule
+        FloatLabelModule,
+        MessageModule
     ],
     template: `
         <form [formGroup]="form" class="grid">
-            <p-floatlabel variant="on">
-                <input pInputText id="code" formControlName="code" autocomplete="off"/>
-                <label for="code">Código</label>
-            </p-floatlabel>
-            <p-floatlabel variant="on">
-                <input pInputText id="name" formControlName="name" autocomplete="off"/>
-                <label for="name">Nombre*</label>
-            </p-floatlabel>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <input pInputText id="code" formControlName="code" autocomplete="off"/>
+                    <label for="code">Código*</label>
+                </p-floatlabel>
+                @if (isInvalid('code')) {
+                    <p-message
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >Campo requerido.</p-message>
+                }
+            </div>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <input pInputText id="name" formControlName="name" autocomplete="off"/>
+                    <label for="name">Nombre*</label>
+                </p-floatlabel>
+                @if (isInvalid('name')) {
+                    <p-message
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >Campo requerido.</p-message>
+                }
+            </div>
         </form>
 
         <div class="actions full">
             <button 
                 type="button" 
-                class="btn" 
-                [disabled]="form.invalid" 
+                class="btn"
                 (click)="save()"
             >
                 Guardar
@@ -97,7 +117,12 @@ export class LocationFormComponent {
 
     form!: FormGroup;
 
-    constructor(private fb: NonNullableFormBuilder) {}
+    formSubmitted = false;
+
+    constructor(
+        private fb: NonNullableFormBuilder,
+        private messageService: MessageService
+    ) {}
 
     private patchFromValue(v: Partial<Location>) {
         this.form.patchValue({
@@ -121,11 +146,27 @@ export class LocationFormComponent {
     }
 
     save() {
+        this.formSubmitted = true;
+
         this.form.markAllAsTouched();
-        if (this.form.invalid) return;
+        
+        if (this.form.invalid) {
+            this.messageService.add({
+                severity: 'info',
+                summary: 'Completar Campos',
+                detail: 'Debe completar todos los campos correctamente.',
+            })
+            return;
+        };
 
         const dto = this.form.getRawValue() as LocationFormValue;
-
         this.submit.emit(dto);
+
+        this.formSubmitted = false;
+    }
+
+    isInvalid(controlName: string) {
+        const control = this.form.get(controlName);
+        return control?.invalid && (control.touched || this.formSubmitted);
     }
 }
