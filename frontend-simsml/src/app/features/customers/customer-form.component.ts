@@ -3,6 +3,8 @@ import { Customer } from "./customers.types";
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { InputTextModule } from "primeng/inputtext";
 import { FloatLabelModule } from "primeng/floatlabel";
+import { MessageModule } from "primeng/message";
+import { MessageService } from "primeng/api";
 
 export type CustomerFormValue = Omit<Customer, 'customerId'>
 
@@ -12,41 +14,67 @@ export type CustomerFormValue = Omit<Customer, 'customerId'>
     imports: [
         ReactiveFormsModule,
         InputTextModule,
-        FloatLabelModule
+        FloatLabelModule,
+        MessageModule
     ],
     template: `
         <form [formGroup]="form" class="grid">
-            <p-floatlabel variant="on">
-                <input pInputText id="identityDocument" formControlName="identityDocument" autocomplete="off"/>
-                <label for="identityDocument">Doc. Identidad</label>
-            </p-floatlabel>
-            <p-floatlabel variant="on">
-                <input pInputText id="name" formControlName="name" autocomplete="off"/>
-                <label for="name">Nombre*</label>
-            </p-floatlabel>
-            <p-floatlabel variant="on">
-                <input pInputText id="phone" formControlName="phone" autocomplete="off"/>
-                <label for="phone">Teléfono</label>
-            </p-floatlabel>
-            <p-floatlabel variant="on">
-                <input pInputText id="paternalSurname" formControlName="paternalSurname" autocomplete="off"/>
-                <label for="paternalSurname">Apellido Paterno*</label>
-            </p-floatlabel>
-            <p-floatlabel variant="on">
-                <input pInputText id="address" formControlName="address" autocomplete="off"/>
-                <label for="address">Dirección</label>
-            </p-floatlabel>
-            <p-floatlabel variant="on">
-                <input pInputText id="maternalSurname" formControlName="maternalSurname" autocomplete="off"/>
-                <label for="maternalSurname">Apellido Materno</label>
-            </p-floatlabel>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <input pInputText id="identityDocument" formControlName="identityDocument" autocomplete="off"/>
+                    <label for="identityDocument">Doc. Identidad</label>
+                </p-floatlabel>
+            </div>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <input pInputText id="name" formControlName="name" autocomplete="off"/>
+                    <label for="name">Nombre*</label>
+                </p-floatlabel>
+                @if (isInvalid('name')) {
+                    <p-message
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >Campo requerido.</p-message>
+                }
+            </div>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <input pInputText id="phone" formControlName="phone" autocomplete="off"/>
+                    <label for="phone">Teléfono</label>
+                </p-floatlabel>
+            </div>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <input pInputText id="paternalSurname" formControlName="paternalSurname" autocomplete="off"/>
+                    <label for="paternalSurname">Apellido Paterno*</label>
+                </p-floatlabel>
+                @if (isInvalid('paternalSurname')) {
+                    <p-message
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >Campo requerido.</p-message>
+                }
+            </div>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <input pInputText id="address" formControlName="address" autocomplete="off"/>
+                    <label for="address">Dirección</label>
+                </p-floatlabel>
+            </div>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <input pInputText id="maternalSurname" formControlName="maternalSurname" autocomplete="off"/>
+                    <label for="maternalSurname">Apellido Materno</label>
+                </p-floatlabel>
+            </div>
         </form>
 
         <div class="actions full">
             <button 
                 type="button" 
                 class="btn" 
-                [disabled]="form.invalid" 
                 (click)="save()"
             >
                 Guardar
@@ -113,7 +141,12 @@ export class CustomerFormComponent {
 
     form!: FormGroup;
 
-    constructor(private fb: NonNullableFormBuilder) {}
+    formSubmitted = false;
+
+    constructor(
+        private fb: NonNullableFormBuilder,
+        private messageService: MessageService
+    ) {}
 
     private patchFromValue(v: Partial<Customer>) {
         this.form.patchValue({
@@ -145,11 +178,27 @@ export class CustomerFormComponent {
     }
 
     save() {
+        this.formSubmitted = true;
+
         this.form.markAllAsTouched();
-        if (this.form.invalid) return;
+
+        if (this.form.invalid) {
+            this.messageService.add({
+                severity: 'info',
+                summary: 'Completar Campos',
+                detail: 'Debe completar todos los campos correctamente.',
+            })
+            return;
+        };
 
         const dto = this.form.getRawValue() as CustomerFormValue;
-
         this.submit.emit(dto);
+
+        this.formSubmitted = false;
+    }
+
+    isInvalid(controlName: string) {
+        const control = this.form.get(controlName);
+        return control?.invalid && (control.touched || this.formSubmitted);
     }
 }

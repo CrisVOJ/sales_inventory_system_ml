@@ -8,6 +8,7 @@ import { ConfirmService } from "../../shared/confirm/confirm.service";
 import { ConfirmComponent } from "../../shared/confirm/confirm.component";
 import { CustomerFormComponent } from "./customer-form.component";
 import { CustomerDetailsComponent } from "./customer-details.component";
+import { MessageService } from "primeng/api";
 
 @Component({
     selector: 'customers-page',
@@ -110,9 +111,12 @@ export class CustomersPage {
     page = 1; pageSize = 5;
     q = '';
 
+    operationDetail = 'Cliente creado exitosamente';
+
     constructor(
         private customers: CustomersService,
-        private confirm: ConfirmService
+        private confirm: ConfirmService,
+        private messageService: MessageService
     ) {
         this.load();
     }
@@ -192,36 +196,63 @@ export class CustomersPage {
             
         req$.subscribe({
             next: ok => {
-                if(ok) {
-                    this.closeForm();
-                    this.load();
-                } else {
-                    console.log('Payload: ', payload);
-                    alert('No autorizado o datos invalidos');
+                if(!ok) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error inesperado'
+                    });
+
+                    return;
                 }
+
+                if(this.editing?.customerId) this.operationDetail = 'Cliente actualizado exitosamente';
+                
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Operación Exitosa',
+                    detail: this.operationDetail
+                });
+                
+                this.closeForm();
+                this.load();
             },
             error: e => {
-                if (e.status === 403) alert('403: sin permisos suficientes');
-                else alert('Error inesperado');
+                if (e.status === 403) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: '403: sin permisos suficientes'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error inesperado'
+                    });
+                };
             }
-        })
-    }
-
-    create(payload: Partial<Customer>) {
-        this.customers.create(payload).subscribe(ok => {
-            if(ok) this.load();
-        })
-    }
-
-    update(id: number, patch: Partial<Customer>) {
-        this.customers.update({ ...patch, customerId: id }).subscribe(ok => {
-            if(ok) this.load();
         })
     }
 
     remove(id: number) {
         this.customers.remove(id, 'customerId').subscribe(ok => {
-            if(ok) this.load();
+            if(!ok) {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'No autorizado o datos invalidos'
+                });
+
+                return;
+            }
+
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Operación Exitosa',
+                detail: 'Cliente eliminado exitosamente'
+            })
+            this.load();
         })
     }
 }
