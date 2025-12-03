@@ -35,11 +35,11 @@ INSERT INTO units (name, active) VALUES
 ON CONFLICT (name) DO NOTHING;
 
 -- LOCATIONS
-INSERT INTO locations (code, name, active) VALUES
-                                               ('A-B-1','Edificio A, Piso B, Estante 1',true),
-                                               ('A-B-2','Edificio A, Piso B, Estante 2',true),
-                                               ('A-B-3','Edificio A, Piso B, Estante 3',true)
-ON CONFLICT (code) DO NOTHING;
+INSERT INTO "db-simsml".public.locations (location_id, code, name, active) VALUES
+                                               (1, 'A-B-1','Edificio A, Piso B, Estante 1',true),
+                                               (2, 'A-B-2','Edificio A, Piso B, Estante 2',true),
+                                               (3, 'A-B-3','Edificio A, Piso B, Estante 3',true)
+ON CONFLICT (location_id) DO NOTHING;
 
 -- SALE STATUSES
 INSERT INTO sale_statuses (name, active) VALUES
@@ -59,4 +59,9 @@ ON CONFLICT (name) DO NOTHING;
 -- Indice parcial para predicciones activas
 CREATE UNIQUE INDEX IF NOT EXISTS ux_predictions_unique_active
 ON "db-simsml".public.predictions (inventory_inventory_id, target_month)
+WHERE active = true;
+
+-- Indice parcial para ubicaciones activas
+CREATE UNIQUE INDEX IF NOT EXISTS ux_locations_code_active
+ON "db-simsml".public.locations (code)
 WHERE active = true;

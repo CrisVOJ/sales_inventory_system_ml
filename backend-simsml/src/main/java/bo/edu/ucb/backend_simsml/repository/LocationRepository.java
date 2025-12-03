@@ -25,4 +25,11 @@ public interface LocationRepository extends JpaRepository<LocationEntity, Long> 
             "ORDER BY l.name ASC")
     List<LocationEntity> findAllLocationSummary();
 
+    @Query("SELECT CASE WHEN COUNT(l) > 0 THEN true ELSE false END " +
+            "FROM locations l " +
+            "WHERE l.code = :code " +
+            "AND (:excludeId IS NULL OR l.locationId <> :excludeId) " +
+            "AND l.active = true")
+    boolean existsByCode(@Param("code") String code, @Param("excludeId") Long excludeId);
+
 }

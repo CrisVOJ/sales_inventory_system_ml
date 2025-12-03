@@ -19,7 +19,7 @@ public class LocationEntity {
     @Column(name = "location_id")
     private Long locationId;
 
-    @Column(name = "code", unique = true, nullable = false)
+    @Column(name = "code", nullable = false)
     private String code;
     @Column(name = "name", nullable = false)
     private String name;

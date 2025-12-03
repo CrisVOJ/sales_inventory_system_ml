@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { BaseCrudService } from "../../shared/base-crud.service";
 import { Location, Locationsummary } from "./locations.types";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
 import { catchError, map, Observable, of } from "rxjs";
 import { ApiEnvelope, isUnsuccessful } from "../../shared/api.types";
@@ -31,5 +31,25 @@ export class LocationsService extends BaseCrudService<Location> {
             }),
             catchError(() => of(null))
         )
+    }
+
+    existByCode(code: string, excludeId?: number | null): Observable<boolean> {
+        let params = new HttpParams().set('code', code);
+
+        if (excludeId != null) {
+            params = params.set('excludeId', String(excludeId));
+        }
+
+        return this.http.get<ApiEnvelope<any>>(`${this.baseUrl}/exists`, { params }).pipe(
+            map(raw => {
+                if (isUnsuccessful(raw)) return false;
+
+                return !!raw.result;
+            }),
+            catchError(err => {
+                console.error(err);
+                return of(false);
+            })
+        );
     }
 }

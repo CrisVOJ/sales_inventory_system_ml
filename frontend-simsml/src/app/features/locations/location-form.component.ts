@@ -1,10 +1,12 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import { AbstractControl, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validators, AsyncValidatorFn } from "@angular/forms";
 import { InputTextModule } from "primeng/inputtext";
 import { FloatLabelModule } from "primeng/floatlabel";
 import { Location } from "./locations.types";
 import { MessageModule } from "primeng/message";
 import { MessageService } from "primeng/api";
+import { LocationsService } from "./locations.service";
+import { catchError, debounceTime, map, of, switchMap } from "rxjs";
 
 export type LocationFormValue = Omit<Location, 'locationId'>
 
@@ -25,11 +27,20 @@ export type LocationFormValue = Omit<Location, 'locationId'>
                     <label for="code">Código*</label>
                 </p-floatlabel>
                 @if (isInvalid('code')) {
-                    <p-message
-                        severity="error"
-                        size="small"
-                        variant="simple"
-                    >Campo requerido.</p-message>
+                    @if (this.form.get('code')?.errors?.['required']) {
+                        <p-message 
+                            severity="error" 
+                            size="small"
+                            variant="simple"
+                        >Campo requerido.</p-message>
+                    }
+                    @if (this.form.get('code')?.errors?.['codeTaken']) {
+                        <p-message
+                            severity="error"
+                            size="small"
+                            variant="simple"
+                        >Código ya existe.</p-message>
+                    }
                 }
             </div>
             <div class="field">
@@ -121,7 +132,8 @@ export class LocationFormComponent {
 
     constructor(
         private fb: NonNullableFormBuilder,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private locationsService: LocationsService
     ) {}
 
     private patchFromValue(v: Partial<Location>) {
@@ -133,7 +145,10 @@ export class LocationFormComponent {
 
     ngOnInit() {
         this.form = this.fb.group({
-            code: this.fb.control('', { validators: [Validators.required] }),
+            code: this.fb.control('', { 
+                validators: [Validators.required], 
+                asyncValidators: [this.codeUniqueValidator()]
+            }),
             name: this.fb.control('', { validators: [Validators.required] }),
         });
 
@@ -167,6 +182,30 @@ export class LocationFormComponent {
 
     isInvalid(controlName: string) {
         const control = this.form.get(controlName);
-        return control?.invalid && (control.touched || this.formSubmitted);
+        return !!control && control.invalid && (control.dirty || control.touched || this.formSubmitted);
+    }
+
+    private codeUniqueValidator(): AsyncValidatorFn {
+        return (control: AbstractControl) => {
+            const rawValue = control.value as string | null | undefined;
+            const value = (rawValue ?? '').trim();
+
+            if (!value) return of(null);
+
+            if (this.value?.locationId && this.value.code === value) return of(null);
+
+            return of(value).pipe(
+                debounceTime(500),
+                switchMap(code => 
+                    this.locationsService.existByCode(code, this.value?.locationId).pipe(
+                        map(exists => (exists ? { codeTaken: true } : null)),
+                        catchError(err => {
+                            console.error('Error al validar el codigo', err);
+                            return of(null)
+                        })
+                    )
+                )
+            )
+        }
     }
 }

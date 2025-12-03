@@ -3,7 +3,6 @@ package bo.edu.ucb.backend_simsml.controller;
 import bo.edu.ucb.backend_simsml.config.util.Globals;
 import bo.edu.ucb.backend_simsml.dto.SuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.UnsuccessfulResponse;
-import bo.edu.ucb.backend_simsml.dto.category.UpdateCategoryRequest;
 import bo.edu.ucb.backend_simsml.dto.location.CreateLocationRequest;
 import bo.edu.ucb.backend_simsml.dto.location.UpdateLocationRequest;
 import bo.edu.ucb.backend_simsml.service.LocationService;
@@ -71,6 +70,20 @@ public class LocationController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new UnsuccessfulResponse("400", "Error al obtener ubicaciones", e.getMessage()));
+        }
+    }
+
+    @GetMapping("/exists")
+    public ResponseEntity<Object> existsLocationByCode(
+            @RequestParam("code") String code,
+            @RequestParam(value = "excludeId", required = false) Long excludeId
+    ) {
+        try {
+            Object response = locationService.existsLocationByCode(code, excludeId);
+            return generateResponse(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UnsuccessfulResponse("400", "Error al verificar existencia de ubicación", e.getMessage()));
         }
     }
 

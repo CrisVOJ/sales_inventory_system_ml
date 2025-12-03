@@ -97,6 +97,18 @@ public class LocationService {
         }
     }
 
+    public Object existsLocationByCode(String code, Long excludeId) {
+        try {
+            if (locationRepository.existsByCode(code.trim(), excludeId)) {
+                return new SuccessfulResponse("200", "La ubicación con el código proporcionado ya existe", true);
+            } else {
+                return new SuccessfulResponse("200", "La ubicación con el código proporcionado no existe", false);
+            }
+        } catch (Exception e) {
+            return new UnsuccessfulResponse("500", "Error al verificar existencia de ubicación", e.getMessage());
+        }
+    }
+
     public Object updateLocation(UpdateLocationRequest request) {
         try {
             LocationEntity location = locationRepository.findById(request.locationId()).orElse(null);
