@@ -193,7 +193,7 @@ export class CustomersPage {
         const req$ = this.editing?.customerId
             ? this.customers.update({ ...payload, customerId: this.editing.customerId })
             : this.customers.create(payload);
-            
+
         req$.subscribe({
             next: ok => {
                 if(!ok) {
@@ -207,6 +207,7 @@ export class CustomersPage {
                 }
 
                 if(this.editing?.customerId) this.operationDetail = 'Cliente actualizado exitosamente';
+                else this.operationDetail = 'Cliente creado exitosamente';
                 
                 this.messageService.add({
                     severity: 'success',
