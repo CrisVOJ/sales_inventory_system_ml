@@ -9,6 +9,10 @@ import { Locationsummary } from "../locations/locations.types";
 import { ProductSummary } from "../products/products.types";
 import { LocationsService } from "../locations/locations.service";
 import { ProductsService } from "../products/products.service";
+import { MessageService } from "primeng/api";
+import { MessageModule } from "primeng/message";
+import { InputNumberModule } from "primeng/inputnumber";
+import { InventoriesService } from "./inventories.service";
 
 export type InventoryFormValue = Omit<Inventory, 'inventoryId'>
 
@@ -20,54 +24,115 @@ export type InventoryFormValue = Omit<Inventory, 'inventoryId'>
     InputTextModule,
     FloatLabelModule,
     SelectModule,
-    MultiSelectModule
+    MultiSelectModule,
+    MessageModule,
+    InputNumberModule
   ],
   template: `
     <form [formGroup]="form" class="grid">
+      <div class="field">
+        <p-floatlabel variant="on">
+          <p-inputnumber 
+            id="currentStock" 
+            formControlName="currentStock" 
+            autocomplete="off" 
+            mode="decimal"
+            [maxFractionDigits]="0"
+            [min]="0"
+          />
+          <label for="currentStock">Stock Actual*</label>
+        </p-floatlabel>
+        @if (isInvalid('currentStock')) {
+          @if (this.form.get('currentStock')?.errors?.['required']) {
+            <p-message
+              severity="error"
+              size="small"
+              variant="simple"
+            >Campo requerido.</p-message>
+          }
+          @if (this.form.get('currentStock')?.errors?.['min']) {
+            <p-message
+              severity="error"
+              size="small"
+              variant="simple"
+            >El valor mínimo debe ser 0.</p-message>
+          }
+        }
+      </div>
+
+      <div class="field">
+        <p-floatlabel variant="on">
+          <p-inputnumber 
+            id="minimumStock" 
+            formControlName="minimumStock" 
+            autocomplete="off" 
+            mode="decimal"
+            [maxFractionDigits]="0"
+            [min]="0"
+          />
+          <label for="minimumStock">Stock Minimo</label>
+        </p-floatlabel>
+        @if (isInvalid('minimumStock')) {
+          @if (this.form.get('minimumStock')?.errors?.['min']) {
+            <p-message
+              severity="error"
+              size="small"
+              variant="simple"
+            >El valor mínimo debe ser 0.</p-message>
+          }
+        }
+      </div>
     
-      <p-floatlabel variant="on">
-        <input pInputText id="currentStock" formControlName="currentStock" autocomplete="off"/>
-        <label for="currentStock">Stock Actual*</label>
-      </p-floatlabel>
+      <div class="field">
+        <p-floatlabel variant="on">
+          <p-select
+              id="location"
+              formControlName="location"
+              [options]="locationOptions"
+              optionLabel="name"
+              optionValue="locationId"
+              appendTo="body"
+              [filter]="true"
+          />
+          <label for="location">Ubicación*</label>
+        </p-floatlabel>
+        @if (isInvalid('location')) {
+          <p-message
+            severity="error"
+            size="small"
+            variant="simple"
+          >Campo requerido.</p-message>
+        }
+      </div>
 
-      <p-floatlabel variant="on">
-        <input pInputText id="minimumStock" formControlName="minimumStock" autocomplete="off"/>
-        <label for="minimumStock">Stock Minimo</label>
-      </p-floatlabel>
-
-      <p-floatlabel variant="on">
-        <p-select
-            id="location"
-            formControlName="location"
-            [options]="locationOptions"
-            optionLabel="name"
-            optionValue="locationId"
-            appendTo="body"
-            [filter]="true"
-        />
-        <label for="location">Ubicación*</label>
-      </p-floatlabel>
-
-      <p-floatlabel variant="on">
-        <p-select
-            id="product"
-            formControlName="product"
-            [options]="productOptions"
-            optionLabel="name"
-            optionValue="productId"
-            appendTo="body"
-            [filter]="true"
-        />
-        <label for="product">Producto*</label>
-      </p-floatlabel>
-
+      <div class="field">
+        <p-floatlabel variant="on">
+          <p-select
+              id="product"
+              formControlName="product"
+              [options]="productOptions"
+              optionLabel="name"
+              optionValue="productId"
+              appendTo="body"
+              [filter]="true"
+              [optionDisabled]="'disabled'"
+          />
+          <label for="product">Producto*</label>
+        </p-floatlabel>
+        @if (isInvalid('product')) {
+          <p-message
+            severity="error"
+            size="small"
+            variant="simple"
+          >Campo requerido.</p-message>
+        }
+      </div>
     </form>
 
     <div class="actions full">
       <button 
         type="button" 
         class="btn" 
-        [disabled]="form.invalid" 
         (click)="save()"
       >
         Guardar
@@ -81,7 +146,7 @@ export type InventoryFormValue = Omit<Inventory, 'inventoryId'>
       gap: .9rem 1.2rem;
     }
 
-    input, p-multiselect, p-select {
+    input, p-multiselect, p-select, p-inputnumber {
       background: #EBFEFF;
       color: #000;
       padding: .55rem .7rem;
@@ -91,10 +156,18 @@ export type InventoryFormValue = Omit<Inventory, 'inventoryId'>
       min-height: 42px;
     }
 
-    :host ::ng-deep .p-multiselect, :host ::ng-deep .p-select{
+    :host ::ng-deep .p-multiselect, 
+    :host ::ng-deep .p-select,
+    :host ::ng-deep .p-inputnumber {
       display: flex;
       align-items: center;
       height: 42px !important;
+    }
+
+    :host ::ng-deep p-inputnumber .p-inputtext {
+      background: #EBFEFF;
+      border: none;
+      width: 100%;
     }
 
     label { display: flex; }
@@ -133,14 +206,20 @@ export class InventoryFormComponent {
   @Output() cancel = new EventEmitter<void>();
 
   locationOptions: Locationsummary[] = [];
+  productOptionsAll: ProductSummary[] = [];
   productOptions: ProductSummary[] = [];
+  inventoryOptions: Inventory[] = [];
   
   form!: FormGroup;
+
+  formSubmitted = false;
 
   constructor(
     private fb: NonNullableFormBuilder,
     private locationsService: LocationsService,
-    private productsService: ProductsService
+    private productsService: ProductsService,
+    private messageService: MessageService,
+    private inventoriesService: InventoriesService
   ) {}
 
   ngOnInit() {
@@ -154,7 +233,23 @@ export class InventoryFormComponent {
       location: this.fb.control<number | null>(null, { validators: [Validators.required] }),
     });
 
-    if (this.value) this.patchFromValue(this.value);
+    if (this.value) {
+      this.patchFromValue(this.value);
+      this.loadProductsByLocation(this.value?.location?.locationId ?? 0);
+    };
+
+    this.form.get('location')!.valueChanges.subscribe(locationId => {
+      if (!locationId) {
+        this.productOptions = [...this.productOptionsAll];
+        this.form.patchValue({ product: null }, { emitEvent: false });
+
+        return;
+      }
+
+      this.form.get('product')!.patchValue(null, { emitEvent: false });
+
+      this.loadProductsByLocation(locationId);
+    })
   }
 
   ngOnChanges(){
@@ -178,8 +273,10 @@ export class InventoryFormComponent {
     this.productsService.productSummayList().subscribe({
       next: (data) => {
         if (data) {
-          this.productOptions = data;
+          this.productOptionsAll = data ?? [];
+          this.productOptions = [...this.productOptionsAll];
         } else {
+          this.productOptionsAll = [];
           this.productOptions = [];
         }
       },
@@ -190,6 +287,32 @@ export class InventoryFormComponent {
     });
   }
 
+  private loadProductsByLocation(locationId: number) {
+    this.inventoriesService.inventoryByLocation(locationId).subscribe({
+      next: (data) => {
+          this.inventoryOptions = data ?? [];
+
+          const currentProductId = this.value?.product?.productId;
+
+          const usedProductIds = new Set(
+            this.inventoryOptions
+              .map(i => i.product?.productId)
+              .filter((id): id is number => id !== null && id !== currentProductId)
+          );
+
+          this.productOptions = this.productOptionsAll.map(p => ({
+            ...p,
+            disabled: usedProductIds.has(p.productId)
+          }) as ProductSummary & { disabled?: boolean })
+      },
+      error: (e) => {
+        console.error('Error al cargar inventarios activos por ubicación: ', e);
+        this.inventoryOptions = [];
+        this.productOptions = [...this.productOptionsAll];
+      }
+    })
+  }
+
   private patchFromValue(v: Partial<Inventory>){
     this.form.patchValue({
         currentStock: v.currentStock,
@@ -197,15 +320,31 @@ export class InventoryFormComponent {
         product: v.product?.productId,
         location: v.location?.locationId
     });
-    console.log(this.form.value);
   }
 
   save(){
+    this.formSubmitted = true;
+
     this.form.markAllAsTouched();
-    if (this.form.invalid) return;
+    
+    if (this.form.invalid) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Completar Campos',
+        detail: 'Debe completar todos los campos correctamente.',
+      });
+
+      return;
+    }
 
     const dto = this.form.getRawValue() as InventoryFormValue;
-
     this.submit.emit(dto);
+
+    this.formSubmitted = false;
+  }
+
+  isInvalid(controlName: string) {
+    const control = this.form.get(controlName);
+    return control?.invalid && (control.touched || this.formSubmitted);
   }
 }
