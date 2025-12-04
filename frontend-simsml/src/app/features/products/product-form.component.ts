@@ -11,6 +11,8 @@ import { CategoriesService } from '../categories/categories.service';
 import { CategorySummary } from '../categories/categories.types';
 import { UnitsService } from '../units/units.service';
 import { Unit } from '../units/units.types';
+import { MessageModule } from 'primeng/message';
+import { MessageService } from 'primeng/api';
 
 export type ProductFormValue = Omit<Product, 'productId'>;
 
@@ -22,65 +24,119 @@ export type ProductFormValue = Omit<Product, 'productId'>;
     InputTextModule,
     FloatLabelModule,
     SelectModule,
-    MultiSelectModule
+    MultiSelectModule,
+    MessageModule
   ],
   template: `
     <form [formGroup]="form" class="grid">
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input pInputText id="name" formControlName="name" autocomplete="off"/>
+          <label for="name">Nombre*</label>
+        </p-floatlabel>
+        @if (isInvalid('name')) {
+          <p-message
+            severity="error"
+            size="small"
+            variant="simple"
+          >Campo requerido.</p-message>
+        }
+      </div>
 
-      <p-floatlabel variant="on">
-        <input pInputText id="name" formControlName="name" autocomplete="off"/>
-        <label for="name">Nombre*</label>
-      </p-floatlabel>
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input pInputText id="description" formControlName="description" autocomplete="off"/>
+          <label for="description">Descripción</label>
+        </p-floatlabel>
+      </div>
 
-      <p-floatlabel variant="on">
-        <input pInputText id="description" formControlName="description" autocomplete="off"/>
-        <label for="description">Descripción</label>
-      </p-floatlabel>
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input pInputText id="code" formControlName="code" autocomplete="off"/>
+          <label for="code">Código*</label>
+        </p-floatlabel>
+        @if (isInvalid('code')) {
+          <p-message
+            severity="error"
+            size="small"
+            variant="simple"
+          >Campo requerido.</p-message>
+        }
+      </div>
 
-      <p-floatlabel variant="on">
-        <input pInputText id="code" formControlName="code" autocomplete="off"/>
-        <label for="code">Código</label>
-      </p-floatlabel>
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input pInputText id="suggestedPrice" formControlName="suggestedPrice" autocomplete="off"/>
+          <label for="suggestedPrice">Precio Recomendado*</label>
+        </p-floatlabel>
+        @if (isInvalid('suggestedPrice')) {
+          @if (this.form.get('suggestedPrice')?.errors?.['required']) {
+            <p-message
+              severity="error"
+              size="small"
+              variant="simple"
+            >Campo requerido.</p-message>
+          }
+          @if (this.form.get('suggestedPrice')?.errors?.['min']) {
+            <p-message
+              severity="error"
+              size="small"
+              variant="simple"
+            >El valor mínimo debe ser 0.</p-message>
+          }
+        }
+      </div>
 
-      <p-floatlabel variant="on">
-        <input pInputText id="suggestedPrice" formControlName="suggestedPrice" autocomplete="off"/>
-        <label for="suggestedPrice">Precio Recomendado</label>
-      </p-floatlabel>
+      <div class="field">
+        <p-floatlabel variant="on">
+          <p-select
+              id="unit"
+              formControlName="unit"
+              [options]="unitOptions"
+              optionLabel="name"
+              optionValue="unitId"
+              appendTo="body"
+              [filter]="true"
+          />
+          <label for="unit">Unidad*</label>
+        </p-floatlabel>
+        @if (isInvalid('unit')) {
+          <p-message
+            severity="error"
+            size="small"
+            variant="simple"
+          >Campo requerido.</p-message>
+        }
+      </div>
 
-      <p-floatlabel variant="on">
-        <p-select
-            id="unit"
-            formControlName="unit"
-            [options]="unitOptions"
+      <div class="field">
+        <p-floatlabel variant="on">
+          <p-multiselect
+            id="categories"
+            formControlName="categories"
+            [options]="categoryOptions"
             optionLabel="name"
-            optionValue="unitId"
+            optionValue="categoryId"
+            display="chip"
             appendTo="body"
-            [filter]="true"
-        />
-        <label for="unit">Unidad</label>
-      </p-floatlabel>
-
-      <p-floatlabel variant="on">
-        <p-multiselect
-          id="categories"
-          formControlName="categories"
-          [options]="categoryOptions"
-          optionLabel="name"
-          optionValue="categoryId"
-          display="chip"
-          appendTo="body"
-          panelStyleClass="multiselect-panel"
-        />
-        <label for="categories">Categoría*</label>
-      </p-floatlabel>
-
+            panelStyleClass="multiselect-panel"
+          />
+          <label for="categories">Categoría*</label>
+        </p-floatlabel>
+        @if (isInvalid('categories')) {
+          <p-message
+            severity="error"
+            size="small"
+            variant="simple"
+          >Campo requerido.</p-message>
+        }
+      </div>
     </form>
 
     <div class="actions full">
       <button 
         type="button" 
         class="btn" 
-        [disabled]="form.invalid" 
         (click)="save()"
       >
         Guardar
@@ -150,10 +206,13 @@ export class ProductFormComponent {
   
   form!: FormGroup;
 
+  formSubmitted = false;
+
   constructor(
     private fb: NonNullableFormBuilder,
     private categoriesService: CategoriesService,
-    private unitsService: UnitsService
+    private unitsService: UnitsService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit() {
@@ -221,11 +280,28 @@ export class ProductFormComponent {
   }
 
   save(){
+    this.formSubmitted = true;
+
     this.form.markAllAsTouched();
-    if (this.form.invalid) return;
+
+    if (this.form.invalid) {
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Completar Campos',
+        detail: 'Debe completar todos los campos correctamente.',
+      })
+
+      return;
+    };
 
     const dto = this.form.getRawValue() as ProductFormValue;
-
     this.submit.emit(dto);
+
+    this.formSubmitted = false;
+  }
+
+  isInvalid(controlName: string) {
+    const control = this.form.get(controlName);
+    return control?.invalid && (control.dirty || control.touched || this.formSubmitted);
   }
 }

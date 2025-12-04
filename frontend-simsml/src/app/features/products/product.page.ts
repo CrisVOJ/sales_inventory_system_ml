@@ -8,6 +8,7 @@ import { Product } from "./products.types";
 import { ProductsService } from "./products.service";
 import { ProductFormComponent } from "./product-form.component";
 import { ProductDetailsComponent } from "./product-details.component";
+import { MessageService } from "primeng/api";
 
 @Component({
     selector: 'products-page',
@@ -113,9 +114,12 @@ export class ProductsPage {
     page = 1; pageSize = 5;
     q = '';
 
+    operationDetail = "Producto creado exitosamente";
+
     constructor(
         private products: ProductsService,
-        private confirm: ConfirmService
+        private confirm: ConfirmService,
+        private messageService: MessageService
     ) {
         this.load();
     }
@@ -195,35 +199,65 @@ export class ProductsPage {
             
         req$.subscribe({
             next: ok => {
-                if(ok) {
-                    this.closeForm();
-                    this.load();
-                } else {
-                    alert('No autorizado o datos invalidos');
+                if(!ok) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'No autorizado o datos invalidos'
+                    })
+
+                    return;
                 }
+
+                if (this.editing?.productId) this.operationDetail = 'Producto actualizado exitosamente';
+                else this.operationDetail = 'Producto creado exitosamente';
+                
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Operación Exitosa',
+                    detail: this.operationDetail
+                });
+
+                this.closeForm();
+                this.load();
             },
             error: e => {
-                if (e.status === 403) alert('403: sin permisos suficientes');
-                else alert('Error inesperado');
+                if (e.status === 403) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'No autorizado o datos invalidos'
+                    })
+                } else {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error inesperado'
+                    })
+                };
             }
-        })
-    }
-
-    create(payload: Partial<Product>) {
-        this.products.create(payload).subscribe(ok => {
-            if(ok) this.load();
-        })
-    }
-
-    update(id: number, patch: Partial<Product>) {
-        this.products.update({ ...patch, productId: id }).subscribe(ok => {
-            if(ok) this.load();
         })
     }
 
     remove(id: number) {
         this.products.remove(id, 'productId').subscribe(ok => {
-            if(ok) this.load();
+            if(!ok) {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'No autorizado o datos invalidos'
+                })
+
+                return;
+            } 
+
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Operación Exitosa',
+                detail: 'Producto eliminado exitosamente'
+            });
+            
+            this.load();
         })
     }
 }
