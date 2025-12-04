@@ -1,8 +1,12 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
 import { Category } from "./categories.types";
-import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
+import { AbstractControl, AsyncValidatorFn, FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { InputTextModule } from "primeng/inputtext";
 import { FloatLabelModule } from "primeng/floatlabel";
+import { MessageModule } from "primeng/message";
+import { MessageService } from "primeng/api";
+import { catchError, debounceTime, map, of, switchMap } from "rxjs";
+import { CategoriesService } from "./categories.service";
 
 export type CategoryFormValue = Omit<Category, 'categoryId'>
 
@@ -12,25 +16,45 @@ export type CategoryFormValue = Omit<Category, 'categoryId'>
     imports: [
         ReactiveFormsModule,
         InputTextModule,
-        FloatLabelModule
+        FloatLabelModule,
+        MessageModule
     ],
     template: `
         <form [formGroup]="form" class="grid">
-            <p-floatlabel variant="on">
-                <input pInputText id="name" formControlName="name" autocomplete="off"/>
-                <label for="name">Nombre*</label>
-            </p-floatlabel>
-            <p-floatlabel variant="on">
-                <input pInputText id="description" formControlName="description" autocomplete="off"/>
-                <label for="description">Descripción</label>
-            </p-floatlabel>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <input pInputText id="name" formControlName="name" autocomplete="off"/>
+                    <label for="name">Nombre*</label>
+                </p-floatlabel>
+                @if (isInvalid('name')) {
+                    @if (this.form.get('name')?.errors?.['required']) {
+                        <p-message 
+                            severity="error" 
+                            size="small"
+                            variant="simple"
+                        >Campo requerido.</p-message>
+                    }
+                    @if (this.form.get('name')?.errors?.['nameTaken']) {
+                        <p-message
+                            severity="error"
+                            size="small"
+                            variant="simple"
+                        >Nombre ya existe.</p-message>
+                    }
+                }
+            </div>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <input pInputText id="description" formControlName="description" autocomplete="off"/>
+                    <label for="description">Descripción</label>
+                </p-floatlabel>
+            </div>
         </form>
 
         <div class="actions full">
             <button 
                 type="button" 
                 class="btn" 
-                [disabled]="form.invalid" 
                 (click)="save()"
             >
                 Guardar
@@ -97,7 +121,13 @@ export class CategoryFormComponent {
 
     form!: FormGroup;
 
-    constructor(private fb: NonNullableFormBuilder) {}
+    formSubmitted = false;
+
+    constructor(
+        private fb: NonNullableFormBuilder,
+        private messageService: MessageService,
+        private categoriesService: CategoriesService
+    ) {}
 
     private patchFromValue(v: Partial<Category>) {
         this.form.patchValue({
@@ -108,7 +138,10 @@ export class CategoryFormComponent {
 
     ngOnInit() {
         this.form = this.fb.group({
-            name: this.fb.control('', { validators: [Validators.required] }),
+            name: this.fb.control('', { 
+                validators: [Validators.required],
+                asyncValidators: [this.nameUniqueValidator()] 
+            }),
             description: this.fb.control(''),
         });
 
@@ -121,11 +154,52 @@ export class CategoryFormComponent {
     }
 
     save() {
+        this.formSubmitted = true;
+
         this.form.markAllAsTouched();
-        if (this.form.invalid) return;
+
+        if (this.form.invalid) {
+            this.messageService.add({
+                severity: 'info',
+                summary: 'Completar Campos',
+                detail: 'Debe completar todos los campos correctamente.',
+            })
+
+            return;
+        };
 
         const dto = this.form.getRawValue() as CategoryFormValue;
-
         this.submit.emit(dto);
+
+        this.formSubmitted = false;
+    }
+
+    isInvalid(controlName: string) {
+        const control = this.form.get(controlName);
+        return control?.invalid && (control.dirty || control.touched || this.formSubmitted);
+    }
+
+    private nameUniqueValidator(): AsyncValidatorFn {
+        return (control: AbstractControl) => {
+            const rawValue = control.value as string | null | undefined;
+            const value = (rawValue ?? '').trim();
+
+            if (!value) return of(null);
+
+            if (this.value?.categoryId && this.value.name === value) return of(null);
+
+            return of(value).pipe(
+                debounceTime(500),
+                switchMap(name => 
+                    this.categoriesService.existsByName(name, this.value?.categoryId).pipe(
+                        map(exists => (exists ? { nameTaken: true } : null)),
+                        catchError(err => {
+                            console.error('Error al validar el nombre', err);
+                            return of(null)
+                        })
+                    )
+                )
+            )
+        }
     }
 }

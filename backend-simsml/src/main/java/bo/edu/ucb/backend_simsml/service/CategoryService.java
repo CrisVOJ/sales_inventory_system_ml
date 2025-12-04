@@ -11,7 +11,6 @@ import bo.edu.ucb.backend_simsml.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -90,6 +89,16 @@ public class CategoryService {
             return new UnsuccessfulResponse("404", "Categoria no encontrada", null);
         } catch (Exception e) {
             return new UnsuccessfulResponse("500", "Error al obtener categoria", e.getMessage());
+        }
+    }
+
+    public Object existsCategoryByName(String name, Long excludeId) {
+        try {
+            boolean exists = categoryRepository.existsByName(name.trim(), excludeId);
+
+            return new SuccessfulResponse("200", "Verificación completada", exists);
+        } catch (Exception e) {
+            return new UnsuccessfulResponse("500", "Error al verificar existencia de categoria", e.getMessage());
         }
     }
 

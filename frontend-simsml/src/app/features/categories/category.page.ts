@@ -8,6 +8,7 @@ import { CategoryFormComponent } from "./category-form.component";
 import { CategoryDetailsComponent } from "./category-details.component";
 import { Category } from "./categories.types";
 import { CategoriesService } from "./categories.service";
+import { MessageService } from "primeng/api";
 
 @Component({
     selector: 'categories-page',
@@ -106,9 +107,12 @@ export class CategoriesPage {
     page = 1; pageSize = 5;
     q = '';
 
+    operationDetail = 'Categoría creada exitosamente';
+
     constructor(
         private categories: CategoriesService,
-        private confirm: ConfirmService
+        private confirm: ConfirmService,
+        private messageService: MessageService
     ) {
         this.load();
     }
@@ -188,36 +192,65 @@ export class CategoriesPage {
             
         req$.subscribe({
             next: ok => {
-                if(ok) {
-                    this.closeForm();
-                    this.load();
-                } else {
-                    console.log('Payload: ', payload);
-                    alert('No autorizado o datos invalidos');
+                if(!ok) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'No autorizado o datos invalidos'
+                    })
+
+                    return;
                 }
+
+                if (this.editing?.categoryId) this.operationDetail = 'Categoría actualizada exitosamente';
+                else this.operationDetail = 'Categoría creada exitosamente';
+                
+                this.messageService.add({
+                    severity: 'success',
+                    summary: 'Operación Exitosa',
+                    detail: this.operationDetail
+                });
+
+                this.closeForm();
+                this.load();
             },
             error: e => {
-                if (e.status === 403) alert('403: sin permisos suficientes');
-                else alert('Error inesperado');
+                if (e.status === 403) {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: '403: No autorizado'
+                    });
+                } else {
+                    this.messageService.add({
+                        severity: 'error',
+                        summary: 'Error',
+                        detail: 'Error inesperado'
+                    });
+                };
             }
-        })
-    }
-
-    create(payload: Partial<Category>) {
-        this.categories.create(payload).subscribe(ok => {
-            if(ok) this.load();
-        })
-    }
-
-    update(id: number, patch: Partial<Category>) {
-        this.categories.update({ ...patch, categoryId: id }).subscribe(ok => {
-            if(ok) this.load();
         })
     }
 
     remove(id: number) {
         this.categories.remove(id, 'categoryId').subscribe(ok => {
-            if(ok) this.load();
+            if(!ok) {
+                this.messageService.add({
+                    severity: 'error',
+                    summary: 'Error',
+                    detail: 'No autorizado o datos invalidos'
+                })
+
+                return;
+            }
+
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Operación Exitosa',
+                detail: 'Categoría eliminada exitosamente'
+            });
+            
+            this.load();
         })
     }
 }

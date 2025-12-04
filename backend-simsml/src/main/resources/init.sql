@@ -65,3 +65,8 @@ WHERE active = true;
 CREATE UNIQUE INDEX IF NOT EXISTS ux_locations_code_active
 ON "db-simsml".public.locations (code)
 WHERE active = true;
+
+-- Indice parcial para categorias activas
+CREATE UNIQUE INDEX IF NOT EXISTS ux_categories_name_active
+ON "db-simsml".public.categories (name)
+WHERE active = true;

@@ -25,4 +25,10 @@ public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> 
             "ORDER BY c.name ASC")
     List<CategoryEntity> findAllCategoriesSummary();
 
+    @Query(value = "SELECT CASE WHEN COUNT(c) > 0 THEN true ELSE false END " +
+            "FROM categories c " +
+            "WHERE c.name = :name " +
+            "AND (:excludeId IS NULL OR c.categoryId <> :excludeId) " +
+            "AND c.active = true")
+    boolean existsByName(@Param("name") String name, @Param("excludeId") Long excludeId);
 }

@@ -72,6 +72,20 @@ public class CategoryController {
         }
     }
 
+    @GetMapping("/exists")
+    public ResponseEntity<Object> existsByName(
+            @RequestParam("name") String name,
+            @RequestParam(value = "excludeId", required = false) Long excludeId
+    ) {
+        try {
+            Object response = categoryService.existsCategoryByName(name, excludeId);
+            return generateResponse(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UnsuccessfulResponse("400", "Error al verificar existencia de categoria", e.getMessage()));
+        }
+    }
+
     @PutMapping("/update")
     public ResponseEntity<Object> updateCategory(@Valid @RequestBody UpdateCategoryRequest request) {
         try {
