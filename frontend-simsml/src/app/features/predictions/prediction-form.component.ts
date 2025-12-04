@@ -9,6 +9,7 @@ import { LocationsService } from "../locations/locations.service";
 import { Inventory } from "../inventories/inventories.types";
 import { InventoriesService } from "../inventories/inventories.service";
 import { MessageService } from "primeng/api";
+import { MessageModule } from "primeng/message";
 
 export type PredictionFormValue = Omit<Prediction, 'predictionId'>
 
@@ -19,71 +20,112 @@ export type PredictionFormValue = Omit<Prediction, 'predictionId'>
         ReactiveFormsModule,
         SelectModule,
         FloatLabelModule,
-        DatePickerModule
+        DatePickerModule,
+        MessageModule
     ],
     template: `
         <form [formGroup]="form" class="grid">
-            <p-floatlabel variant="on">
-                <p-select
-                    id="location"
-                    formControlName="location"
-                    [options]="locationOptions"
-                    optionLabel="displayLabel"
-                    optionValue="locationId"
-                    appendTo="body"
-                    [filter]="true"
-                />
-                <label for="location">Ubicación</label>
-            </p-floatlabel>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <p-select
+                        id="location"
+                        formControlName="location"
+                        [options]="locationOptions"
+                        optionLabel="displayLabel"
+                        optionValue="locationId"
+                        appendTo="body"
+                        [filter]="true"
+                    />
+                    <label for="location">Ubicación*</label>
+                </p-floatlabel>
+                @if (isInvalid('location')) {
+                    <p-message
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >Campo requerido.</p-message>
+                }
+            </div>
 
-            <p-floatlabel variant="on">
-                <p-select
-                    id="inventory"
-                    formControlName="inventory"
-                    [options]="inventoryProductsOptions"
-                    optionLabel="displayLabel"
-                    optionValue="inventoryId"
-                    appendTo="body"
-                    [filter]="true"
-                />
-                <label for="inventory">Producto</label>
-            </p-floatlabel>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <p-select
+                        id="inventory"
+                        formControlName="inventory"
+                        [options]="inventoryProductsOptions"
+                        optionLabel="displayLabel"
+                        optionValue="inventoryId"
+                        appendTo="body"
+                        [filter]="true"
+                    />
+                    <label for="inventory">Producto*</label>
+                </p-floatlabel>
+                @if (isInvalid('inventory')) {
+                    <p-message
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >Campo requerido.</p-message>
+                }
+            </div>
 
-            <p-floatlabel variant="on">
-                <p-datepicker
-                    view="month"
-                    dateFormat="dd/mm/yy"
-                    [readonlyInput]="true"
-                    formControlName="targetMonth"
-                    showIcon
-                    iconDisplay="input"
-                    appendTo="body"
-                    [minDate]="minMonth"
-                />
-                <label for="name">Mes Límite*</label>
-            </p-floatlabel>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <p-datepicker
+                        view="month"
+                        dateFormat="dd/mm/yy"
+                        [readonlyInput]="true"
+                        formControlName="targetMonth"
+                        showIcon
+                        iconDisplay="input"
+                        appendTo="body"
+                        [minDate]="minMonth"
+                    />
+                    <label for="targetMonth">Mes Límite*</label>
+                </p-floatlabel>
+                @if (isInvalid('targetMonth')) {
+                    <p-message
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >Campo requerido.</p-message>
+                }
+            </div>
 
-            <p-floatlabel variant="on">
-                <p-select
-                    id="modelType"
-                    formControlName="modelType"
-                    [options]="modelTypeOptions"
-                    optionLabel="label"
-                    optionValue="value"
-                    appendTo="body"
-                />
-                <label for="modelType">Tipo de predicción</label>
-            </p-floatlabel>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <p-select
+                        id="modelType"
+                        formControlName="modelType"
+                        [options]="modelTypeOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        appendTo="body"
+                    />
+                    <label for="modelType">Tipo de predicción</label>
+                </p-floatlabel>
+                @if (isInvalid('modelType')) {
+                    <p-message
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >Campo requerido.</p-message>
+                }
+            </div>
         </form>
 
         <div class="actions full">
             <button 
-                type="button" 
-                class="btn" 
-                [disabled]="form.invalid" 
+                type="button"
+                class="btn"
+                [disabled]="loading"
                 (click)="save()"
             >
-                Guardar
+                @if (!loading) {
+                    Guardar
+                } @else {
+                    Procesando...
+                }
             </button>
         </div>
     `,
@@ -135,6 +177,12 @@ export type PredictionFormValue = Omit<Prediction, 'predictionId'>
             font-weight: 500;
             font-size: var(--h6, 1rem);
             cursor: pointer;
+            transition: background .2s ease, opacity .2s ease;
+        }:disabled {
+            background: #0090bf;
+            color: #9CA3AF;
+            cursor: not-allowed;
+            opacity: .8;
         }
 
         @media (max-width: 1024px) {
@@ -149,6 +197,8 @@ export type PredictionFormValue = Omit<Prediction, 'predictionId'>
 })
 export class PredictionFormComponent {
     @Input() value: any | null = null;
+    @Input() loading = false;
+
     @Output() submit = new EventEmitter<CreatePredictionRequest>();
     @Output() cancel = new EventEmitter<void>();
 
@@ -162,6 +212,8 @@ export class PredictionFormComponent {
     minMonth!: Date;
 
     form!: FormGroup;
+
+    formSubmitted = false;
 
     constructor(
         private fb: NonNullableFormBuilder,
@@ -272,8 +324,19 @@ export class PredictionFormComponent {
     }
 
     save() {
+        this.formSubmitted = true;
+
         this.form.markAllAsTouched();
-        if (this.form.invalid) return;
+
+        if (this.form.invalid) {
+            this.messageService.add({
+                severity: 'info',
+                summary: 'Completar Campos',
+                detail: 'Debe completar todos los campos correctamente.'
+            })
+
+            return;
+        }
 
         const { inventory, targetMonth, modelType } = this.form.getRawValue();
 
@@ -314,5 +377,12 @@ export class PredictionFormComponent {
         }
 
         this.submit.emit(payload);
+
+        this.formSubmitted = false;
+    }
+
+    isInvalid(controlName: string) {
+        const control = this.form.get(controlName);
+        return control?.invalid && (control.touched || this.formSubmitted);
     }
 }

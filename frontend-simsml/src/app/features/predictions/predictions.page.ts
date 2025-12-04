@@ -66,6 +66,7 @@ import { PredictionChartComponent } from "./prediction-chart.component";
                 <prediction-form
                     *ngIf="formOpen"
                     (cancel)="closeForm()"
+                    [loading]="predicting"
                     (submit)="save($event)"
                 />
             </app-modal>
@@ -117,6 +118,8 @@ export class PredictionPage {
     page = 1; pageSize = 5;
     q = '';
 
+    predicting = false;
+
     viewMode: 'table' | 'chart' = 'table';
 
     constructor(
@@ -162,6 +165,8 @@ export class PredictionPage {
     }
 
     save(payload: CreatePredictionRequest){
+        this.predicting = true;
+
         this.predictions.createPrediction(payload).subscribe(() => {
             this.closeForm();
             this.load();
@@ -170,6 +175,8 @@ export class PredictionPage {
                 summary: 'Operación Exitosa',
                 detail: `Predicción creada exitosamente. Inventario ${payload.inventory}, Meses ${payload.months} y Tipo ${payload.modelType}`
             });
+            
+            this.predicting = false;
         });
     }
 }
