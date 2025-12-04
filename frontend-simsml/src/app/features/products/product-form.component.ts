@@ -13,6 +13,7 @@ import { UnitsService } from '../units/units.service';
 import { Unit } from '../units/units.types';
 import { MessageModule } from 'primeng/message';
 import { MessageService } from 'primeng/api';
+import { InputNumberModule } from 'primeng/inputnumber';
 
 export type ProductFormValue = Omit<Product, 'productId'>;
 
@@ -25,7 +26,8 @@ export type ProductFormValue = Omit<Product, 'productId'>;
     FloatLabelModule,
     SelectModule,
     MultiSelectModule,
-    MessageModule
+    MessageModule,
+    InputNumberModule
   ],
   template: `
     <form [formGroup]="form" class="grid">
@@ -66,7 +68,15 @@ export type ProductFormValue = Omit<Product, 'productId'>;
 
       <div class="field">
         <p-floatlabel variant="on">
-          <input pInputText id="suggestedPrice" formControlName="suggestedPrice" autocomplete="off"/>
+          <p-inputnumber 
+            id="suggestedPrice" 
+            formControlName="suggestedPrice" 
+            autocomplete="off" 
+            mode="decimal"
+            [minFractionDigits]="0"
+            [maxFractionDigits]="2"
+            [min]="0"
+          />
           <label for="suggestedPrice">Precio Recomendado*</label>
         </p-floatlabel>
         @if (isInvalid('suggestedPrice')) {
@@ -150,7 +160,7 @@ export type ProductFormValue = Omit<Product, 'productId'>;
       gap: .9rem 1.2rem;
     }
 
-    input, p-multiselect, p-select {
+    input, p-multiselect, p-select, p-inputnumber {
       background: #EBFEFF;
       color: #000;
       padding: .55rem .7rem;
@@ -160,10 +170,18 @@ export type ProductFormValue = Omit<Product, 'productId'>;
       min-height: 42px;
     }
 
-    :host ::ng-deep .p-multiselect, :host ::ng-deep .p-select{
+    :host ::ng-deep .p-multiselect, 
+    :host ::ng-deep .p-select, 
+    :host ::ng-deep .p-inputnumber {
       display: flex;
       align-items: center;
       height: 42px !important;
+    }
+
+    :host ::ng-deep p-inputnumber .p-inputtext {
+      background: #EBFEFF;
+      border: none;
+      width: 100%;
     }
 
     label { display: flex; }
