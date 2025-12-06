@@ -13,12 +13,11 @@ import { SaleStatusSummary } from "./sale-statuses/sale-statuses.types";
 import { SaleStatusesService } from "./sale-statuses/sale-statuses.service";
 import { CommonModule } from "@angular/common";
 import { TableModule } from "primeng/table";
-import { AutoCompleteModule } from "primeng/autocomplete";
 import { ButtonModule } from "primeng/button";
 import { InventoriesService } from "../inventories/inventories.service";
-import { ProductSummary } from "../products/products.types";
 import { Inventory } from "../inventories/inventories.types";
-import { SaleItem } from "./sale-details/sale-details.types";
+import { MessageService } from "primeng/api";
+import { MessageModule } from "primeng/message";
 
 export type SaleFormValue = Omit<Sale, 'saleId'>;
 
@@ -33,64 +32,101 @@ export type SaleFormValue = Omit<Sale, 'saleId'>;
     SelectModule,
     DatePickerModule,
     TableModule,
-    AutoCompleteModule,
     ButtonModule,
-    FormsModule
+    FormsModule,
+    MessageModule
 ],
     template: `
         <form [formGroup]="form" class="grid">
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <p-select
+                        id="customer"
+                        formControlName="customer"
+                        [options]="customerOptions"
+                        optionLabel="displayLabel"
+                        optionValue="customerId"
+                        appendTo="body"
+                        [filter]="true"
+                    />
+                    <label for="customer">Cliente</label>
+                </p-floatlabel>
+                @if (isInvalid('customer')) {
+                    <p-message
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >Campo requerido.</p-message>
+                }
+            </div>
 
-            <p-floatlabel variant="on">
-                <p-select
-                    id="customer"
-                    formControlName="customer"
-                    [options]="customerOptions"
-                    optionLabel="displayLabel"
-                    optionValue="customerId"
-                    appendTo="body"
-                    [filter]="true"
-                />
-                <label for="customer">Cliente</label>
-            </p-floatlabel>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <p-datepicker 
+                        formControlName="registrationDate" 
+                        showIcon 
+                        iconDisplay="input" 
+                        dateFormat="dd/mm/yy" 
+                        appendTo="body"
+                        [minDate]="editing ? null : registrationMinDate"
+                    />
+                    <label for="registrationDate">Fecha de Registro</label>
+                </p-floatlabel>
+                @if (isInvalid('registrationDate')) {
+                    <p-message
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >Campo requerido.</p-message>
+                }
+            </div>
 
-            <p-floatlabel variant="on">
-                <p-datepicker 
-                    formControlName="registrationDate" 
-                    inputId="registrationDate" 
-                    showIcon 
-                    iconDisplay="input" 
-                    dateFormat="dd/mm/yy" 
-                    appendTo="body"
-                />
-                <label for="on_label">Fecha de Registro</label>
-            </p-floatlabel>
+            <div class="field">
+                <p-floatlabel variant="on">
+                    <p-select
+                        id="location"
+                        formControlName="location"
+                        [options]="locationOptions"
+                        optionLabel="displayLabel"
+                        optionValue="locationId"
+                        appendTo="body"
+                        [filter]="true"
+                        (onChange)="handleLocationChange($event.value)"
+                    />
+                    <label for="location">Ubicación</label>
+                </p-floatlabel>
+                @if (isInvalid('location')) {
+                    <p-message
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >Campo requerido.</p-message>
+                }
+            </div>
 
-            <p-floatlabel variant="on">
-                <p-select
-                    id="location"
-                    formControlName="location"
-                    [options]="locationOptions"
-                    optionLabel="displayLabel"
-                    optionValue="locationId"
-                    appendTo="body"
-                    [filter]="true"
-                    (onChange)="handleLocationChange($event.value)"
-                />
-                <label for="location">Ubicación</label>
-            </p-floatlabel>
-
-            <p-floatlabel variant="on">
-                <p-select
-                    id="saleStatus"
-                    formControlName="saleStatus"
-                    [options]="saleStatusOptions"
-                    optionLabel="name"
-                    optionValue="saleStatusId"
-                    appendTo="body"
-                    [filter]="true"
-                />
-                <label for="saleStatus">Estado</label>
-            </p-floatlabel>
+            @if (editing) {
+                <div class="field">
+                    <p-floatlabel variant="on">
+                        <p-select
+                            id="saleStatus"
+                            formControlName="saleStatus"
+                            [options]="saleStatusOptions"
+                            optionLabel="name"
+                            optionValue="saleStatusId"
+                            appendTo="body"
+                            [filter]="true"
+                        />
+                        <label for="saleStatus">Estado</label>
+                    </p-floatlabel>
+                    @if (isInvalid('saleStatus')) {
+                        <p-message
+                            severity="error"
+                            size="small"
+                            variant="simple"
+                        >Campo requerido.</p-message>
+                    }
+                </div>
+            }
         </form>
 
         <!-- Items -->
@@ -99,7 +135,7 @@ export type SaleFormValue = Omit<Sale, 'saleId'>;
             <button 
                 pButton 
                 type="button" 
-                label="Agregar Ítem" 
+                label="Agregar Producto" 
                 (click)="addItem()" 
                 [disabled]="!form.value.location"
             >
@@ -138,25 +174,55 @@ export type SaleFormValue = Omit<Sale, 'saleId'>;
                             />
                             <label for="inventory">Producto*</label>
                         </p-floatlabel>
-                        <!-- Autocomplete: busca por ubicación -->
-                        <!-- <p-autoComplete
-                        [disabled]="!form.value.location"
-                        ngModel="displayProducto[rowIndex]"
-                        [(ngModel)]="displayProducts[rowIndex]"
-                        (completeMethod)="searchProducts($event, rowIndex)"
-                        [suggestions]="suggestions[rowIndex] || []"
-                        field="display"
-                        [forceSelection]="true"
-                        (onSelect)="selectProduct($event, rowIndex)"
-                        [placeholder]="form.value.location ? 'Buscar producto...' : 'Seleccione ubicación'" /> -->
+                        @if (isRowInvalid(rowIndex, 'inventory')) {
+                            <p-message
+                            severity="error"
+                            size="small"
+                            variant="simple"
+                            >
+                            @if (getRowErrors(rowIndex, 'inventory')?.['required']) {
+                                Seleccione un producto.
+                            } @else if (getRowErrors(rowIndex, 'inventory')?.['duplicate']) {
+                                Este producto ya fue agregado a la venta.
+                            } @else {
+                                Producto inválido.
+                            }
+                            </p-message>
+                        }
                     </td>
 
                     <td>
                         <input type="number" min="1" formControlName="productQuantity" (input)="recalcRow(rowIndex)" class="num" />
+                        @if (isRowInvalid(rowIndex, 'productQuantity')) {
+                            <p-message
+                            severity="error"
+                            size="small"
+                            variant="simple"
+                            >
+                            @if (getRowErrors(rowIndex, 'productQuantity')?.['required']) {
+                                La cantidad es requerida.
+                            } @else {
+                                Ingrese una cantidad numérica mayor a 0.
+                            }
+                            </p-message>
+                        }
                     </td>
 
                     <td>
                         <input type="number" min="0" step="0.01" formControlName="unitPrice" (input)="recalcRow(rowIndex)" class="num" />
+                        @if (isRowInvalid(rowIndex, 'unitPrice')) {
+                            <p-message
+                            severity="error"
+                            size="small"
+                            variant="simple"
+                            >
+                            @if (getRowErrors(rowIndex, 'unitPrice')?.['required']) {
+                                El precio unitario es requerido.
+                            } @else {
+                                El precio debe ser mayor a 0.
+                            }
+                            </p-message>
+                        }
                     </td>
 
                     <td>
@@ -164,19 +230,17 @@ export type SaleFormValue = Omit<Sale, 'saleId'>;
                     </td>
 
                     <td class="actions">
-                        <button pButton icon="pi pi-copy" severity="secondary" (click)="cloneRow(rowIndex)" text></button>
                         <button pButton icon="pi pi-trash" severity="danger" (click)="removeRow(rowIndex)" text></button>
                     </td>
                 </tr>
 
-                <!-- info secundaria opcional -->
                 <tr class="meta">
                     <td colspan="5">
                         <small class="hint" *ngIf="meta[rowIndex]?.stock != null">
-                        Stock en ubicación: {{ meta[rowIndex]?.stock }}
+                            Stock en ubicación: {{ meta[rowIndex]?.stock }}
                         </small>
                         <small class="warn" *ngIf="stockError(rowIndex)">
-                        Cantidad supera el stock disponible.
+                            Cantidad supera el stock disponible.
                         </small>
                     </td>
                 </tr>
@@ -195,7 +259,6 @@ export type SaleFormValue = Omit<Sale, 'saleId'>;
         <button 
             type="button" 
             class="btn" 
-            [disabled]="form.invalid" 
             (click)="save()"
         >
             Guardar
@@ -273,11 +336,13 @@ export class SaleFormComponent {
   saleStatusOptions: SaleStatusSummary[] = [];
   inventoryProductsOptions: Inventory[] = [];
 
-  suggestions: Record<number, any[]> = {};
-  displayProducts: Record<number, any> = {};
   meta: Record<number, { stock?: number }> = {};
   
   form!: FormGroup;
+
+  formSubmitted = false;
+
+  editing = false;
 
   constructor(
     private fb: NonNullableFormBuilder,
@@ -285,6 +350,7 @@ export class SaleFormComponent {
     private locationsService: LocationsService,
     private saleStatusesService: SaleStatusesService,
     private inventoriesService: InventoriesService,
+    private messageService: MessageService
   ) {}
 
   get saleItems() { 
@@ -292,36 +358,70 @@ export class SaleFormComponent {
   }
 
   ngOnInit() {
-    this.loadCustomerOptions();
-    this.loadLocationOptions();
-    this.loadSaleStatusOptions();
+    const today = this.today();
+    this.registrationMinDate = today;
 
     this.form = this.fb.group({
-      registrationDate: this.fb.control('', { validators: [Validators.required] }),
+      registrationDate: this.fb.control<Date | null>(today, { validators: [Validators.required] }),
       customer: this.fb.control<number | null>(null, { validators: [Validators.required] }),
-      saleStatus: this.fb.control<number | null>(null, { validators: [Validators.required] }),
+      saleStatus: this.fb.control<number | null>(2, { validators: [Validators.required] }),
       location: this.fb.control<number | null>(null, { validators: [Validators.required] }),
       saleItems: this.fb.array<FormGroup>([])
     });
 
-    if (this.value) this.patchFromValue(this.value);
+    if (this.value) {
+        this.editing = true;
+        this.setValueFromSale(this.value as Sale);
+    } else {
+        this.editing = false;
+        this.form.patchValue(
+            { registrationDate: this.today() },
+            { emitEvent: false }
+        )
+    }
+
+    this.loadCustomerOptions();
+    this.loadLocationOptions();
+    this.loadSaleStatusOptions();
   }
 
   ngOnChanges(){
     if (!this.form || !this.value) return;
-    this.setValueFromSale(this.value as Sale);
+
+    if (this.value && this.value.saleId) {
+        this.editing = true;
+        this.setValueFromSale(this.value as Sale);
+    } else {
+        this.editing = false;
+        this.form.patchValue(
+        { registrationDate: this.today() },
+        { emitEvent: false }
+        );
+        this.saleItems.clear();
+        this.meta = {};
+    }
+  }
+
+  private today(): Date {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  }
+
+  registrationMinDate: Date | null = null;
+
+  private toLocalDate(iso: string | Date | null): Date | null {
+    if (!iso) return null;
+    if (iso instanceof Date) return iso;
+
+    const [year, month, day] = iso.split('-').map(Number);
+    if (!year || !month || !day) return null;
+
+    return new Date(year, month - 1, day);
   }
 
   private setValueFromSale(sale: Sale) {
-    function toLocalDate(iso: string | Date | null): Date | null {
-        if (!iso) return null;
-        if (iso instanceof Date) return iso;
-        const [y, m, d] = (iso as string).split('-').map(Number);
-        return new Date(y, (m ?? 1) - 1, d ?? 1);
-    }
-
     this.form.patchValue({
-        registrationDate: toLocalDate(sale.registrationDate),
+        registrationDate: this.toLocalDate(sale.registrationDate),
         customer: sale.customer?.customerId ?? null,
         saleStatus: sale.saleStatus?.saleStatusId ?? null,
     }, { emitEvent: false });
@@ -352,16 +452,14 @@ export class SaleFormComponent {
         const unitPrice   = Number(d.unitPrice ?? 0);
         const qty         = Number(d.productQuantity ?? d.qty ?? 0);
 
-        const g = this.fb.group({
-            saleDetailId:       this.fb.control<number>(d.saleDetailId ?? 0),
-            inventory:          this.fb.control<number | null>(inventoryId, { validators: [Validators.required] }),
-            productId:          this.fb.control<number | null>(productId,   { validators: [Validators.required] }),
-            productQuantity:    this.fb.control<number>(qty,       { validators: [Validators.required, Validators.min(1)] }),
-            unitPrice:          this.fb.control<number>(unitPrice, { validators: [Validators.required, Validators.min(0)] }),
-            subTotal:           this.fb.control<number>({ value: qty * unitPrice, disabled: true } as any),
+        const g = this.createSaleItemGroup({
+            saleDetailId: d.saleDetailId ?? 0,
+            inventoryId,
+            productId,
+            quantity: qty,
+            unitPrice,
         });
 
-        g.valueChanges.subscribe(() => this.recalcGroup(g));
         this.saleItems.push(g);
 
         this.meta[idx] = { stock: Number(d.inventory?.currentStock ?? d.currentStock ?? 0) };
@@ -453,6 +551,20 @@ export class SaleFormComponent {
     const g = this.saleItems.at(rowIndex) as FormGroup;
     if (!inventory || !g) return;
 
+    if (this.hasInventoryDuplicate(inventoryId, rowIndex)) {
+        const control = g.get('inventory');
+        const prevErrors = control?.errors || {};
+        control?.setErrors({ ...prevErrors, duplicate: true });
+
+        this.messageService.add({
+            severity: 'warn',
+            summary: 'Producto repetido',
+            detail: 'Este producto ya fue agregado a la venta.'
+        });
+    } else {
+        this.clearInventoryDuplicateError(rowIndex);
+    }
+
     g.patchValue({
         unitPrice: Number(inventory.product?.suggestedPrice) || 0
     }, { emitEvent: true });
@@ -465,71 +577,33 @@ export class SaleFormComponent {
     g.get('productId')!.setValue(inventory.product?.productId ?? null, { emitEvent: true });
   }
 
+  isRowInvalid(index: number, controlName: string) {
+    const row = this.saleItems.at(index) as FormGroup;
+    const control = row.get(controlName);
+    return control?.invalid && (control.touched || this.formSubmitted);
+  }
+
+  getRowErrors(index: number, controlName: string) {
+    const row = this.saleItems.at(index) as FormGroup;
+    const control = row.get(controlName);
+    return control?.errors || null;
+  }
+
+
   onLocationChange() {
     if (this.saleItems.length) {
         this.saleItems.clear();
-        this.suggestions = {};
-        this.displayProducts = {};
         this.meta = {};
     }
   }
 
   addItem() {
-    const g = this.fb.group({
-        inventory: this.fb.control<number | null>(null, { validators: [Validators.required] }),
-        productQuantity: this.fb.control<number | null>(null, { validators: [Validators.required] }),
-        unitPrice: this.fb.control<number | null>(1, { validators: [Validators.required] }),
-        subTotal: this.fb.control<number | null>({ value: 0, disabled: true } as any),
-        productId: this.fb.control<number | null>(null, { validators: [Validators.required] })
-    });
-    g.valueChanges.subscribe(() => this.recalcGroup(g));
-    this.saleItems.push(g);
-  }
-
-  cloneRow(i: number) {
-    const val = this.saleItems.at(i).getRawValue();
-    const g = this.fb.group({
-        inventory: this.fb.control<number | null>(val.inventory, { validators: [Validators.required] }),
-        productQuantity: this.fb.control<number>(val.productQuantity ?? 1, { validators: [Validators.required, Validators.min(1)] }),
-        unitPrice: this.fb.control<number>(val.unitPrice ?? 0, { validators: [Validators.required, Validators.min(0)] }),
-        subTotal: this.fb.control<number>({ value: val.productQuantity * val.unitPrice, disabled: true } as any)
-    });
-    g.valueChanges.subscribe(() => this.recalcGroup(g));
-    this.saleItems.insert(i + 1, g);
-    this.displayProducts[i + 1] = this.displayProducts[i];
-    this.meta[i + 1] = this.meta[i];
+    this.saleItems.push(this.createSaleItemGroup());
   }
 
   removeRow(i: number) {
-    delete this.suggestions[i];
-    delete this.displayProducts[i];
     delete this.meta[i];
     this.saleItems.removeAt(i);
-  }
-
-  searchProducts(ev: any, rowIndex: number) {
-    const q = (ev?.query || '').trim();
-    const location = this.form.value.location;
-    if (!location) return;
-
-    this.inventoriesService.inventoryByLocation(Number(location)).subscribe(rows => {
-        const mapped = rows.map(p => ({
-            ...p,
-            display: `${p.product.name}`,
-        }));
-        this.suggestions[rowIndex] = mapped;
-    });
-  }
-
-  selectProduct(ev: any, rowIndex: number) {
-    const sel: SaleItem = ev as SaleItem;
-    const g = this.saleItems.at(rowIndex) as FormGroup;
-    g.patchValue({
-        inventory: sel.inventory,
-        product: sel.inventory.product,
-        unitPrice: sel.unitPrice
-    }, { emitEvent: true });
-    this.meta[rowIndex] = { stock: sel.productQuantity };
   }
 
   private recalcGroup(g: FormGroup) {
@@ -561,34 +635,95 @@ export class SaleFormComponent {
     return this.saleItems.controls.some((_, i) => this.stockError(i));
   }
 
-  private patchFromValue(s: Partial<Sale>){
-    this.form.patchValue({
-        registrationDate: s.registrationDate ?? '',
-        customer: s.customer?.customerId ?? null,
-        saleStatus: s.saleStatus?.saleStatusId ?? null,
-        location: null
-    });
-  }
-
   formatMoney(n: number) {
     return `Bs. ${ (n || 0).toFixed(2) }`;
   }
 
+  private hasInventoryDuplicate(inventoryId: number, rowIndex: number): boolean {
+    return this.saleItems.controls.some((ctrl, i) => 
+        i !== rowIndex && ctrl.get('inventory')?.value === inventoryId
+    )
+  }
+
+  private clearInventoryDuplicateError(rowIndex: number) {
+    const c = this.saleItems.at(rowIndex).get('inventory');
+    if (!c) return;
+
+    const errors = { ...(c.errors || {}) };
+    delete errors['duplicate'];
+
+    const hasOtherErrors = Object.keys(errors).length > 0;
+    c.setErrors(hasOtherErrors ? errors : null);
+  }
+
   save(){
+    this.formSubmitted = true;
+
     this.form.markAllAsTouched();
-    if (this.form.invalid || this.saleItems.length === 0 || this.anyStockError()) return;
+
+    const hasItems = this.saleItems.length > 0;
+    const hasStockErr = this.anyStockError();
+
+    if (this.form.invalid || !hasItems || this.anyStockError()) {
+        this.messageService.add({
+            severity: 'info',
+            summary: 'Completar Campos',
+            detail: !hasItems 
+                ? 'Debe agregar al menos un producto.'
+                : hasStockErr 
+                    ? 'Hay cantidades que superan el stock disponible.'
+                    : 'Debe completar todos los campos correctamente.'
+        });
+
+        return;
+    }
 
     const dto = this.form.getRawValue() as SaleFormValue;
-    console.log('Formulario de venta ', dto);
-
     this.submit.emit(dto);
+
+    this.formSubmitted = false;
   }
 
   reset() {
     this.saleItems.clear();
-    this.form.reset({ registrationDate: new Date().toISOString().slice(0, 10) });
-    this.suggestions = {};
-    this.displayProducts = {};
+    this.form.reset({ registrationDate: this.registrationMinDate ?? this.today() });
     this.meta = {};
+  }
+
+  private createSaleItemGroup(initial?: {
+    saleDetailId?: number;
+    inventoryId?: number | null;
+    productId?: number | null;
+    quantity?: number;
+    unitPrice?: number;
+  }): FormGroup {
+    const qty = initial?.quantity ?? 1;
+    const price = initial?.unitPrice ?? 0;
+
+    const g = this.fb.group({
+        saleDetailId: this.fb.control<number>(initial?.saleDetailId ?? 0),
+        inventory: this.fb.control<number | null>(initial?.inventoryId ?? null, 
+            { validators: [Validators.required] }
+        ),
+        productId: this.fb.control<number | null>(initial?.productId ?? null, 
+            { validators: [Validators.required] }
+        ),
+        productQuantity: this.fb.control<number>(qty, 
+            { validators: [Validators.required, Validators.min(1)] }
+        ),
+        unitPrice: this.fb.control<number>(price, 
+            { validators: [Validators.required, Validators.min(0)] }
+        ),
+        subTotal: this.fb.control<number>({ value: qty * price, disabled: true } as any),
+    });
+
+    g.valueChanges.subscribe(() => this.recalcGroup(g));
+
+    return g;
+  }
+
+  isInvalid(controlName: string) {
+    const control = this.form.get(controlName);
+    return control?.invalid && (control.touched || this.formSubmitted);
   }
 }
