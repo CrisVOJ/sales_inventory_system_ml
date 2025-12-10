@@ -122,9 +122,9 @@ public class PredictionService {
         }
     }
 
-    public Object getDemandVsPrediction(Long inventoryId) {
+    public Object getDemandVsPrediction(Long inventoryId, LocalDate startDate, LocalDate endDate) {
         try {
-            List<DemandVsPredictionResponse> demandVsPrediction = predictionRepository.findDemandVsPredictionByInventory(inventoryId)
+            List<DemandVsPredictionResponse> demandVsPrediction = predictionRepository.findDemandVsPredictionByInventory(inventoryId, startDate, endDate)
                     .stream().map(p -> new DemandVsPredictionResponse(
                             p.getMonthlabel(),
                             p.getPrediction(),

@@ -11,6 +11,7 @@ import { LocationsService } from "../locations/locations.service";
 import { InventoriesService } from "../inventories/inventories.service";
 import { MessageService } from "primeng/api";
 import { DemandVsPredictionPoint } from "./predictions.types";
+import { DatePickerModule } from "primeng/datepicker";
 
 @Component({
     selector: 'prediction-chart',
@@ -20,7 +21,8 @@ import { DemandVsPredictionPoint } from "./predictions.types";
         ChartModule,
         ReactiveFormsModule,
         FloatLabelModule,
-        SelectModule
+        SelectModule,
+        DatePickerModule
     ],
     template: `
         <div class="chart-card">
@@ -30,30 +32,54 @@ import { DemandVsPredictionPoint } from "./predictions.types";
 
             <form [formGroup]="filters" class="filters">
                 <p-floatlabel variant="on">
-                <p-select
-                    id="location"
-                    formControlName="location"
-                    [options]="locationOptions"
-                    optionLabel="displayLabel"
-                    optionValue="locationId"
-                    appendTo="body"
-                    [filter]="true"
-                />
-                <label for="location">Ubicación</label>
+                    <p-select
+                        id="location"
+                        formControlName="location"
+                        [options]="locationOptions"
+                        optionLabel="displayLabel"
+                        optionValue="locationId"
+                        appendTo="body"
+                        [filter]="true"
+                    />
+                    <label for="location">Ubicación</label>
                 </p-floatlabel>
 
                 <p-floatlabel variant="on">
-                <p-select
-                    id="inventory"
-                    formControlName="inventory"
-                    [options]="inventoryProductsOptions"
-                    optionLabel="displayLabel"
-                    optionValue="inventoryId"
-                    appendTo="body"
-                    [filter]="true"
-                />
-                <label for="inventory">Producto</label>
+                    <p-select
+                        id="inventory"
+                        formControlName="inventory"
+                        [options]="inventoryProductsOptions"
+                        optionLabel="displayLabel"
+                        optionValue="inventoryId"
+                        appendTo="body"
+                        [filter]="true"
+                    />
+                    <label for="inventory">Producto</label>
                 </p-floatlabel>
+
+                <p-floatlabel variant="on">
+                    <p-datepicker 
+                        formControlName="startDate" 
+                        showIcon 
+                        iconDisplay="input" 
+                        dateFormat="dd/mm/yy" 
+                        appendTo="body"
+                    />
+                    <label for="startDate">Fecha Inicio</label>
+                </p-floatlabel>
+
+                <div class="field">
+                    <p-floatlabel variant="on">
+                        <p-datepicker 
+                            formControlName="endDate" 
+                            showIcon 
+                            iconDisplay="input" 
+                            dateFormat="dd/mm/yy" 
+                            appendTo="body"
+                        />
+                        <label for="endDate">Fecha Fin</label>
+                    </p-floatlabel>
+                </div>
 
                 <button
                 type="button"
@@ -108,6 +134,32 @@ import { DemandVsPredictionPoint } from "./predictions.types";
             gap: .75rem 1rem;
             align-items: end;
         }
+
+        input, p-multiselect, p-select, p-datepicker{
+            background: #EBFEFF;
+            color: #000;
+            padding: .55rem .7rem;
+            border-radius: .4rem;
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 42px;
+        }
+
+        :host ::ng-deep .p-multiselect,
+        :host ::ng-deep .p-select,
+        :host ::ng-deep .p-datepicker {
+            display: flex;
+            align-items: center;
+            height: 42px !important;
+        }
+
+        :host ::ng-deep p-datepicker .p-inputtext {
+            background: #EBFEFF;
+            border: none;
+            width: 100%;
+        }
+
+        label { display: flex; }
 
         .btn {
             border: 0;
@@ -180,7 +232,9 @@ export class PredictionChartComponent implements OnInit {
     private buildForm() {
         this.filters = this.fb.group({
             location: this.fb.control<number | null>(null, { validators: [Validators.required] }),
-            inventory: this.fb.control<number | null>(null, { validators: [Validators.required] })
+            inventory: this.fb.control<number | null>(null, { validators: [Validators.required] }),
+            startDate: this.fb.control<Date | null>(null),
+            endDate: this.fb.control<Date | null>(null)
         });
 
         this.filters.get('location')!.valueChanges.subscribe((locationId) => {
@@ -286,8 +340,20 @@ export class PredictionChartComponent implements OnInit {
         const inventoryId = this.filters.get('inventory')!.value;
         if (!inventoryId) return;
 
+        const startDate: Date | null = this.filters.get('startDate')!.value;
+        const endDate: Date | null = this.filters.get('endDate')!.value;
+
+        if (startDate && endDate && startDate > endDate) {
+            this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: 'La fecha de inicio debe ser menor a la fecha de fin.'
+            });
+            return;
+        }
+
         this.loading = true;
-        this.predictions.getDemandVsPrediction(inventoryId).subscribe({
+        this.predictions.getDemandVsPrediction(inventoryId, startDate ?? undefined, endDate ?? undefined).subscribe({
             next: (points) => {
                 if (!points || !points.length) {
                     this.chartData = null;

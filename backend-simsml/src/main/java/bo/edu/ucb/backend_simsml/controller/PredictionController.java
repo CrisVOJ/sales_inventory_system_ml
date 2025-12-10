@@ -53,10 +53,12 @@ public class PredictionController {
 
     @GetMapping("/demand-vs-prediction")
     public ResponseEntity<Object> getDemandVsPrediction(
-            @RequestParam(value = "inventoryId") Long inventoryId
+            @RequestParam(value = "inventoryId") Long inventoryId,
+            @RequestParam(value = "startDate", required = false) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) LocalDate endDate
     ) {
         try {
-            Object response = predictionService.getDemandVsPrediction(inventoryId);
+            Object response = predictionService.getDemandVsPrediction(inventoryId, startDate, endDate);
             return generateResponse(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

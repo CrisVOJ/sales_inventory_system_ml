@@ -32,37 +32,51 @@ public interface PredictionRepository extends JpaRepository<PredictionEntity, Lo
     List<PredictionEntity> findActiveByInventoryAndTargetMonth(@Param("inventoryId") Long inventoryId, @Param("targetMonth") LocalDate targetMonth);
 
     @Query(value = """
-            WITH pred_month AS (
+            WITH bounds AS (
                 SELECT
-                    date_trunc('month', p.target_month) AS month_key,
-                    SUM(p.estimated_amount)            AS prediction
-                FROM predictions p
+                    COALESCE(:startDate,
+                             date_trunc('year', CURRENT_DATE)::date) AS start_date,
+                    COALESCE(:endDate,
+                             (date_trunc('year', CURRENT_DATE) + INTERVAL '1 year - 1 day')::date) AS end_date
+            ),
+            pred_month AS (
+                SELECT
+                    date_trunc('month', p.target_month)::date AS month_key,
+                    SUM(p.estimated_amount)                  AS prediction
+                FROM predictions p, bounds b
                 WHERE p.inventory_inventory_id = :inventoryId
                   AND p.active = true
-                GROUP BY date_trunc('month', p.target_month)
+                  AND p.target_month::date BETWEEN b.start_date AND b.end_date
+                GROUP BY date_trunc('month', p.target_month)::date
             ),
             sales_month AS (
                 SELECT
-                    date_trunc('month', s.registration_date) AS month_key,
-                    SUM(sd.product_quantity)                 AS demand
+                    date_trunc('month', s.registration_date)::date AS month_key,
+                    SUM(sd.product_quantity)                       AS demand
                 FROM sales_details sd
                 JOIN sales s
                     ON s.sale_id = sd.sale_id
+                JOIN bounds b
+                    ON s.registration_date::date BETWEEN b.start_date AND b.end_date
                 WHERE sd.inventory_id = :inventoryId
-                GROUP BY date_trunc('month', s.registration_date)
+                GROUP BY date_trunc('month', s.registration_date)::date
             )
             SELECT
-                to_char(pm.month_key, 'MM/YYYY') AS monthLabel,
-                pm.prediction,
-                COALESCE(sm.demand, 0)           AS demand
+                to_char(COALESCE(pm.month_key, sm.month_key), 'MM/YYYY') AS monthLabel,
+                COALESCE(pm.prediction, 0)                               AS prediction,
+                COALESCE(sm.demand, 0)                                   AS demand
             FROM pred_month pm
-            LEFT JOIN sales_month sm
+            FULL OUTER JOIN sales_month sm
                 ON sm.month_key = pm.month_key
-            ORDER BY pm.month_key ASC
+            ORDER BY COALESCE(pm.month_key, sm.month_key) ASC
             """,
             nativeQuery = true
     )
-    List<DemandVsPredictionProjection> findDemandVsPredictionByInventory(@Param("inventoryId") Long inventoryId);
+    List<DemandVsPredictionProjection> findDemandVsPredictionByInventory(
+            @Param("inventoryId") Long inventoryId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
 
     @Transactional
     @Modifying

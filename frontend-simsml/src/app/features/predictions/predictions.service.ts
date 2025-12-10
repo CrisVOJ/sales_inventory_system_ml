@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { BaseCrudService } from "../../shared/base-crud.service";
 import { CreatePredictionRequest, DemandVsPredictionPoint, Prediction } from "./predictions.types";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
 import { ApiEnvelope, isUnsuccessful } from "../../shared/api.types";
 import { catchError, map, Observable, of } from "rxjs";
@@ -39,8 +39,13 @@ export class PredictionsService extends BaseCrudService<Prediction> {
         }
     }
 
-    getDemandVsPrediction(inventoryId: number): Observable<DemandVsPredictionPoint[]> {
-        return this.http.get<ApiEnvelope<any>>(`${this.baseUrl}/demand-vs-prediction?inventoryId=${inventoryId}`).pipe(
+    getDemandVsPrediction(inventoryId: number, startDate?: Date, endDate?: Date): Observable<DemandVsPredictionPoint[]> {
+        let params = new HttpParams().set('inventoryId', inventoryId.toString());
+
+        if (startDate) params = params.set('startDate', this.formatDateParam(startDate));
+        if (endDate) params = params.set('endDate', this.formatDateParam(endDate));
+console.log(params);
+        return this.http.get<ApiEnvelope<any>>(`${this.baseUrl}/demand-vs-prediction`, {params}).pipe(
             map(raw =>{
                 if (isUnsuccessful(raw)) return [];
                 const result = Array.isArray(raw.result) ? raw.result : [];
@@ -48,5 +53,12 @@ export class PredictionsService extends BaseCrudService<Prediction> {
             }),
             catchError(() => of([]))
         );
+    }
+
+    private formatDateParam(date: Date): string {
+        const year = date.getFullYear();
+        const month = `${date.getMonth() + 1}`.padStart(2, '0');
+        const day = `${date.getDate()}`.padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 }
