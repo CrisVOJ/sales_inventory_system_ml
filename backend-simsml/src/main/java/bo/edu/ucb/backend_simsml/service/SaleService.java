@@ -127,6 +127,29 @@ public class SaleService {
         }
     }
 
+    public Object getSalesWithDebts(Pageable pageable) {
+        try {
+            Page<SaleResponse> sales = saleRepository.findSalesWithDebts(pageable)
+                    .map(saleResposne -> new SaleResponse(
+                            saleResposne.getSaleId(),
+                            saleResposne.getRegistrationDate(),
+                            UserSummary.from(saleResposne.getUser()),
+                            CustomerSummary.from(saleResposne.getCustomer()),
+                            SaleStatusSummary.from(saleResposne.getSaleStatus()),
+                            saleResposne.getTotal(),
+                            null
+                    ));
+
+            if (sales.isEmpty()) {
+                return new UnsuccessfulResponse("404", "No existen ventas con deudas registradas", null);
+            }
+
+            return new SuccessfulResponse("200", "Ventas con deudas obtenidas exitosamente", sales);
+        } catch (Exception e) {
+            return new UnsuccessfulResponse("500", "Error al obtener ventas con deudas", e.getMessage());
+        }
+    }
+
     public Object getSale(Long saleId) {
         try {
             var opt = saleRepository.findOneWithDetails(saleId);

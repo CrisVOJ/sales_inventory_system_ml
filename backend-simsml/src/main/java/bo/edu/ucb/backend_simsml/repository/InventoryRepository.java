@@ -30,4 +30,10 @@ public interface InventoryRepository extends JpaRepository<InventoryEntity, Long
             "ORDER BY i.product.name ASC"
     )
     List<InventoryEntity> findInventoriesByLocation(@Param("locationId") Long locationId);
+
+    @Query(value = "SELECT i FROM inventories i " +
+            "WHERE i.active = true " +
+            "ORDER BY (i.currentStock - i.minimumStock) ASC "
+    )
+    List<InventoryEntity> findInventoriesWithLessStock();
 }

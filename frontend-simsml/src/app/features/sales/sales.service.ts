@@ -4,7 +4,7 @@ import { Sale } from "./sales.types";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
 import { catchError, map, Observable, of, race } from "rxjs";
-import { ApiEnvelope, isUnsuccessful } from "../../shared/api.types";
+import { ApiEnvelope, isUnsuccessful, SpringPage } from "../../shared/api.types";
 
 @Injectable({ providedIn: 'root' })
 export class SalesService extends BaseCrudService<Sale> {
@@ -49,9 +49,32 @@ export class SalesService extends BaseCrudService<Sale> {
     }
 
     updateHeader(dto: Sale): Observable<boolean> {
-    return this.http.put<ApiEnvelope<any>>(`${this.baseUrl}/update`, dto).pipe(
-      map(raw => !isUnsuccessful(raw) && String(raw.status).startsWith('2')),
-      catchError(() => of(false))
-    );
-  }
+        return this.http.put<ApiEnvelope<any>>(`${this.baseUrl}/update`, dto).pipe(
+        map(raw => !isUnsuccessful(raw) && String(raw.status).startsWith('2')),
+        catchError(() => of(false))
+        );
+    }
+
+    getSalesWithDebt(params: { page: number; size: number;}): Observable<PageResult<Sale>> {
+        params.page = Math.max(0, params.page - 1);
+        return this.http.get<ApiEnvelope<SpringPage<any>>>(`${this.baseUrl}/debts`, { params }).pipe(
+            map(raw => {
+                if (isUnsuccessful(raw)) {
+                    return { total: 0, rows: [] as Sale[] };
+                }
+
+                const page = raw.result;
+                const rows = Array.isArray(page?.content)
+                ? page.content.map((x: any) => this.normalize(x))
+                : [];
+
+                return {
+                total: page?.totalElements ?? rows.length,
+                rows,
+                };
+            }),
+            catchError(() => of({ total: 0, rows: [] as Sale[] }))
+        );
+    }
+
 }

@@ -65,6 +65,19 @@ public class SaleController {
         }
     }
 
+    @GetMapping("/debts")
+    public ResponseEntity<Object> getSalesWithDebts(
+            @PageableDefault(sort = "registrationDate", direction = Sort.Direction.ASC) Pageable pageable
+    ) {
+        try {
+            Object response = saleService.getSalesWithDebts(pageable);
+            return generateResponse(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UnsuccessfulResponse("400", "Error al obtener ventas con deudas", e.getMessage()));
+        }
+    }
+
     @GetMapping("/")
     public ResponseEntity<Object> getSale(@RequestParam("saleId") Long saleId) {
         try {

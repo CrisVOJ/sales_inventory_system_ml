@@ -43,4 +43,8 @@ public interface SaleRepository extends JpaRepository<SaleEntity, Long> {
             "ORDER BY FUNCTION('to_char', s.registrationDate, 'YYYY-MM')"
     )
     List<Map<String, Object>> findMonthlyDemandByInventory(@Param("inventoryId") Long inventoryId);
+
+    @Query(value = "SELECT s FROM sales s " +
+            "WHERE s.saleStatus.name = 'DEUDA'")
+    Page<SaleEntity> findSalesWithDebts(Pageable pageable);
 }

@@ -58,7 +58,7 @@ export interface CrudAction<T = any> {
               <option [value]="15">15</option>
             </select>
           </div>
-          <p-iconfield iconPosition="left" class="search">
+          <p-iconfield iconPosition="left" class="search" *ngIf="showSearch">
             <p-inputicon class="pi pi-search" style="color: #00B4E0;"/>
             <input  pInputText type="search" 
                     [placeholder]="searchPlaceholder"
@@ -66,7 +66,7 @@ export interface CrudAction<T = any> {
                     (input)="onSearch.emit(query)" />
           </p-iconfield>
         </div>
-        <div class="right">
+        <div class="right" *ngIf="showCreate">
           <button class="btn add" (click)="create.emit()">Agregar {{entityName}}</button>
         </div>
       </div>
@@ -154,6 +154,8 @@ export class DataTableComponent<T> {
   @Input() pageSize = 5;
   @Input() searchPlaceholder = 'Buscar...';
   @Input() actions: CrudAction<T>[] = [];
+  @Input() showCreate = true;
+  @Input() showSearch = true;
   
   // @Output() onCreate = new EventEmitter<void>();
   // @Output() onView = new EventEmitter<T>();

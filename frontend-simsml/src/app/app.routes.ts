@@ -22,7 +22,9 @@ export const routes: Routes = [
         component: AppShellComponent,
         canActivateChild: [authGuard],
         children: [
-            { path: '', redirectTo: 'customers', pathMatch: 'full' },
+            {   path: '', 
+                loadComponent: () => import('./features/dashboard/dashboard.page').then(m => m.DashboardPage)
+            },
             { 
                 path: 'customers',
                 loadComponent: () => import('./features/customers/customers.page').then(m => m.CustomersPage) 

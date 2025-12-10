@@ -74,6 +74,17 @@ public class InventoryController {
         }
     }
 
+    @GetMapping("/lessStock")
+    public ResponseEntity<Object> getInventoriesWithLessStock() {
+        try {
+            Object response = inventoryService.getInventoriesWithLessStock();
+            return generateResponse(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UnsuccessfulResponse("400", "Error al obtener inventarios con bajo stock", e.getMessage()));
+        }
+    }
+
     @PutMapping("/update")
     public ResponseEntity<Object> updateInventory(@Valid @RequestBody UpdateInventoryRequest request) {
         try {

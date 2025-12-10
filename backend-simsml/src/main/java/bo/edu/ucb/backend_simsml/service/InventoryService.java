@@ -126,6 +126,28 @@ public class InventoryService {
         }
     }
 
+    public Object getInventoriesWithLessStock() {
+        try {
+            List<InventoryResponse> inventories = inventoryRepository.findInventoriesWithLessStock()
+                    .stream().map(inventoryResponse -> new InventoryResponse(
+                            inventoryResponse.getInventoryId(),
+                            inventoryResponse.getCurrentStock(),
+                            inventoryResponse.getMinimumStock(),
+                            ProductSummary.from(inventoryResponse.getProduct()),
+                            LocationResponse.from(inventoryResponse.getLocation()),
+                            inventoryResponse.isActive()
+                    )).toList();
+
+            if (inventories.isEmpty()) {
+                return new UnsuccessfulResponse("404", "No se encontraron inventarios con bajo stock", null);
+            }
+
+            return new SuccessfulResponse("200", "Inventarios con bajo stock encontrados", inventories);
+        } catch (Exception e) {
+            return new UnsuccessfulResponse("500", "Error al obtener los inventarios con bajo stock", e.getMessage());
+        }
+    }
+
     public Object updateInventory(UpdateInventoryRequest request) {
         try {
             ProductEntity product = productRepository.findById(request.product())

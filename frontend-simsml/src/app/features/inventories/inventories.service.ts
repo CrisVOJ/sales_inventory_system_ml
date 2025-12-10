@@ -44,4 +44,14 @@ export class InventoriesService extends BaseCrudService<Inventory> {
             catchError(() => of([] as Inventory[])) 
         )
     }
+
+    inventoryWithLessStock(): Observable<Inventory[]> {
+        return this.http.get<ApiEnvelope<any>>(`${this.baseUrl}/lessStock`).pipe(
+            map(raw => {
+                if (isUnsuccessful(raw)) return [] as Inventory[];
+                return Array.isArray(raw.result) ? raw.result.map(x => this.normalize(x)) : [];
+            }),
+            catchError(() => of([] as Inventory[])) 
+        )
+    }
 }
