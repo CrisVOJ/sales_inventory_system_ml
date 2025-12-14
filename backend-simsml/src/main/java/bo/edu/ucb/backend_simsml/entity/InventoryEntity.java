@@ -25,6 +25,10 @@ public class InventoryEntity {
     private Long currentStock;
     @Column(name = "minimum_stock")
     private Long minimumStock;
+    @Column(name = "base_capacity")
+    private Long baseCapacity;
+    @Column(name = "last_notified_threshold")
+    private Integer lastNotifiedThreshold;
 
     @Column(name = "active")
     private boolean active;

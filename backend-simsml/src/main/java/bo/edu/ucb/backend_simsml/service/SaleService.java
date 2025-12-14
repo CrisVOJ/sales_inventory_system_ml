@@ -42,6 +42,13 @@ public class SaleService {
     private InventoryRepository inventoryRepository;
     @Autowired
     private EmailService emailService;
+    @Autowired
+    private PredictionRepository predictionRepository;
+
+    private InventoryEntity lockInventoryOrThrow(Long inventoryId) {
+        return inventoryRepository.lockById(inventoryId)
+                .orElseThrow(() -> new IllegalArgumentException("Inventario no encontrad"));
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public Object createSale(CreateSaleRequest request, Long userId) {
@@ -76,8 +83,7 @@ public class SaleService {
             BigDecimal total = BigDecimal.ZERO;
 
             for (var saleItem : request.saleItems()) {
-                InventoryEntity inventory = inventoryRepository.lockById(saleItem.inventory())
-                        .orElseThrow(() -> new IllegalArgumentException("Inventario no encontrado"));
+                InventoryEntity inventory = lockInventoryOrThrow(saleItem.inventory());
 
                 SaleDetailEntity saleDetail = new SaleDetailEntity();
                 saleDetail.setInventory(inventory);
@@ -218,8 +224,7 @@ public class SaleService {
 
             if (saleStatus.getName().equalsIgnoreCase("ANULADO")) {
                 for (SaleDetailEntity d : sale.getSaleDetails()) {
-                    InventoryEntity inv = inventoryRepository.lockById(d.getInventory().getInventoryId())
-                            .orElseThrow(() -> new IllegalStateException("Inventario no encontrado"));
+                    InventoryEntity inv = lockInventoryOrThrow(d.getInventory().getInventoryId());
                     inv.setCurrentStock(inv.getCurrentStock() + d.getProductQuantity());
                     d.setActive(false);
                 }
@@ -263,13 +268,11 @@ public class SaleService {
             for (UpdateSaleRequest.UpdateSaleItem item : items) {
                 if (item.saleDetailId() != null && existingById.containsKey(item.saleDetailId())) {
                     SaleDetailEntity saleDetail = existingById.get(item.saleDetailId());
-                    InventoryEntity oldInventory = inventoryRepository.lockById(saleDetail.getInventory().getInventoryId())
-                            .orElseThrow(() -> new IllegalStateException("Inventario anterior no encontrado"));
+                    InventoryEntity oldInventory = lockInventoryOrThrow(saleDetail.getInventory().getInventoryId());
                     InventoryEntity newInventory = oldInventory;
 
                     if (!saleDetail.getInventory().getInventoryId().equals(item.inventory())) {
-                        newInventory = inventoryRepository.lockById(item.inventory())
-                                .orElseThrow(() -> new IllegalArgumentException("Inventario no encontrado"));
+                        newInventory = lockInventoryOrThrow(item.inventory());
                     }
 
                     int oldQuantity = saleDetail.getProductQuantity();
@@ -304,8 +307,7 @@ public class SaleService {
 
                     keepIds.add(saleDetail.getSaleDetailId());
                 } else {
-                    InventoryEntity inventory = inventoryRepository.lockById(item.inventory())
-                            .orElseThrow(() -> new IllegalArgumentException("Inventario no encontrado"));
+                    InventoryEntity inventory = lockInventoryOrThrow(item.inventory());
                     if (inventory.getCurrentStock() < item.productQuantity()) {
                         return new UnsuccessfulResponse("400", "Stock insuficiente en inventario", null);
                     }
@@ -329,8 +331,7 @@ public class SaleService {
                                     .toList();
 
             for (SaleDetailEntity saleDetail : toRemove) {
-                InventoryEntity inventory = inventoryRepository.lockById(saleDetail.getInventory().getInventoryId())
-                        .orElseThrow(() -> new IllegalStateException("Inventario no encontrado"));
+                InventoryEntity inventory = lockInventoryOrThrow(saleDetail.getInventory().getInventoryId());
                 inventory.setCurrentStock(inventory.getCurrentStock() + saleDetail.getProductQuantity());
                 sale.removeDetail(saleDetail);
             }
@@ -350,15 +351,62 @@ public class SaleService {
             if (minimumStock == null) {
                 log.debug("Inventario {} no tiene minimo configurado.",
                         inventory.getInventoryId());
+            } else {
+                String sendTo = String.valueOf(userRepository.findById(1L).get().getEmail());
+
+                if (inventory.getCurrentStock() <= minimumStock) {
+                    log.info("Stock bajo detectado. Inventario {}: current={}, min={}",
+                            inventory.getInventoryId(), inventory.getCurrentStock(), minimumStock);
+                    emailService.sendLowStockAlert(inventory, sendTo);
+                }
+            }
+
+            Long base = inventory.getBaseCapacity();
+            if (base == null || base <= 0) {
                 return;
             }
 
-            String sendTo = String.valueOf(userRepository.findById(1L).get().getEmail());
+            double percent = (inventory.getCurrentStock().doubleValue() * 100.0) / base.doubleValue();
+            int[] thresholds = new int[]{75, 50, 25};
+            Integer triggered = null;
+            for (int t : thresholds) {
+                double thresholdStock = base * (t / 100.0);
+                if (inventory.getCurrentStock() <= Math.floor(thresholdStock)) {
+                    triggered = t;
+                    break;
+                }
+            }
 
-            if (inventory.getCurrentStock() <= minimumStock) {
-                log.info("Stock bajo detectado. Inventario {}: current={}, min={}",
-                        inventory.getInventoryId(), inventory.getCurrentStock(), minimumStock);
-                emailService.sendLowStockAlert(inventory, sendTo);
+            if (triggered == null) return;
+
+            Integer lastNotified = inventory.getLastNotifiedThreshold();
+
+            if (lastNotified == null || lastNotified > triggered) {
+                long recommendedByBase = Math.max(0L, base - inventory.getCurrentStock());
+
+                LocalDate start = LocalDate.now().withDayOfMonth(1);
+                LocalDate end = LocalDate.now().plusMonths(3).withDayOfMonth(1);
+                Long predictDemand = 0L;
+                try {
+                    predictDemand = predictionRepository.sumEstimatedAmountByInventoryAndRange(inventory.getInventoryId(), start, end);
+                } catch (Exception e) {
+                    log.debug("No se pudieron obtener predicciones para inventario {}: {}", inventory.getInventoryId());
+                    predictDemand = 0L;
+                }
+                long recommendedFromPredictions = Math.max(0L, predictDemand - inventory.getCurrentStock());
+
+                long recommended = recommendedByBase;
+                boolean usedPredictions = false;
+                if (predictDemand != null && predictDemand > 0 && recommendedFromPredictions > recommendedByBase) {
+                    recommended = recommendedFromPredictions;
+                    usedPredictions = true;
+                }
+
+                String sendTo = String.valueOf(userRepository.findById(1L).get().getEmail());
+                emailService.sendThresholdAlert(inventory, sendTo, triggered, recommended, usedPredictions);
+
+                inventory.setLastNotifiedThreshold(triggered);
+                inventoryRepository.save(inventory);
             }
         } catch (Exception e) {
             log.error("Error al verifica/enviar alerta de stock bajo para ingentario {}: {}",

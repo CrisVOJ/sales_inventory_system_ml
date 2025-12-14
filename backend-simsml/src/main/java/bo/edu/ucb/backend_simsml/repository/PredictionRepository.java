@@ -31,6 +31,14 @@ public interface PredictionRepository extends JpaRepository<PredictionEntity, Lo
     )
     List<PredictionEntity> findActiveByInventoryAndTargetMonth(@Param("inventoryId") Long inventoryId, @Param("targetMonth") LocalDate targetMonth);
 
+    @Query(value = "SELECT COALESCE(SUM(p.estimatedAmount), 0) FROM predictions p " +
+            "WHERE p.inventory.inventoryId = :inventoryId " +
+            "AND p.targetMonth BETWEEN :startDate AND :endDate " +
+            "AND p.active = true")
+    Long sumEstimatedAmountByInventoryAndRange(@Param("inventoryId") Long inventoryId,
+                                               @Param("startDate") LocalDate startDate,
+                                               @Param("endDate") LocalDate endDate);
+
     @Query(value = """
             WITH bounds AS (
                 SELECT
