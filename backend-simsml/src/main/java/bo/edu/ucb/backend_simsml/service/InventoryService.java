@@ -50,6 +50,7 @@ public class InventoryService {
             InventoryEntity inventory = new InventoryEntity();
             inventory.setCurrentStock(request.currentStock());
             inventory.setMinimumStock(request.minimumStock());
+            inventory.setBaseCapacity(request.currentStock());
             inventory.setProduct(product);
             inventory.setLocation(location);
 
@@ -173,6 +174,8 @@ public class InventoryService {
 
             inventory.setCurrentStock(request.currentStock());
             inventory.setMinimumStock(request.minimumStock());
+            inventory.setBaseCapacity(request.currentStock());
+            inventory.setLastNotifiedThreshold(null);
             inventory.setProduct(product);
             inventory.setLocation(location);
             inventory.setUpdatedAt(LocalDateTime.now());
