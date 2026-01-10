@@ -48,7 +48,7 @@ def predict_demand(payload: dict):
             reliability = base_reliability - horizon_penalty
             reliability = max(0.0, min(1.0, reliability))
 
-            reliability_pct = round(base_reliability * 100, 2)
+            reliability_pct = round(reliability * 100, 2)
 
             result.append({
                 "month": row["ds"].strftime("%Y-%m"),
