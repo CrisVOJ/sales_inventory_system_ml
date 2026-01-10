@@ -8,6 +8,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
+
 @Service
 public class EmailService {
 
@@ -102,7 +104,7 @@ public class EmailService {
                     thresholdPercent,
                     recommendedQuantity,
                     (recommendedFromPredictions ? "(basada en predicciones)" : "(basada en capacidad base)"),
-                    java.time.LocalDateTime.now()
+                    java.time.LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
             );
 
             SimpleMailMessage message = new SimpleMailMessage();
