@@ -44,6 +44,8 @@ public class SaleService {
     private EmailService emailService;
     @Autowired
     private PredictionRepository predictionRepository;
+    @Autowired
+    private PredictionService predictionService;
 
     private InventoryEntity lockInventoryOrThrow(Long inventoryId) {
         return inventoryRepository.lockById(inventoryId)
@@ -367,7 +369,7 @@ public class SaleService {
             }
 
             double percent = (inventory.getCurrentStock().doubleValue() * 100.0) / base.doubleValue();
-            int[] thresholds = new int[]{75, 50, 25};
+            int[] thresholds = new int[]{25, 50, 75};
             Integer triggered = null;
             for (int t : thresholds) {
                 double thresholdStock = base * (t / 100.0);
@@ -382,6 +384,44 @@ public class SaleService {
             Integer lastNotified = inventory.getLastNotifiedThreshold();
 
             if (lastNotified == null || lastNotified > triggered) {
+                String sendTo = String.valueOf(userRepository.findById(1L).get().getEmail());
+
+                if (triggered == 25) {
+                    PredictionEntity nextMonthPrediction = predictionService.getNextMonthPredictionOrCreateNew(inventory.getInventoryId());
+
+                    if (nextMonthPrediction.isActive() || nextMonthPrediction == null) {
+                        log.debug("No se encontraron ni se pudieron realizar predicciones para el siguiente mes");
+                    }
+
+                    LocalDate endDate = LocalDate.now().withDayOfMonth(1);
+                    LocalDate startDate = endDate.minusMonths(2);
+
+                    List<Map<String, Object>> lastMonthlySales = saleRepository.findMonthlyDemandByInventoryAndDateRange(inventory.getInventoryId(), startDate, endDate);
+
+                    if (lastMonthlySales.isEmpty()) {
+                        log.debug("No se encontraron ventas de anteriores meses");
+                    }
+
+                    double predictionValue = nextMonthPrediction.getEstimatedAmount();
+
+                    int monthsWithSales = 0;
+                    double totalSales = 0.0;
+
+                    for (Map<String, Object> sale : lastMonthlySales) {
+                        Object quantity = sale.get("quantity");
+                        if (quantity != null) {
+                            double sales = ((Number) quantity).doubleValue();
+                            if (sales > 0) {
+                                totalSales += sales;
+                                monthsWithSales++;
+                            }
+                        }
+                    }
+
+                    double average = (totalSales + predictionValue) / (monthsWithSales + 1);
+
+                    emailService.sendCriticInventoryAlert(inventory, sendTo, triggered, Math.round(average));
+                }
                 long recommendedByBase = Math.max(0L, base - inventory.getCurrentStock());
 
                 LocalDate start = LocalDate.now().withDayOfMonth(1);
@@ -402,7 +442,6 @@ public class SaleService {
                     usedPredictions = true;
                 }
 
-                String sendTo = String.valueOf(userRepository.findById(1L).get().getEmail());
                 emailService.sendThresholdAlert(inventory, sendTo, triggered, recommended, usedPredictions);
 
                 inventory.setLastNotifiedThreshold(triggered);

@@ -17,10 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class PredictionService {
@@ -134,6 +131,63 @@ public class PredictionService {
             return new SuccessfulResponse("200", "Demanda vs Predicción obtenida correctamente", demandVsPrediction);
         } catch (Exception e) {
             return new UnsuccessfulResponse("500", "Error al obtener la comparación de demanda vs predicción del inventario", e.getMessage());
+        }
+    }
+
+    public PredictionEntity getNextMonthPredictionOrCreateNew(Long inventoryId) {
+        try {
+            List<PredictionEntity> nextMonthPredictions = predictionRepository.findActiveByInventoryAndTargetMonth(inventoryId, LocalDate.now().plusMonths(1).withDayOfMonth(1));
+
+            if (!nextMonthPredictions.isEmpty()) {
+                return nextMonthPredictions.getFirst();
+            }
+
+            LocalDate endDate = LocalDate.now().plusMonths(1).withDayOfMonth(1);
+            LocalDate startDate = endDate.minusMonths(6);
+            List<Map<String, Object>> monthlyData = saleRepository.findMonthlyDemandByInventoryAndDateRange(inventoryId, startDate, endDate);
+
+            if (monthlyData.isEmpty()) {
+                throw new RuntimeException("No se encontraron ventas de meses anteriores");
+            }
+
+            MlForecastResponse mlResponse = predictDemand(inventoryId, monthlyData, 1, "/predict/demand");
+
+            if (mlResponse == null || mlResponse.forecasts() == null || mlResponse.forecasts().isEmpty()) {
+                throw new RuntimeException("Error al obtener la predicción del modelo de ML");
+            }
+
+            InventoryEntity inventory = inventoryRepository.findById(inventoryId).orElseThrow(null);
+
+            PredictionEntity nextMonthPrediction = null;
+            for (MlForecastItem item : mlResponse.forecasts()) {
+                LocalDate targetMonth = LocalDate.parse(item.month() + "-01");
+
+                List<PredictionEntity> duplicates = predictionRepository.findActiveByInventoryAndTargetMonth(
+                        inventoryId,
+                        targetMonth
+                );
+
+                for (PredictionEntity old : duplicates) {
+                    old.setActive(false);
+                    predictionRepository.save(old);
+                }
+
+                predictionRepository.flush();
+
+                PredictionEntity prediction = new PredictionEntity();
+                prediction.setEstimatedAmount(item.predictedQuantity());
+                prediction.setReliability(item.reliability());
+                prediction.setInventory(inventory);
+                prediction.setTargetMonth(targetMonth);
+                prediction.setActive(true);
+
+                predictionRepository.save(prediction);
+                nextMonthPrediction = predictionRepository.findById(prediction.getPredictionId()).orElseThrow(null);
+            }
+
+            return nextMonthPrediction;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

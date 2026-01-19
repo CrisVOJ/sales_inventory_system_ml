@@ -44,6 +44,24 @@ public interface SaleRepository extends JpaRepository<SaleEntity, Long> {
     )
     List<Map<String, Object>> findMonthlyDemandByInventory(@Param("inventoryId") Long inventoryId);
 
+    @Query(value = "" +
+            "SELECT new map(" +
+            "FUNCTION('to_char', s.registrationDate, 'YYYY-MM') as month, " +
+            "SUM (sd.productQuantity) as quantity" +
+            ") " +
+            "FROM sales_details sd " +
+            "JOIN sd.sale s " +
+            "WHERE sd.inventory.inventoryId = :inventoryId " +
+            "AND s.saleStatus.name <> 'ANULADO' " +
+            "AND s.registrationDate >= :startDate " +
+            "AND s.registrationDate < :endDate " +
+            "GROUP BY FUNCTION('to_char', s.registrationDate, 'YYYY-MM') " +
+            "ORDER BY FUNCTION('to_char', s.registrationDate, 'YYYY-MM')"
+    )
+    List<Map<String, Object>> findMonthlyDemandByInventoryAndDateRange(@Param("inventoryId") Long inventoryId,
+                                                                       @Param("startDate") LocalDate startDate,
+                                                                       @Param("endDate") LocalDate endDate);
+
     @Query(value = "SELECT s FROM sales s " +
             "WHERE s.saleStatus.name = 'DEUDA'")
     Page<SaleEntity> findSalesWithDebts(Pageable pageable);
