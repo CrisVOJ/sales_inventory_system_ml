@@ -52,16 +52,16 @@ import { MessageService } from "primeng/api";
         </section>
     `,
     styles: [`
-        .page{ 
-            background: transparent; 
+        .page{
+            background: transparent;
         }
-        .page__header{ 
-            margin-bottom: .75rem; 
+        .page__header{
+            margin-bottom: .75rem;
         }
-        h1{ 
-            font-size: var(--h3); 
-            margin: 0 0 .5rem; 
-            color: var(--txt-1); 
+        h1{
+            font-size: var(--h3);
+            margin: 0 0 .5rem;
+            color: var(--txt-1);
         }
     `]
 })
@@ -81,8 +81,8 @@ export class SalesPage {
     ];
 
     rowActions: CrudAction<Sale>[] = [
-        { 
-            id:'edit',  label:'Editar', icon:'pi-pen-to-square', 
+        {
+            id:'edit',  label:'Editar', icon:'pi-pen-to-square',
             color: u => '#86E000',
             disabled: s => s.saleStatus?.name === 'ANULADO' || s.saleStatus?.name === 'PAGADO'
         }
@@ -104,7 +104,8 @@ export class SalesPage {
         this.sales.list({
             q: this.q,
             page: this.page,
-            pageSize: this.pageSize
+            pageSize: this.pageSize,
+            sort: 'registrationDate,desc'
         }).subscribe(r => {
             this.rows = r.rows;
             this.total = r.total;
@@ -166,7 +167,7 @@ export class SalesPage {
         const req$ = this.editing?.saleId
             ? this.sales.update({ ...payload, saleId: this.editing.saleId })
             : this.sales.create(payload);
-            
+
         req$.subscribe({
             next: ok => {
                 if(!ok) {
@@ -175,7 +176,7 @@ export class SalesPage {
                         summary: 'Error',
                         detail: 'No autorizado o datos invalidos'
                     })
-                    
+
                     return;
                 }
 

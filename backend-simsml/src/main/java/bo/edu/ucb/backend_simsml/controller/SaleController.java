@@ -54,7 +54,7 @@ public class SaleController {
     public ResponseEntity<Object> getSales(
             @RequestParam(value = "startDate", required = false) LocalDate startDate,
             @RequestParam(value = "endDate", required = false) LocalDate endDate,
-            @PageableDefault(sort = "registrationDate", direction = Sort.Direction.ASC) Pageable pageable
+            @PageableDefault(sort = "registrationDate", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         try {
             Object response = saleService.getSales(startDate, endDate, pageable);
