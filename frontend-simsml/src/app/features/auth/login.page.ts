@@ -7,6 +7,9 @@ import { InputTextModule } from "primeng/inputtext";
 import { PasswordModule } from "primeng/password";
 import { ButtonModule } from "primeng/button";
 import { FloatLabelModule } from "primeng/floatlabel";
+import { IconFieldModule } from "primeng/iconfield";
+import { InputIconModule } from "primeng/inputicon";
+import { MessageModule } from "primeng/message";
 
 @Component ({
     selector: 'app-login',
@@ -17,91 +20,131 @@ import { FloatLabelModule } from "primeng/floatlabel";
         InputTextModule,
         PasswordModule,
         ButtonModule,
-        FloatLabelModule
+        FloatLabelModule,
+        IconFieldModule,
+        InputIconModule,
+        MessageModule
     ],
     template: `
         <div class="auth-bg">
+            <h1 class="title">Sistema de Gestión de Ventas e Inventarios</h1>
+
             <div class="auth-card" [class.show-forgot]="showForgot">
-            <!-- PANEL LOGIN -->
-            <section class="panel panel-login">
-                <h2>Sistema de Gestión de Ventas e Inventarios</h2>
-                <h3>Iniciar Sesión</h3>
+                <!-- PANEL LOGIN -->
+                <section class="panel panel-login">
+                    <h2>Iniciar Sesión</h2>
 
-                <form [formGroup]="loginForm" (ngSubmit)="doLogin()">
-                <p-floatlabel variant="on">
-                    <input pInputText id="username" formControlName="username" autocomplete="off" />
-                    <label for="username">Usuario</label>
-                </p-floatlabel>
+                    <form [formGroup]="loginForm" (ngSubmit)="doLogin()">
+                        <div class="field">
+                            <p-floatlabel variant="on">
+                                <p-iconField>
+                                    <p-inputicon class="pi pi-user"/>
+                                    <input pInputText id="username" formControlName="username" autocomplete="off" fluid/>
+                                </p-iconField>
+                                <label for="username">Usuario</label>
+                            </p-floatlabel>
+                            @if (isInvalid('username')) {
+                                @if (this.loginForm.get('username')?.errors?.['required']) {
+                                    <p-message 
+                                        severity="error" 
+                                        size="small"
+                                        variant="simple"
+                                    >Campo requerido.</p-message>
+                                }
+                            }
+                        </div>
+                        
+                        <div class="field">
+                            <p-floatlabel variant="on">
+                                <p-iconField>
+                                    <p-inputicon class="pi pi-key"/>
+                                    <input pInputText id="password" type="password" formControlName="password" autocomplete="off" fluid/>
+                                </p-iconField>
+                                <label for="password">Contraseña</label>
+                            </p-floatlabel>
+                            @if (isInvalid('password')) {
+                                @if (this.loginForm.get('password')?.errors?.['required']) {
+                                    <p-message 
+                                        severity="error" 
+                                        size="small"
+                                        variant="simple"
+                                    >Campo requerido.</p-message>
+                                }
+                            }
+                        </div>
 
-                <p-floatlabel variant="on">
-                    <input pInputText id="password" type="password" formControlName="password" autocomplete="off" />
-                    <label for="password">Contraseña</label>
-                </p-floatlabel>
+                        <p-button type="submit" label="Iniciar Sesión " [loading]="loading" [disabled]="loading" severity="info" fluid/>
+                    </form>
 
-                <button pButton type="submit" label="Entrar" [disabled]="loginForm.invalid || loading"></button>
-                </form>
+                    <p class="hint error" *ngIf="error">{{ error }}</p>
 
-                <p class="hint error" *ngIf="error">{{ error }}</p>
+                    <button type="button" class="link-btn" style="align-self: flex-end;" (click)="toggleForgot()">
+                        ¿Olvidaste tu Contraseña?
+                    </button>
+                </section>
 
-                <button type="button" class="link-btn" (click)="toggleForgot()">
-                ¿Olvidaste tu contraseña?
-                </button>
-            </section>
+                <!-- PANEL OLVIDÉ CONTRASEÑA -->
+                <section class="panel panel-forgot">
+                    <h2>Restaurar Contraseña</h2>
 
-            <!-- PANEL OLVIDÉ CONTRASEÑA -->
-            <section class="panel panel-forgot">
-                <h2>Sistema de Gestión de Ventas e Inventarios</h2>
-                <h3>Restaurar Contraseña</h3>
+                    <p class="text-sm">
+                        Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
+                    </p>
 
-                <p class="text-sm">
-                Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña.
-                </p>
+                    <form [formGroup]="forgotForm" (ngSubmit)="sendResetLink()">
+                        <div class="field">
+                            <p-floatlabel variant="on">
+                                <p-iconField>
+                                    <p-inputicon class="pi pi-envelope"/>
+                                    <input pInputText id="email" formControlName="email" autocomplete="off" fluid/>
+                                </p-iconField>
+                                <label for="email">Correo electrónico</label>
+                            </p-floatlabel>
+                            @if (isInvalid('email')) {
+                                @if (this.forgotForm.get('email')?.errors?.['required']) {
+                                    <p-message 
+                                        severity="error" 
+                                        size="small"
+                                        variant="simple"
+                                    >Campo requerido.</p-message>
+                                }
+                                @if (this.forgotForm.get('email')?.errors?.['email']) {
+                                    <p-message 
+                                        severity="error" 
+                                        size="small"
+                                        variant="simple"
+                                    >Correo electrónico no válido.</p-message>
+                                }
+                            }
+                        </div>
 
-                <form [formGroup]="forgotForm" (ngSubmit)="sendResetLink()">
-                <p-floatlabel variant="on">
-                    <input pInputText id="email" formControlName="email" autocomplete="off" />
-                    <label for="email">Correo electrónico</label>
-                </p-floatlabel>
+                        <p-button type="submit" label="Enviar Correo" [loading]="loadingForgot" [disabled]="loadingForgot" severity="info" fluid/>
+                    </form>
 
-                <button pButton type="submit" label="Enviar correo"
-                        [disabled]="forgotForm.invalid || loadingForgot"></button>
-                </form>
+                    <p class="hint success" *ngIf="info">{{ info }}</p>
+                    <p class="hint error" *ngIf="errorForgot">{{ errorForgot }}</p>
 
-                <p class="hint success" *ngIf="info">{{ info }}</p>
-                <p class="hint error" *ngIf="errorForgot">{{ errorForgot }}</p>
-
-                <button type="button" class="link-btn" (click)="toggleForgot()">
-                ← Volver a iniciar sesión
-                </button>
-            </section>
+                    <button type="button" class="link-btn" style="align-self: flex-start;" (click)="toggleForgot()">
+                    < Volver a iniciar sesión
+                    </button>
+                </section>
             </div>
         </div>
-        <!-- <div class="login-wrap">
-        <h2>Iniciar sesión</h2>
-        <form [formGroup]="f" (ngSubmit)="doLogin()">
-            <p-floatlabel variant="on">
-            <input pInputText id="username" formControlName="username" autocomplete="off"/>
-            <label for="username">Usuario</label>
-            </p-floatlabel>
-
-            <p-floatlabel variant="on">
-            <input pInputText id="password" type="password" formControlName="password" autocomplete="off"/>
-            <label for="password">Contraseña</label>
-            </p-floatlabel>
-
-            <button pButton type="submit" label="Entrar" [disabled]="f.invalid || loading"></button>
-        </form>
-
-        <p class="hint" *ngIf="error">{{ error }}</p>
-        </div> -->
     `,
     styles:[`
         .auth-bg{
             min-height: 100vh;
             display:flex;
+            flex-direction:column;
             align-items:center;
             justify-content:center;
-            background:#021018 url('/assets/login-bg.jpg') center/cover no-repeat; /* Pon aquí tu fondo */
+            background:#021018 url('/assets/login-bg.jpg') center/cover no-repeat;
+        }
+
+        .title{
+            font-size: var(--h3);
+            font-weight: 500;
+            color: var(--txt-1);
         }
 
         .auth-card{
@@ -112,7 +155,7 @@ import { FloatLabelModule } from "primeng/floatlabel";
             overflow:hidden;
             border-radius:14px;
             box-shadow:0 10px 30px rgba(0,0,0,.5);
-            background: rgba(10,30,40,0.92);
+            background:var(--panel-bg);
         }
 
         .panel{
@@ -137,15 +180,12 @@ import { FloatLabelModule } from "primeng/floatlabel";
             transform:translateX(0);
         }
 
-        h2{
-            margin:0;
-            font-size:1rem;
+        .panel h2{
+            margin: 0 0 .5rem;
+            font-size: var(--h4);
             font-weight:500;
-            opacity:.9;
-        }
-        h3{
-            margin:0 0 .5rem;
-            font-size:1.3rem;
+            justify-content: center;
+            display: flex;
         }
 
         form{ display:grid; gap:1rem; }
@@ -165,7 +205,6 @@ import { FloatLabelModule } from "primeng/floatlabel";
             font-size:.85rem;
             text-decoration:underline;
             cursor:pointer;
-            align-self:flex-start;
         }
 
         .text-sm{
@@ -210,7 +249,10 @@ export class LoginPage {
     }
 
     doLogin() {
-        if (this.loginForm.invalid) return;
+        if (this.loginForm.invalid) {
+            this.loginForm.markAllAsTouched();
+            return;
+        }
         this.loading = true;
         this.error = '';
 
@@ -228,7 +270,10 @@ export class LoginPage {
     }
 
     sendResetLink() {
-        if (this.forgotForm.invalid) return;
+        if (this.forgotForm.invalid) {
+            this.forgotForm.markAllAsTouched();
+            return;
+        }
         this.loadingForgot = true;
         this.errorForgot = '';
         this.info = '';
@@ -244,5 +289,10 @@ export class LoginPage {
                 this.errorForgot = 'No se pudo enviar el correo. Intenta nuevamente más tarde.';
             }
         });
+    }
+
+    isInvalid(controlName: string) {
+        const control = this.loginForm.get(controlName) || this.forgotForm.get(controlName);
+        return control?.invalid && (control.dirty || control.touched);
     }
 }
