@@ -268,7 +268,7 @@ export type SaleFormValue = Omit<Sale, 'saleId'>;
     styles:[`
         .grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: .9rem 1.2rem;
         }
 
@@ -282,18 +282,35 @@ export type SaleFormValue = Omit<Sale, 'saleId'>;
             min-height: 42px;
         }
 
-        :host ::ng-deep .p-multiselect,
+        :host ::ng-deep p-floatlabel,
+        :host ::ng-deep .p-floatlabel {
+            display: block;
+            width: 100%;
+            min-width: 0;
+        }
+
         :host ::ng-deep .p-select,
-        :host ::ng-deep .p-datepicker {
+        :host ::ng-deep .p-datepicker, 
+        :host ::ng-deep .p-multiselect {
             display: flex;
             align-items: center;
             height: 42px !important;
+            width: 100% !important;
+            max-width: 100%;
+            min-width: 0;
+            box-sizing: border-box;
         }
 
         :host ::ng-deep p-datepicker .p-inputtext {
             background: #EBFEFF;
             border: none;
             width: 100%;
+        }
+
+        .field {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
         }
 
         label { display: flex; }
@@ -317,11 +334,13 @@ export type SaleFormValue = Omit<Sale, 'saleId'>;
         }
 
         @media (max-width: 1024px) {
-            .grid { grid-template-columns: repeat(2, 1fr); }
+            .grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
         }
 
         @media (max-width: 600px) {
-            .grid { grid-template-columns: 1fr; }
+            .grid { grid-template-columns: minmax(0, 1fr); }
             .btn { width: 100%; }
         }
     `]
