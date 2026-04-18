@@ -182,6 +182,7 @@ public class EmailService {
                 """.formatted(resetUrl);
 
             SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(from);
             message.setTo(to);
             message.setSubject(subject);
             message.setText(text);
@@ -190,7 +191,7 @@ public class EmailService {
 
             log.info("Correo de restauración enviado correctamente");
         } catch (Exception e) {
-            log.error("Error al enviar el correo para resetear contraseña");
+            log.error("Error al enviar el correo para resetear contraseña {}", e.getMessage(), e);
         }
     }
 }

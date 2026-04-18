@@ -4,6 +4,8 @@ server:
 spring:
   application:
     name: backend-simsml
+  config:
+    import: optional:file:.env[.properties]
   datasource:
     url: jdbc:postgresql://localhost:5432/db-simsml
     username: postgres
@@ -21,10 +23,10 @@ spring:
       data-locations: classpath:init.sql
       mode: always
   mail:
-    host: smtp.gmail.com
+    host: smtp-relay.brevo.com
     port: 587
-    username: cristopheroliverajimenez@gmail.com
-    password: aaxpjalnhxsctnah
+    username: ${BREVO_SMTP_USER}
+    password: ${BREVO_SMTP_PASSWORD}
     properties:
       mail:
         smtp:
@@ -37,9 +39,7 @@ spring:
 
 app:
   mail:
-    from: "Sistema de Ventas y Inventario <no-reply>"
-    low-stock:
-      to: "cristopheroliverajimenez@gmail.com"
+    from: ${FROM}
   frontend:
     base-url: http://localhost:4200
 
