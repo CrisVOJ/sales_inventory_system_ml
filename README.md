@@ -34,7 +34,19 @@ docker run --name simsml-container -e POSTGRES_DB=db-simsml -e POSTGRES_PASSWORD
 
 Nota: En caso de haber cambiado las propiedades del comando anterior, se deben configurar las propiedad del application.yml
 
-1.2. Ejecutar el Backend Spring Boot
+1.2. Configuración de Variables de Entorno (para correos)
+
+Aunque el proyecto usa **Brevo** para enviar correos, es posible usar cualquier otro servicio.
+
+Las variables de entorno necesarias para el correo son:
+
+- Usuario: Correo del servicio que usa o uno personal
+- Contraseña: Clave de acceso generada
+- Remitente: Correo que enviara los correos
+
+Estas variables se encuentran en .env.example, pero para que las variables sean reconocidas por la aplicación debe crear el archivo .env con las varables de .env.example. Este archivo es ignorado por Git para proteger las credenciales.
+
+1.3. Ejecutar el Backend Spring Boot
 
 Para ejecutar el backend puede hacerlo ingresando desde el editor IntelliJ Idea o mediante una terminal ejecutando:
 ```
