@@ -1,16 +1,16 @@
 <p-toolbar class="app-header">
-  <div class="p-toolbar-group-start left">
+  <div class="left">
     <button 
-    pButton 
-    type="button" 
-    class="profile-icon-btn"
-    icon="pi pi-bars" 
-    (click)="menuClick.emit()" 
-    aria-label="Abrir menú">
+      pButton 
+      type="button" 
+      class="profile-icon-btn"
+      icon="pi pi-bars" 
+      (click)="menuClick.emit()" 
+      aria-label="Abrir menú">
     </button>
   </div>
 
-  <div class="p-toolbar-group-end right">
+  <div class="right">
     <span class="p-overlay-badge">
       <button
         pButton
@@ -26,7 +26,6 @@
       #profileMenu 
       [model]="profileItems" 
       [popup]="true"
-      appendTo="body"
     />
     
     <button 
