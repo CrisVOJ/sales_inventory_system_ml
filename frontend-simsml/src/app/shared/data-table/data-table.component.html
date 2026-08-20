@@ -1,0 +1,115 @@
+<div class="table-content-bg">
+    <!-- Toolbar -->
+    @if (showSearch || showFilter || showCreate) {
+        <div class="toolbar">
+            @if (showSearch || showFilter) {
+                <div class="left">
+                    @if (showSearch) {
+                        <p-iconfield iconPosition="left" [class.filter]="showFilter">
+                            <p-inputicon class="pi pi-search"/>
+                            <input  
+                                pInputText type="search" 
+                                [placeholder]="searchPlaceholder"
+                                [(ngModel)]="query" 
+                                (input)="onSearch.emit(query)"
+                            />
+                        </p-iconfield>
+                    }
+                    
+                    @if (showFilter) {
+                        <div [class.search]="showSearch">
+                            <p-button (click)="filters.toggle($event)" icon="pi pi-filter"/>
+                            <p-popover 
+                                #filters
+                            >
+                                <ng-content select="[filters]"></ng-content>
+                            </p-popover>
+                        </div>
+                    }
+                </div>
+            }
+        
+            @if (showCreate) {
+                <p-button (click)="create.emit()" label="Agregar {{entityName}}"/>
+            }
+        </div>
+    }
+
+    <!-- Table -->
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th 
+                        *ngFor="let c of columns" 
+                        [style.width]="c.width" 
+                        [class.center]="c.align==='center'" 
+                        [class.right]="c.align==='right'"
+                    >
+                        {{ c.header }}
+                    </th>
+                    <th 
+                        *ngIf="actions?.length" 
+                        class="head-actions"
+                    >
+                        Acciones
+                    </th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr *ngFor="let row of rows; let i = index">
+                    <td 
+                        *ngFor="let c of columns" 
+                        [class.center]="c.align==='center'" 
+                        [class.right]="c.align==='right'"
+                    >
+                        {{ c.format ? c.format(row, i) : $any(row)[c.key] }}
+                    </td>
+
+                    <td *ngIf="actions?.length" class="actions">
+                        <div class="actions-container">
+                            <ng-container *ngFor="let a of actions">
+                                <button 
+                                    *ngIf="!a.show || a.show(row)"
+                                    class="act" [ngClass]="a.class || 'ghost'"
+                                    [title]="a.tooltip ? a.tooltip(row) : a.label"
+                                    [disabled]="a.disabled ? a.disabled(row) : false"
+                                    (click)="emitAction(a.id, row)"
+                                    pButton pRipple
+                                    [pTooltip]="a.tooltip ? a.tooltip(row) : a.label"
+                                    tooltipPosition="bottom"
+                                >
+                                    <span 
+                                        class="pi" [class]="a.icon"
+                                        [style.color]="a.color ? a.color(row) : null"
+                                    >
+                                    </span>
+                                </button>
+                            </ng-container>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr *ngIf="!rows?.length">
+                    <td [attr.colspan]="columns.length + 1" class="empty">Sin datos</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginator -->
+    <div class="pager" *ngIf="total > 0">
+        <span class="hint">
+            Registros por página:
+            <p-select [options]="options" optionLabel="label" optionValue="value" [(ngModel)]="pageSize" (ngModelChange)="pageSizeChange(1)"/>
+            {{startIndex()+1}} - {{endIndex()}} de {{total}}
+        </span>
+        <p-paginator
+            (onPageChange)="onPageChange($event)"
+            [rows]="pageSize"
+            [totalRecords]="total"
+            [pageLinkSize]="3"
+        />
+    </div>
+</div>

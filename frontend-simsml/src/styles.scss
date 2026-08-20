@@ -1,6 +1,10 @@
 @use 'app/theme/tokens';
 @import "primeicons/primeicons.css";
 
+* {
+  box-sizing: border-box;
+}
+
 body { 
   background: var(--bg-1); 
   color: var(--txt-1); 
@@ -45,17 +49,20 @@ html,body{height:100%}
   grid-template-columns: var(--layout-sidebar-width-collapsed) 1fr; /* antes: --layout-sidebar-w-collapsed */
 }
 
-/* Header */
-.app-header .p-toolbar { border-radius: 0; }
-.app-header .p-inputtext { width: 260px; }
-
-/* Contenido */
-.app-content { padding: 1rem; }
-
-/* Tabla compartida */
-.data-table-caption { display: flex; gap: .75rem; align-items: center; justify-content: space-between; padding: .5rem; }
-.data-table-caption .left, .data-table-caption .right { display: flex; align-items: center; gap: .5rem; }
-
 /* Ícono hamburguesa más visible */
 .header-trigger { cursor: pointer; padding: .5rem; border-radius: .5rem; }
 .header-trigger:hover { background: rgba(0,0,0,.05); }
+
+/*--- Table filters container ---*/
+.p-component.p-popover {
+  background-color: var(--panel-bg);
+  border: 1px solid var(--app-bg);
+}
+
+.p-component.p-popover::before {
+  border-bottom-color: var(--app-bg);
+}
+
+.p-component.p-popover::after {
+  border-bottom-color: var(--panel-bg);
+}

@@ -1,224 +1,221 @@
-.crud-card{
-  background: var(--panel-bg);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
-  padding: 16px;
-  border: 1px solid var(--line);
-}
-
 .table-content-bg {
-  background-color: #345861;
-  padding: 1rem;
-  border-radius: 0.5rem;
+  background-color: var(--panel-bg);
+  padding: 1em;
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
 }
 
-/* ─── Toolbar ─────────────────────────────────────────────────────────── */
-.toolbar{ 
-  display:flex; 
-  align-items:center; 
-  justify-content:space-between; 
-  gap:12px; 
-  margin-bottom:12px; 
+/*-------- Toolbar --------*/
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  height: 36px;
 }
 
-.select-box{
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background: none;
-  color: white;
-  font-size: var(--p);
-  border:1px solid #043248;
-  padding:8px 35px 8px 15px;
-  cursor: pointer;
-  height: 2.45rem;
-
-  background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
-  background-repeat: no-repeat;
-  background-position: right 10px center;
-  background-size: 20px;
-}
-.select-box:focus{
-  outline: none;
+.left {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+  gap: .1em;
 }
 
-.select-box select{
-  appearance: none; 
-  -webkit-appearance:none; 
-  -moz-appearance:none;
-  background: #043248; 
-  border: 0.5em; 
-  color: var(--txt-1); 
-  padding-right: 20px; 
-  font: inherit; 
-  cursor: pointer;
+:host ::ng-deep {
+  .p-iconfield .p-inputicon {
+    color: var(--cyan);
+  }
+
+  .p-iconfield .p-inputtext {
+    background-color: transparent;
+    border-color: var(--app-bg);
+    color: var(--txt-1);
+    height: 100%;
+  }
+
+  .p-iconfield.filter .p-inputtext {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  .p-iconfield .p-inputtext:hover {
+    border-color: var(--txt-1);
+  }
+
+  .p-iconfield .p-inputtext:focus {
+    border-color: var(--cyan);
+  }
+
+  .p-button {
+    background-color: var(--cyan);
+    color: var(--txt-2);
+    border-color: var(--app-bg);
+    height: 100%;
+  }
+
+  .left .p-button {
+    background-color: transparent;
+    color: var(--txt-1);
+  }
+
+  .left .search .p-button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  :is(.left .p-button, .p-button):hover {
+    background-color: var(--cyan);
+    color: var(--txt-2);
+    border-color: var(--cyan);
+  }
+
+  :is(.left .p-button, .p-button):focus {
+    background-color: var(--cyan);
+    color: var(--txt-2);
+    border-color: var(--cyan);
+  }
+
+  .filters-container {
+    background-color: var(--cyan);
+  }
 }
 
-.select-box option{
-  background-color: #345861;
-  color: white;
-  font-size: var(--p);
-  border: none;
-}
-.select-box option:focus{
-  outline: none;
-}
-.select-box option:hover{
-  background-color: #01313a;
-}
-.select-box .chev{ width:18px; height:18px; position:absolute; right:10px; fill:none; stroke:var(--txt-2); stroke-width:2; pointer-events:none; }
-
-.left{ display:flex; align-items:center; gap:10px; }
-.right{ display:flex; align-items:center; gap:10px; }
-
-.search{
-  position: relative; 
-  display:inline-flex; 
-  align-items:center;
-  background:none; 
-  border:1px solid #043248;
-  padding-left:1.75rem;
-}
-.search input{
-  background: none; 
-  border:0; 
-  color: var(--txt-1); 
-  padding:9px 12px; 
-  min-width: 240px; 
-  outline:none;
-}
-input[type="search"]::-webkit-search-cancel-button {
-  -webkit-appearance: none;
-  appearance: none;
-  height: 20px;
-  width: 20px;
-  cursor: pointer;
-  background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' fill='red' viewBox='0 0 24 24'><path d='M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z'/></svg>") 
-              no-repeat center center;
-  background-size: contain;
+/*-------- Table --------*/
+.table-wrap {
+  overflow: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--app-bg);
 }
 
-.btn.add{
-  background: var(--header-cyan); 
-  color:#ffffff; 
-  border:0;
-  font-weight: 500;
-  font-size: var(--p);
-  padding: 10px 14px; 
-  border-radius: 12px; 
-  cursor: pointer;
-}
-
-/* ─── Tabla ───────────────────────────────────────────────────────────── */
-.table-wrap{ 
-  overflow:auto; 
-  border-radius: var(--radius-md); 
-  border: 1px solid #043248;
-}
-table{ 
-  width:100%; 
-  border-collapse: collapse; 
+table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
 thead th{
-  background: var(--header-cyan); 
-  color:#ffffff; 
-  text-align:left;
+  background-color: var(--cyan);
+  color: var(--txt-2);
+  text-align: left;
   font-weight: 500;
   font-size: var(--p);
-  padding: 14px 14px; 
   letter-spacing: .2px;
-  border-bottom: 1px solid #043248;
-}
-thead th.head-actions{ 
-  width: 160px; 
-  text-align: center; 
-}
-
-tbody td{
-  padding: 14px 14px; 
-  color: var(--txt-1); 
-  border-bottom: 1px solid #043248;
-  vertical-align: middle;
-}
-
-tbody tr:hover{ background: var(--panel-bg-2); }
-
-td.center, th.center{ text-align:center; }
-td.right,  th.right { text-align:right;  }
-
-td.empty{ text-align:center; color: var(--txt-2); padding: 24px; }
-
-/* ─── Acciones ───────────────────────────────────────────────── */
-td.actions{
   padding: 14px;
-  vertical-align: middle;
-  text-align: center;
+  border-bottom: 1px solid var(--app-bg);
 }
 
-.act{
-  width:36px; 
-  height:36px; 
-  border-radius: 50%; 
-  display:grid; 
-  place-items:center;
-  border: 0; 
-  background: none; 
-  color: none; 
-  cursor: pointer;
+tbody td {
+  padding: 14px;
+  color: var(--txt-1);
+  border-bottom: 1px solid var(--app-bg);
 }
-.act.info   { background: var(--act-info); }
-.act.success{ background: var(--act-ok); }
-.act.warn   { background: var(--act-warn); }
-.act.danger { background: var(--act-del); }
-.act:disabled{ opacity:.55; cursor:not-allowed; }
-.i{ font-size: 18px; line-height: 1; }
+
+tbody tr:last-child td {
+  border: none;
+}
+
+tbody tr:hover {
+  background-color: var(--panel-bg-2);
+}
 
 .actions-container {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: nowrap;
+  gap: 5px;
 }
 
-td.actions .actions-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  height: 100%;
+.actions-container button {
+  width: 36px;
+  height: 36px;
+  background: none;
+  border: none;
+  border-radius: 50%;
+  margin: 0;
+  transition: all .2s ease-in-out;
 }
-/* ─── Paginación ─────────────────────────────────────────────────────── */
-.pager{ 
-  display:flex; 
-  align-items:center; 
-  gap:8px; 
-  margin-top:12px; 
-  flex-wrap: wrap; 
+
+.actions-container button:hover {
+  transform: scale(1.1) translate(-2px, -2px);
+}
+
+/*-------- Pagination --------*/
+.pager {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
 }
-.pager .page, .pager .nav{
-  width:36px; 
-  height:36px; 
-  border-radius: .5rem; 
-  border:0; 
-  cursor:pointer;
-  background: none; 
-  color: white;
+
+.hint .p-select {
+  background: none;
+  border-color: var(--app-bg);
 }
-.pager .page.isActive{ 
-  background: var(--header-cyan); 
-  color:#01313a; 
-  font-weight: 900; 
+
+:host ::ng-deep {
+  .hint .p-select :is(.p-select-label, .p-select-dropdown) {
+    color: var(--txt-1);
+  }
+
+  .hint .p-select .p-select-overlay {
+    background-color: var(--panel-bg);
+    border-color: var(--app-bg);
+  }
+
+  .hint .p-select .p-select-overlay .p-select-option-selected {
+    background-color: var(--cyan);
+    span {
+      color: var(--txt-2);
+    }
+  }
+
+  .hint .p-select .p-select-overlay .p-select-option {
+    color: var(--txt-1);
+  }
+
+  .hint .p-select .p-select-overlay .p-select-option:hover {
+    background-color: var(--cyan);
+    color: var(--txt-2);
+  }
+
+  .hint .p-select .p-select-overlay .p-select-option.p-focus {
+    background-color: var(--cyan);
+    color: var(--txt-2);
+  }
 }
-.pager .nav[disabled], .pager .page[disabled]{ 
-  opacity:.5; 
-  cursor:not-allowed; 
+
+.p-paginator {
+  background: none;
+  border: none; 
+  padding: 0;
 }
-.hint{ 
-  margin-left: 6px; 
-  color: white; 
-  font-size: var(--p); 
+
+:host ::ng-deep {
+  .p-paginator .p-paginator-first, 
+  .p-paginator .p-paginator-prev,
+  .p-paginator .p-paginator-page,
+  .p-paginator .p-paginator-next, 
+  .p-paginator .p-paginator-last {
+    color: var(--txt-1);
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border-radius: 4px;
+    font-size: var(--p);
+  }
+
+  .p-paginator .p-paginator-page {
+    background-color: var(--panel-bg-2);
+  }
+
+  .p-paginator .p-paginator-page-selected {
+    background-color: var(--cyan);
+    color: var(--txt-2);
+    cursor: default;
+  }
+
+  .p-paginator :is(.p-paginator-first, .p-paginator-prev,
+  .p-paginator-page,
+  .p-paginator-next, .p-paginator-last):hover:not(:disabled, .p-paginator-page-selected) {
+    background-color: var(--cyan);
+    color: var(--txt-2);
+  }
 }
