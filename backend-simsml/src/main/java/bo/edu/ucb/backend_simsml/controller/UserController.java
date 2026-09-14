@@ -83,6 +83,18 @@ public class UserController {
         }
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
+    @GetMapping("/allSummary")
+    public ResponseEntity<Object> getUsersSummary() {
+        try {
+            Object response = userService.getUsersSummary();
+            return generateResponse(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new UnsuccessfulResponse("400", "Error al obtener resumen de usuarios", e.getMessage()));
+        }
+    }
+
     @GetMapping("/")
     public ResponseEntity<Object> getUser(@RequestParam("userId") Long userId) {
         try {

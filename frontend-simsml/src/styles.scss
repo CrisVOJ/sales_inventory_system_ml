@@ -22,6 +22,7 @@ body {
   --panel-bg: #345861;       /* tarjetas/paneles */
   --panel-bg-2:#254a52;      /* hover fila */
   --cyan:#54B4d0;     /* cabecera tabla / acento */
+  --input-bg: #EBFEFF;
   --txt-1:#efefef;           /* texto principal */
   --txt-2:black;           /* texto muted */
   --line: rgba(255,255,255,.06);
@@ -29,12 +30,12 @@ body {
   --shadow: 0 14px 40px rgba(0,0,0,.28);
   --radius-lg: 16px;
   --radius-md: 12px;
-  --h1: 61px;
-  --h2: 49px;
-  --h3: 39px;
-  --h4: 31px;
-  --h5: 25px;
-  --h6: 20px;
+  --h1: 40px;
+  --h2: 35px;
+  --h3: 30px;
+  --h4: 25px;
+  --h5: 20px;
+  --h6: 15px;
   --p: 16px;
   --small: 13px;
 }
@@ -53,6 +54,13 @@ html,body{height:100%}
 .header-trigger { cursor: pointer; padding: .5rem; border-radius: .5rem; }
 .header-trigger:hover { background: rgba(0,0,0,.05); }
 
+/*--- Title views ---*/
+.page .page_header h1 {
+    font-size: var(--h1);
+    margin: 0 0 .75rem;
+    color: var(--txt-1);
+}
+
 /*--- Table filters container ---*/
 .p-component.p-popover {
   background-color: var(--panel-bg);
@@ -65,4 +73,83 @@ html,body{height:100%}
 
 .p-component.p-popover::after {
   border-bottom-color: var(--panel-bg);
+}
+
+.p-component.p-popover .p-popover-content {
+  width: max(350px, 25vw);
+}
+
+/*--- Filters popover ---*/
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filters .p-datepicker-input,
+.filters .p-datepicker-panel,
+.filters .p-datepicker-header,
+.filters .p-select,
+.filters .p-select-overlay,
+.filters .p-select-filter,
+.filters .p-multiselect,
+.filters .p-multiselect-overlay,
+.filters .p-multiselect-overlay .p-checkbox-box,
+.filters .p-multiselect-filter {
+  background-color: var(--input-bg);
+  border-color: var(--app-bg);
+  color: var(--txt-2);
+}
+
+.filters .p-button-text.p-button-secondary:not(:disabled):hover,
+.filters .p-datepicker-select-month:enabled:hover,
+.filters .p-datepicker-select-year:enabled:hover,
+.filters .p-datepicker-day:not(.p-datepicker-day-selected):not(.p-disabled):hover,
+.filters .p-datepicker-month:not(.p-disabled):not(.p-datepicker-month-selected):hover,
+.filters .p-datepicker-year:not(.p-disabled):not(.p-datepicker-year-selected):hover,
+.filters .p-datepicker-day-selected,
+.filters .p-datepicker-month-selected,
+.filters .p-datepicker-year-selected,
+.filters .p-datepicker-today .p-datepicker-day:hover,
+.filters .p-datepicker-today .p-datepicker-day.p-datepicker-day-selected,
+.filters .p-multiselect-overlay .p-checkbox-checked:has(.p-checkbox-input:hover) .p-checkbox-box,
+.filters .p-multiselect-overlay .p-checkbox-checked .p-checkbox-box,
+.filters .p-multiselect-overlay .p-multiselect-option-selected.p-focus {
+  background-color: var(--cyan);
+  color: var(--txt-2);
+}
+
+.filters .p-multiselect-overlay .p-multiselect-option-selected {
+  color: var(--cyan);
+}
+
+.filters .p-datepicker-today .p-datepicker-day {
+  background-color: var(--panel-bg);
+  color: var(--txt-1);
+}
+
+.filters .p-datepicker-clear-icon,
+.filters .p-multiselect-clear-icon {
+  color: red;
+  margin-right: -20px;
+  right: 50px;
+}
+
+.filters .p-datepicker-input.p-inputtext:focus,
+.filters .p-select-open,
+.filters .p-select.p-select-open:hover,
+.filters .p-select-header input:focus,
+.filters .p-multiselect-header input:focus {
+  border-color: var(--cyan);
+}
+
+.filters .p-floatlabel-on:has(.p-inputwrapper-focus) label,
+.filters .p-floatlabel-on:has(.p-inputwrapper-filled) label,
+.filters .p-multiselect-chip {
+  background-color: var(--cyan);
+  color: var(--txt-2);
+}
+
+.filters .p-select, .filters .p-multiselect {
+  width: 100%;
 }

@@ -18,5 +18,6 @@ export interface UserSummary {
   userId: number;
   name: string;
   paternalSurname: string;
+  maternalSurname?: string;
   username: string;
 }

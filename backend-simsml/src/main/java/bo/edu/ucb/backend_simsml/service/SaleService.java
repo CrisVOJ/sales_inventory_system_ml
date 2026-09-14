@@ -112,9 +112,9 @@ public class SaleService {
         }
     }
 
-    public Object getSales(LocalDate startDate, LocalDate endDate, Pageable pageable) {
+    public Object getSales(LocalDate startDate, LocalDate endDate, List<Integer> userIds, List<Integer> customerIds, List<Integer> statusIds, Pageable pageable) {
         try {
-            Page<SaleResponse> sales = saleRepository.findAllSales(startDate, endDate, pageable)
+            Page<SaleResponse> sales = saleRepository.findAllSales(startDate, endDate, userIds, customerIds, statusIds, pageable)
                     .map(saleResposne -> new SaleResponse(
                             saleResposne.getSaleId(),
                             saleResposne.getRegistrationDate(),

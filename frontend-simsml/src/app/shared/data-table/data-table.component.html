@@ -21,6 +21,7 @@
                             <p-button (click)="filters.toggle($event)" icon="pi pi-filter"/>
                             <p-popover 
                                 #filters
+                                [focusOnShow]="false"
                             >
                                 <ng-content select="[filters]"></ng-content>
                             </p-popover>

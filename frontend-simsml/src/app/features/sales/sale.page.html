@@ -1,0 +1,125 @@
+<section class="page">
+    <header class="page_header">
+        <h1>Ventas</h1>
+    </header>
+
+    <main>
+        <app-data-table
+            [entityName]="'Venta'"
+            [columns]="cols"
+            [rows]="rows"
+            [total]="total"
+            [page]="page"
+            [pageSize]="pageSize"
+            [actions]="rowActions"
+            [searchPlaceholder]="'Buscar...'"
+            (create)="openCreate()"
+            (onSearch)="search($event)"
+            (pageChange)="paginate($event)"
+            (action)="onRowAction($event)"
+            [showSearch]="false"
+            [showFilter]="true"
+        >
+            <div filters>
+                <form [formGroup]="filterForm" class="filters">
+                    <div class="dates-filter">
+                        <p-floatLabel variant="on">
+                            <p-datepicker 
+                                formControlName="startDate" 
+                                inputId="start_date" 
+                                dateFormat="dd/mm/yy" 
+                                showIcon 
+                                iconDisplay="input" 
+                                [showClear]="true"
+                            />
+                            <label for="start_date">Fecha Inicio</label>
+                        </p-floatLabel>
+
+                        <p-floatLabel variant="on">
+                            <p-datepicker 
+                                formControlName="endDate" 
+                                inputId="end_date" 
+                                dateFormat="dd/mm/yy" 
+                                showIcon 
+                                iconDisplay="input" 
+                                [showClear]="true"
+                            />
+                            <label for="end_date">Fecha Fin</label>
+                        </p-floatLabel>
+                    </div>
+
+                    <p-floatlabel variant="on">
+                        <p-multiselect 
+                            formControlName="userIds"
+                            inputId="user" 
+                            [options]="userOptions" 
+                            optionLabel="displayLabel" 
+                            optionValue="userId"
+                            [filter]="true" 
+                            filterBy="displayLabel" 
+                            [virtualScroll]="true" 
+                            [virtualScrollItemSize]="38" 
+                            emptyFilterMessage="No se encontraron usuarios."
+                            [showClear]="true"
+                            emptyMessage="No se encontraron usuarios."
+                            display="chip"
+                        />
+                        <label for="user">Ususario</label>
+                    </p-floatlabel>
+
+                    <p-floatlabel variant="on">
+                        <p-multiselect 
+                            formControlName="customerIds"
+                            inputId="customer" 
+                            [options]="customerOptions" 
+                            optionLabel="displayLabel"
+                            optionValue="customerId" 
+                            [filter]="true" 
+                            filterBy="displayLabel" 
+                            [virtualScroll]="true" 
+                            [virtualScrollItemSize]="38" 
+                            emptyFilterMessage="No se encontraron clientes."
+                            [showClear]="true"
+                            emptyMessage="No se encontraron clientes."
+                            display="chip"
+                        />
+                        <label for="customer">Cliente</label>
+                    </p-floatlabel>
+
+                    <p-floatlabel variant="on">
+                        <p-multiselect 
+                            formControlName="statusIds"
+                            [options]="saleStatusOptions" 
+                            optionLabel="displayLabel" 
+                            optionValue="saleStatusId"
+                            inputId="status" 
+                            [filter]="true" 
+                            filterBy="displayLabel" 
+                            [virtualScroll]="true" 
+                            [virtualScrollItemSize]="38" 
+                            emptyFilterMessage="No se encontraron estados."
+                            [showClear]="true"
+                            emptyMessage="No se encontraron estados."
+                            display="chip"
+                        />
+                        <label for="status">Estado</label>
+                    </p-floatlabel>
+                </form>
+            </div>
+        </app-data-table>
+
+        <app-modal
+            [open]="formOpen"
+            [title]="formTitle"
+            [hasFooter]="false"
+            (close)="closeForm()"
+        >
+            <sale-form
+                *ngIf="formOpen"
+                [value]="editing"
+                (cancel)="closeForm()"
+                (submit)="onSubmitForm($event)"
+            />
+        </app-modal>
+    </main>
+</section>

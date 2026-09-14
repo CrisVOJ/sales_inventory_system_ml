@@ -21,7 +21,7 @@ export abstract class BaseCrudService<TList, TSingle = TList> {
     return this.normalize(item) as unknown as TSingle;
   }
 
-  list(params: { q?: string; page: number; pageSize: number; status?: boolean; sort?: string }): Observable<PageResult<TList>> {
+  list(params: { q?: string; page: number; pageSize: number; status?: boolean; sort?: string, additionalParams?: Record<string, any> }): Observable<PageResult<TList>> {
     const { q, page, pageSize, status, sort } = params;
     let hp = new HttpParams()
       .set('page', String(Math.max(0, page - 1)))
@@ -30,6 +30,12 @@ export abstract class BaseCrudService<TList, TSingle = TList> {
       .set('status', Boolean(true));
     if (q) hp = hp.set('filter', q);
     if (typeof status === 'boolean') hp = hp.set('status', String(status));
+
+    if (params.additionalParams) {
+      for (const [key, value] of Object.entries(params.additionalParams)) {
+        hp = hp.set(key, value);
+      }
+    }
 
     return this.http.get<ApiEnvelope<SpringPage<any>>>(`${this.baseUrl}/all`, { params: hp }).pipe(
       map(raw => {

@@ -6,10 +6,16 @@ public record UserSummary(
         Long userId,
         String name,
         String paternalSurname,
+        String maternalSurname,
         String username
 ) {
     public static UserSummary from(UserEntity user) {
         if (user == null) return null;
-        return new UserSummary(user.getUserId(), user.getName(), user.getPaternalSurname(), user.getUsername());
+        return new UserSummary(
+                user.getUserId(),
+                user.getName(),
+                user.getPaternalSurname(),
+                user.getMaternalSurname(),
+                user.getUsername());
     }
 }

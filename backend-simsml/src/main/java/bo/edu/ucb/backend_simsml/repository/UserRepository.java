@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.userdetails.User;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
@@ -25,6 +26,11 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
             "(:status IS NULL OR u.isEnabled = :status)"
     )
     Page<UserEntity> findAlleUsers(@Param("filter") String filter, @Param("status") Boolean status, Pageable pageable);
+
+    @Query(value = "SELECT u FROM users u " +
+            "WHERE u.isEnabled = true " +
+            "ORDER BY u.username ASC")
+    List<UserEntity> findAllUsersSummary();
 
     Optional<UserEntity> findUserEntityByUsername(String username);
 

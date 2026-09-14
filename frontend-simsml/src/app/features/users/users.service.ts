@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, catchError, delay, map, Observable, of } from "rxjs";
-import { User } from '../users/users.types'
+import { User, UserSummary } from '../users/users.types'
 import { environment } from "../../../environments/environment";
 import { HttpClient, HttpErrorResponse, HttpParams } from "@angular/common/http";
 import { BaseCrudService } from "../../shared/base-crud.service";
@@ -31,6 +31,16 @@ export class UsersService extends BaseCrudService<User>{
           : Array.isArray(u.role)  ? u.role
           : (u.roles ? [u.roles] : []),
     }
+  }
+
+  usersSummaryList(): Observable<UserSummary[] | null> {
+    return this.http.get<ApiEnvelope<any>>(`${this.baseUrl}/allSummary`).pipe(
+      map(raw => {
+        if (isUnsuccessful(raw)) return null;
+        return Array.isArray(raw.result) ? raw.result.map(x => this.normalize(x)) : [];
+      }),
+      catchError(() => of(null))
+    )
   }
 
   getUserData(): Observable<User | null> {

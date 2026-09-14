@@ -21,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -54,10 +55,13 @@ public class SaleController {
     public ResponseEntity<Object> getSales(
             @RequestParam(value = "startDate", required = false) LocalDate startDate,
             @RequestParam(value = "endDate", required = false) LocalDate endDate,
+            @RequestParam(value = "userIds", required = false) List<Integer> userIds,
+            @RequestParam(value = "customerIds", required = false) List<Integer> customerIds,
+            @RequestParam(value = "statusIds", required = false) List<Integer> statusIds,
             @PageableDefault(sort = "registrationDate", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         try {
-            Object response = saleService.getSales(startDate, endDate, pageable);
+            Object response = saleService.getSales(startDate, endDate, userIds, customerIds, statusIds, pageable);
             return generateResponse(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

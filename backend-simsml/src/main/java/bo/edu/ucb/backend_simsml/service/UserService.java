@@ -4,10 +4,7 @@ import bo.edu.ucb.backend_simsml.dto.SuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.UnsuccessfulResponse;
 import bo.edu.ucb.backend_simsml.dto.auth.ForgotPasswordRequest;
 import bo.edu.ucb.backend_simsml.dto.auth.ResetPasswordRequest;
-import bo.edu.ucb.backend_simsml.dto.user.CreateUserRequest;
-import bo.edu.ucb.backend_simsml.dto.user.UpdatePasswordProfile;
-import bo.edu.ucb.backend_simsml.dto.user.UpdateUserRequest;
-import bo.edu.ucb.backend_simsml.dto.user.UserResponse;
+import bo.edu.ucb.backend_simsml.dto.user.*;
 import bo.edu.ucb.backend_simsml.entity.RoleEntity;
 import bo.edu.ucb.backend_simsml.entity.UserEntity;
 import bo.edu.ucb.backend_simsml.repository.RolesRepository;
@@ -21,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -116,6 +114,24 @@ public class UserService {
 
             if (!users.isEmpty()) {
                 return new SuccessfulResponse("200", "Usuarios encontrados exitosamente", users);
+            }
+
+            return new UnsuccessfulResponse("404", "No hay usuarios registrados", null);
+        } catch (Exception e) {
+            return new UnsuccessfulResponse("500", "Error al encontrar usuarios", e.getMessage());
+        }
+    }
+
+    // Find all users summary
+    public Object getUsersSummary() {
+        try {
+            List<UserSummary> usersSummary = userRepository.findAllUsersSummary()
+                    .stream()
+                    .map(UserSummary::from)
+                    .toList();
+
+            if (!usersSummary.isEmpty()) {
+                return new SuccessfulResponse("200", "Usuarios encontrados exitosamente", usersSummary);
             }
 
             return new UnsuccessfulResponse("404", "No hay usuarios registrados", null);

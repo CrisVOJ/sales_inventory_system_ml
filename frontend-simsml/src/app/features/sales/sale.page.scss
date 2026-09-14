@@ -1,0 +1,10 @@
+.dates-filter {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.dates-filter .p-floatlabel {
+    width: 50%;
+}

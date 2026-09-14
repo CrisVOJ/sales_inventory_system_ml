@@ -22,9 +22,17 @@ public interface SaleRepository extends JpaRepository<SaleEntity, Long> {
     @Query(value = "SELECT s FROM sales s " +
             "WHERE " +
             "s.registrationDate >= COALESCE(:startDate, s.registrationDate) " +
-            "AND s.registrationDate <= COALESCE(:endDate, s.registrationDate) "
+            "AND s.registrationDate <= COALESCE(:endDate, s.registrationDate) " +
+            "AND (:userIds IS NULL OR s.user.userId IN :userIds) " +
+            "AND (:customerIds IS NULL OR s.customer.customerId IN :customerIds) " +
+            "AND (:statusIds IS NULL OR s.saleStatus.saleStatusId IN :statusIds)"
     )
-    Page<SaleEntity> findAllSales(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate, Pageable pageable);
+    Page<SaleEntity> findAllSales(@Param("startDate") LocalDate startDate,
+                                  @Param("endDate") LocalDate endDate,
+                                  @Param("userIds") List<Integer> userIds,
+                                  @Param("customerIds") List<Integer> customerIds,
+                                  @Param("statusIds") List<Integer> statusIds,
+                                  Pageable pageable);
 
     @EntityGraph(attributePaths = {"user", "customer", "saleStatus", "saleDetails", "saleDetails.inventory"})
     @Query("SELECT s FROM sales s WHERE s.saleId = :saleId")
