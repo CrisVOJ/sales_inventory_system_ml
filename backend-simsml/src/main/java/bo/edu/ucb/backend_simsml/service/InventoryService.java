@@ -61,9 +61,9 @@ public class InventoryService {
         }
     }
 
-    public Object getInventories(Boolean status, Pageable pageable) {
+    public Object getInventories(List<Integer> locationIds, List<Integer> productIds, Boolean status, Pageable pageable) {
         try {
-            Page<InventoryResponse> inventories = inventoryRepository.findAllInventories(status, pageable)
+            Page<InventoryResponse> inventories = inventoryRepository.findAllInventories(locationIds, productIds, status, pageable)
                     .map(inventoryResponse -> new InventoryResponse(
                             inventoryResponse.getInventoryId(),
                             inventoryResponse.getCurrentStock(),

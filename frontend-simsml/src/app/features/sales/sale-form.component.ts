@@ -7,7 +7,7 @@ import { SelectModule } from "primeng/select";
 import { CustomersService } from "../customers/customers.service";
 import { CustomerSummary } from "../customers/customers.types";
 import { DatePickerModule } from "primeng/datepicker";
-import { Locationsummary } from "../locations/locations.types";
+import { LocationSummary } from "../locations/locations.types";
 import { LocationsService } from "../locations/locations.service";
 import { SaleStatusSummary } from "./sale-statuses/sale-statuses.types";
 import { SaleStatusesService } from "./sale-statuses/sale-statuses.service";
@@ -351,7 +351,7 @@ export class SaleFormComponent {
   @Output() cancel = new EventEmitter<void>();
 
   customerOptions: CustomerSummary[] = [];
-  locationOptions: Locationsummary[] = [];
+  locationOptions: LocationSummary[] = [];
   saleStatusOptions: SaleStatusSummary[] = [];
   inventoryProductsOptions: Inventory[] = [];
 

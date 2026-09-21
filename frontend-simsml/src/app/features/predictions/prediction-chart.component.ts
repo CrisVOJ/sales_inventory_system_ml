@@ -5,7 +5,7 @@ import { PredictionsService } from "./predictions.service";
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { FloatLabelModule } from "primeng/floatlabel";
 import { SelectModule } from "primeng/select";
-import { Locationsummary } from "../locations/locations.types";
+import { LocationSummary } from "../locations/locations.types";
 import { Inventory } from "../inventories/inventories.types";
 import { LocationsService } from "../locations/locations.service";
 import { InventoriesService } from "../inventories/inventories.service";
@@ -212,7 +212,7 @@ export class PredictionChartComponent implements OnInit {
 
     filters!: FormGroup;
 
-    locationOptions: (Locationsummary & { displayLabel?: string })[] = [];
+    locationOptions: (LocationSummary & { displayLabel?: string })[] = [];
     inventoryProductsOptions: (Inventory & { displayLabel?: string })[] = [];
 
     constructor(

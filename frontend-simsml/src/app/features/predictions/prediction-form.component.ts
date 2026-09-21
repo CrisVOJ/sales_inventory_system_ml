@@ -4,7 +4,7 @@ import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } fr
 import { FloatLabelModule } from "primeng/floatlabel";
 import { DatePickerModule } from "primeng/datepicker";
 import { SelectModule } from "primeng/select";
-import { Locationsummary } from "../locations/locations.types";
+import { LocationSummary } from "../locations/locations.types";
 import { LocationsService } from "../locations/locations.service";
 import { Inventory } from "../inventories/inventories.types";
 import { InventoriesService } from "../inventories/inventories.service";
@@ -202,7 +202,7 @@ export class PredictionFormComponent {
     @Output() submit = new EventEmitter<CreatePredictionRequest>();
     @Output() cancel = new EventEmitter<void>();
 
-    locationOptions: Locationsummary[] = [];
+    locationOptions: LocationSummary[] = [];
     inventoryProductsOptions: Inventory[] = [];
     modelTypeOptions = [
         { label: 'Serie de tiempo', value: PredictionModelType.PROPHET },

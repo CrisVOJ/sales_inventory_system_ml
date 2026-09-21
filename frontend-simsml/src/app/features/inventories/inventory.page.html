@@ -1,0 +1,89 @@
+<section class="page">
+    <header class="page_header">
+        <h1>Inventarios</h1>
+    </header>
+
+    <app-data-table
+        [entityName]="'Inventario'"
+        [columns]="cols"
+        [rows]="rows"
+        [total]="total"
+        [page]="page"
+        [pageSize]="pageSize"
+        [actions]="rowActions"
+        [searchPlaceholder]="'Buscar...'"
+        (create)="openCreate()"
+        (onSearch)="search($event)"
+        (pageChange)="paginate($event)"
+        (action)="onRowAction($event)"
+        [showFilter]="true"
+        [showSearch]="false"
+    >
+        <div filters>
+            <form [formGroup]="filtersForm" class="filters">
+                <p-floatlabel variant="on">
+                    <p-multiselect 
+                        formControlName="locationIds"
+                        inputId="location"
+                        [options]="locationOptions" 
+                        optionLabel="displayLabel" 
+                        optionValue="locationId"
+                        [filter]="true" 
+                        filterBy="displayLabel" 
+                        [virtualScroll]="true" 
+                        [virtualScrollItemSize]="38" 
+                        emptyFilterMessage="No se encontraron ubicaciones."
+                        [showClear]="true"
+                        emptyMessage="No se encontraron ubicaciones."
+                        display="chip"
+                    />
+                    <label for="location">Ubicación</label>
+                </p-floatlabel>
+
+                <p-floatlabel variant="on">
+                    <p-multiselect 
+                        formControlName="productIds"
+                        inputId="product"
+                        [options]="productOptions" 
+                        optionLabel="displayLabel" 
+                        optionValue="productId"
+                        [filter]="true" 
+                        filterBy="displayLabel" 
+                        [virtualScroll]="true" 
+                        [virtualScrollItemSize]="38" 
+                        emptyFilterMessage="No se encontraron productos."
+                        [showClear]="true"
+                        emptyMessage="No se encontraron productos."
+                        display="chip"
+                    />
+                    <label for="product">Producto</label>
+                </p-floatlabel>
+            </form>
+        </div>
+    </app-data-table>
+
+    <app-modal
+        [open]="formOpen"
+        [title]="formTitle"
+        [hasFooter]="false"
+        (close)="closeForm()"
+    >
+        <inventory-form
+            *ngIf="formOpen"
+            [value]="editing"
+            (cancel)="closeForm()"
+            (submit)="onSubmitForm($event)"
+        />
+    </app-modal>
+
+    <app-modal
+        [open]="detailOpen"
+        [title]="formTitle"
+        [hasFooter]="false"
+        (close)="detailOpen = false"
+    >
+        <inventory-details [i]="selected"/>
+    </app-modal>
+
+    <app-confirm/>
+</section>

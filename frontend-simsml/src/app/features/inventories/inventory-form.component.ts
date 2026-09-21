@@ -5,7 +5,7 @@ import { FloatLabelModule } from "primeng/floatlabel";
 import { SelectModule } from "primeng/select";
 import { MultiSelectModule } from "primeng/multiselect";
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { Locationsummary } from "../locations/locations.types";
+import { LocationSummary } from "../locations/locations.types";
 import { ProductSummary } from "../products/products.types";
 import { LocationsService } from "../locations/locations.service";
 import { ProductsService } from "../products/products.service";
@@ -205,7 +205,7 @@ export class InventoryFormComponent {
   @Output() submit = new EventEmitter<InventoryFormValue>();
   @Output() cancel = new EventEmitter<void>();
 
-  locationOptions: Locationsummary[] = [];
+  locationOptions: LocationSummary[] = [];
   productOptionsAll: ProductSummary[] = [];
   productOptions: ProductSummary[] = [];
   inventoryOptions: Inventory[] = [];

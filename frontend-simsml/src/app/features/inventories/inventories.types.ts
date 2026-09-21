@@ -1,4 +1,4 @@
-import { Location, Locationsummary } from "../locations/locations.types";
+import { Location, LocationSummary } from "../locations/locations.types";
 import { ProductSummary } from "../products/products.types";
 
 export interface Inventory {
@@ -14,5 +14,5 @@ export interface InventorySummary {
     inventoryId: number;
     currentStock: number;
     product: ProductSummary;
-    location: Locationsummary;
+    location: LocationSummary;
 }

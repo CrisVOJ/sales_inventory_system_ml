@@ -5,7 +5,7 @@ export interface Location {
     active: boolean;
 }
 
-export interface Locationsummary {
+export interface LocationSummary {
     locationId: number;
     code: string;
     name: string;

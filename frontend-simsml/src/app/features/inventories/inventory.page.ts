@@ -9,89 +9,45 @@ import { InventoriesService } from "./inventories.service";
 import { ConfirmService } from "../../shared/confirm/confirm.service";
 import { InventoryDetailsComponent } from "./inventory-details.component";
 import { MessageService } from "primeng/api";
+import { FloatLabel } from "primeng/floatlabel";
+import { MultiSelectModule } from "primeng/multiselect";
+import { ProductsService } from "../products/products.service";
+import { LocationsService } from "../locations/locations.service";
+import { FormBuilder, FormGroup, ɵInternalFormsSharedModule, ReactiveFormsModule } from "@angular/forms";
+import { debounceTime, distinctUntilChanged } from "rxjs";
+import { LocationSummary } from "../locations/locations.types";
+import { ProductSummary } from "../products/products.types";
 
 @Component({
     selector: 'inventory-page',
+    templateUrl: './inventory.page.html',
     imports: [
-    CommonModule,
-    DataTableComponent,
-    ModalComponent,
-    InventoryFormComponent,
-    ConfirmComponent,
-    InventoryFormComponent,
-    InventoryDetailsComponent
-],
-    template: `
-        <section class="page">
-            <header class="page__header">
-                <h1>Inventarios</h1>
-            </header>
-
-            <app-data-table
-                [entityName]="'Inventario'"
-                [columns]="cols"
-                [rows]="rows"
-                [total]="total"
-                [page]="page"
-                [pageSize]="pageSize"
-                [actions]="rowActions"
-                [searchPlaceholder]="'Buscar...'"
-                (create)="openCreate()"
-                (onSearch)="search($event)"
-                (pageChange)="paginate($event)"
-                (action)="onRowAction($event)"
-            />
-
-            <app-modal
-                [open]="formOpen"
-                [title]="formTitle"
-                [hasFooter]="false"
-                (close)="closeForm()"
-            >
-                <inventory-form
-                    *ngIf="formOpen"
-                    [value]="editing"
-                    (cancel)="closeForm()"
-                    (submit)="onSubmitForm($event)"
-                />
-            </app-modal>
-
-            <app-modal
-                [open]="detailOpen"
-                [title]="formTitle"
-                [hasFooter]="false"
-                (close)="detailOpen = false"
-            >
-                <inventory-details [i]="selected"/>
-            </app-modal>
-
-            <app-confirm/>
-        </section>
-    `,
-    styles: [`
-        .page{ 
-            background: transparent; 
-        }
-        .page__header{ 
-            margin-bottom: .75rem; 
-        }
-        h1{ 
-            font-size: var(--h3); 
-            margin: 0 0 .5rem; 
-            color: var(--txt-1); 
-        }
-    `]
+        CommonModule,
+        DataTableComponent,
+        ModalComponent,
+        InventoryFormComponent,
+        ConfirmComponent,
+        InventoryFormComponent,
+        InventoryDetailsComponent,
+        FloatLabel,
+        MultiSelectModule,
+        ɵInternalFormsSharedModule,
+        ReactiveFormsModule
+    ]
 })
 export class InventoriesPage {
+    private fb = new FormBuilder();
+    private formSubscription?: any;
+
     cols: CrudColumn<Inventory>[] = [
-        {   key: 'currentStock',    header: 'Stock Actual'  },
-        {   key: 'minimumStock',    header: 'Stock Minimo'  },
-        {   key: 'product',         header: 'Producto',
-            format: (p) => p.product?.name ?? ''
-        },
         {   key: 'location',        header: 'Ubicación',
             format: (l) => l.location?.name ?? ''
         },
+        {   key: 'product',         header: 'Producto',
+            format: (p) => p.product?.name ?? ''
+        },
+        {   key: 'currentStock',    header: 'Stock Actual'  },
+        {   key: 'minimumStock',    header: 'Stock Minimo'  },
     ];
 
     rowActions: CrudAction<Inventory>[] = [
@@ -113,14 +69,90 @@ export class InventoriesPage {
     total = 0;
     page = 1; pageSize = 5;
     q = '';
+    additionalParams: Record<string, any> = {};
+
+    locationOptions: LocationSummary[] = [];
+    productOptions: ProductSummary[] = [];
 
     operationDetail = 'Inventario creado exitosamente';
 
     constructor(
         private inventories: InventoriesService,
         private confirm: ConfirmService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private productsService: ProductsService,
+        private locationsService: LocationsService
     ) {
+        this.load();
+    }
+
+    filtersForm: FormGroup = this.fb.group({
+        locationIds: [null],
+        productIds: [null]
+    });
+
+    ngOnInit(): void {
+        this.loadLocationOptions();
+        this.loadProductOptions();
+
+        this.formSubscription = this.filtersForm.valueChanges.pipe(
+            debounceTime(300),
+            distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+        ).subscribe(val => {
+            this.applyFilters(val);
+        });
+    }
+
+    private loadLocationOptions() {
+        this.locationsService.locationsSummaryList().subscribe({
+            next: (data) => {
+                if (data) {
+                    this.locationOptions = (data || []).map(c => ({
+                        ...c,
+                        displayLabel: `${c.code} - ${c.name}`.trim()
+                    }));
+                } else {
+                    this.locationOptions = [];
+                }
+            },
+            error: (e) => {
+                console.error('Error al cargar el resumen de ubicaciones: ', e);
+                this.locationOptions = [];
+            }
+        })
+    }
+
+    private loadProductOptions() {
+        this.productsService.productSummayList().subscribe({
+            next: (data) => {
+                if (data) {
+                    this.productOptions = (data || []).map(c => ({
+                        ...c,
+                        displayLabel: `${c.name}`.trim()
+                    }));
+                } else {
+                    this.productOptions = [];
+                }
+            },
+            error: (e) => {
+                console.error('Error al cargar el resumen de productos: ', e);
+                this.productOptions = [];
+            }
+        })
+    }
+
+    private applyFilters(formValues: any) {
+        this.additionalParams = {};
+
+        if (formValues.productIds && formValues.productIds.length > 0) {
+            this.additionalParams['productIds'] = formValues.productIds;
+        }
+
+        if (formValues.locationIds && formValues.locationIds.length > 0) {
+            this.additionalParams['locationIds'] = formValues.locationIds;
+        }
+
+        this.page = 1;
         this.load();
     }
 
@@ -128,7 +160,8 @@ export class InventoriesPage {
         this.inventories.list({
             q: this.q,
             page: this.page,
-            pageSize: this.pageSize
+            pageSize: this.pageSize,
+            additionalParams: this.additionalParams
         }).subscribe(r => {
             this.rows = r.rows;
             this.total = r.total;

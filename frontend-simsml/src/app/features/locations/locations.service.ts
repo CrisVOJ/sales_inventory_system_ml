@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { BaseCrudService } from "../../shared/base-crud.service";
-import { Location, Locationsummary } from "./locations.types";
+import { Location, LocationSummary } from "./locations.types";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
 import { catchError, map, Observable, of } from "rxjs";
@@ -23,7 +23,7 @@ export class LocationsService extends BaseCrudService<Location> {
         }
     }
 
-    locationsSummaryList(): Observable<Locationsummary[] | null> {
+    locationsSummaryList(): Observable<LocationSummary[] | null> {
         return this.http.get<ApiEnvelope<any>>(`${this.baseUrl}/allSummary`).pipe(
             map(raw => {
                 if (isUnsuccessful(raw)) return null;

@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(Globals.baseApi + "inventory")
 @PreAuthorize("hasRole('ADMIN')")
@@ -37,11 +39,13 @@ public class InventoryController {
 
     @GetMapping("/all")
     public ResponseEntity<Object> getInventories(
+            @RequestParam(value = "locationIds", required = false) List<Integer> locationIds,
+            @RequestParam(value = "productIds", required = false) List<Integer> productIds,
             @RequestParam(value = "status", required = false) Boolean status,
             @PageableDefault(sort = "updatedAt", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         try {
-            Object response = inventoryService.getInventories(status, pageable);
+            Object response = inventoryService.getInventories(locationIds, productIds, status, pageable);
             return generateResponse(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

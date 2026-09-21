@@ -21,9 +21,13 @@ public interface InventoryRepository extends JpaRepository<InventoryEntity, Long
     Optional<InventoryEntity> lockById(@Param("inventoryId") Long inventoryId);
 
     @Query(value = "SELECT i FROM inventories i " +
-            "WHERE " +
-            "(:status IS NULL OR i.active = :status)")
-    Page<InventoryEntity> findAllInventories(@Param("status") Boolean status, Pageable pageable);
+            "WHERE (:locationIds IS NULL OR i.location.locationId IN :locationIds) " +
+            "AND (:productIds IS NULL OR i.product.productId IN :productIds) " +
+            "AND (:status IS NULL OR i.active = :status)")
+    Page<InventoryEntity> findAllInventories(@Param("locationIds") List<Integer> locationIds,
+                                             @Param("productIds") List<Integer> productIds,
+                                             @Param("status") Boolean status,
+                                             Pageable pageable);
 
     @Query(value = "SELECT i FROM inventories i " +
             "WHERE i.active = true AND i.location.locationId = :locationId " +
