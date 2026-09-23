@@ -12,13 +12,13 @@ import java.util.List;
 public interface CustomerRepository extends JpaRepository<CustomerEntity, Long> {
 
     @Query(value = "SELECT c FROM customers c " +
-            "WHERE (" +
-            ":filter IS NULL OR " +
-            "c.identityDocument ILIKE %:filter% OR " +
-            "c.name ILIKE %:filter% OR " +
-            "c.paternalSurname ILIKE %:filter% OR " +
-            "c.maternalSurname ILIKE %:filter%) AND " +
-            "(:status IS NULL OR c.active = :status)"
+            "WHERE (:filter IS NULL " +
+            "OR c.identityDocument ILIKE %:filter% " +
+            "OR c.name ILIKE %:filter% " +
+            "OR c.paternalSurname ILIKE %:filter% " +
+            "OR c.maternalSurname ILIKE %:filter% " +
+            "OR CONCAT(c.name, ' ', c.paternalSurname, ' ', c.maternalSurname) ILIKE %:filter%) " +
+            "AND (:status IS NULL OR c.active = :status)"
     )
     Page<CustomerEntity> findAllCustomers(@Param("filter") String filter, @Param("status") Boolean status, Pageable pageable);
 
