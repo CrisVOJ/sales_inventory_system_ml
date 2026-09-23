@@ -9,79 +9,35 @@ import { ProductsService } from "./products.service";
 import { ProductFormComponent } from "./product-form.component";
 import { ProductDetailsComponent } from "./product-details.component";
 import { MessageService } from "primeng/api";
+import { FloatLabel } from "primeng/floatlabel";
+import { MultiSelectModule } from "primeng/multiselect";
+import { FormBuilder, FormGroup, ReactiveFormsModule, ɵInternalFormsSharedModule } from "@angular/forms";
+import { CategorySummary } from "../categories/categories.types";
+import { Unit } from "../units/units.types";
+import { CategoriesService } from "../categories/categories.service";
+import { UnitsService } from "../units/units.service";
+import { debounceTime, distinctUntilChanged } from "rxjs";
 
 @Component({
     selector: 'products-page',
+    templateUrl: './product.page.html',
     imports: [
         CommonModule,
         DataTableComponent,
         ModalComponent,
         ConfirmComponent,
         ProductFormComponent,
-        ProductDetailsComponent
-    ],
-    template: `
-        <section class="page">
-            <header class="page__header">
-                <h1>Productos</h1>
-            </header>
-
-            <app-data-table
-                [entityName]="'Producto'"
-                [columns]="cols"
-                [rows]="rows"
-                [total]="total"
-                [page]="page"
-                [pageSize]="pageSize"
-                [actions]="rowActions"
-                [searchPlaceholder]="'Buscar...'"
-                (create)="openCreate()"
-                (onSearch)="search($event)"
-                (pageChange)="paginate($event)"
-                (action)="onRowAction($event)"
-            />
-
-            <app-modal
-                [open]="formOpen"
-                [title]="formTitle"
-                [hasFooter]="false"
-                (close)="closeForm()"
-            >
-                <product-form
-                    *ngIf="formOpen"
-                    [value]="editing"
-                    (cancel)="closeForm()"
-                    (submit)="onSubmitForm($event)"
-                />
-            </app-modal>
-
-            <app-modal
-                [open]="detailOpen"
-                [title]="formTitle"
-                [hasFooter]="false"
-                (close)="detailOpen = false"
-            >
-                <product-details [p]="selected"/>
-            </app-modal>
-
-            <app-confirm/>
-        </section>
-    `,
-    styles: [`
-        .page{ 
-            background: transparent; 
-        }
-        .page__header{ 
-            margin-bottom: .75rem; 
-        }
-        h1{ 
-            font-size: var(--h3); 
-            margin: 0 0 .5rem; 
-            color: var(--txt-1); 
-        }
-    `]
+        ProductDetailsComponent,
+        FloatLabel,
+        MultiSelectModule,
+        ɵInternalFormsSharedModule,
+        ReactiveFormsModule
+    ]
 })
 export class ProductsPage {
+    private fb = new FormBuilder();
+    private formSubscription?: any;
+
     cols: CrudColumn<Product>[] = [
         {   key: 'code',            header: 'Código'                },
         {   key: 'name',            header: 'Nombre'                },
@@ -113,14 +69,90 @@ export class ProductsPage {
     total = 0;
     page = 1; pageSize = 5;
     q = '';
+    additionalParams: Record<string, any> = {};
+
+    categoryOptions: CategorySummary[] = [];
+    unitOptions: Unit[] = [];
 
     operationDetail = "Producto creado exitosamente";
 
     constructor(
         private products: ProductsService,
         private confirm: ConfirmService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private categoriesService: CategoriesService,
+        private unitsService: UnitsService
     ) {
+        this.load();
+    }
+
+    filtersForm: FormGroup = this.fb.group({
+        categoryIds: [null],
+        unitIds: [null]
+    })
+
+    ngOnInit() {
+        this.loadCategoryOptions();
+        this.loadUnitOptions();
+
+        this.formSubscription = this.filtersForm.valueChanges.pipe(
+            debounceTime(300),
+            distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+        ).subscribe(val => {
+            this.applyFilters(val);
+        });
+    }
+
+    private loadCategoryOptions() {
+        this.categoriesService.categoriesSummaryList().subscribe({
+            next: (data) => {
+                if (data) {
+                    this.categoryOptions = (data || []).map(c => ({
+                        ...c,
+                        displayLabel: `${c.name}`.trim()
+                    }));
+                } else {
+                    this.categoryOptions = [];
+                }
+            },
+            error: (e) => {
+                console.error('Error al cargar el resumen de categorías: ', e);
+                this.categoryOptions = [];
+            }
+        })
+    }
+
+    private loadUnitOptions() {
+        this.unitsService.getUnits('', true).subscribe({
+            next: (data) => {
+                if (data) {
+                    this.unitOptions = (data || []).map(c => ({
+                        ...c,
+                        displayLabel: `${c.name}`.trim()
+                    }));
+                } else {
+                    this.unitOptions = [];
+                }
+            },
+            error: (e) => {
+                console.error('Error al cargar el resumen de unidades: ', e);
+                this.unitOptions = [];
+            }
+        })
+    }
+
+    private applyFilters(formValues: any) {
+        this.additionalParams = {};
+
+        if (formValues.categoryIds && formValues.categoryIds.length > 0) {
+            this.additionalParams['categoryIds'] = formValues.categoryIds;
+        }
+
+        if (formValues.unitIds && formValues.unitIds.length > 0) {
+            this.additionalParams['unitIds'] = formValues.unitIds;
+        }
+
+        this.page = 1;
         this.load();
     }
 
@@ -128,7 +160,8 @@ export class ProductsPage {
         this.products.list({
             q: this.q,
             page: this.page,
-            pageSize: this.pageSize
+            pageSize: this.pageSize,
+            additionalParams: this.additionalParams
         }).subscribe(r => {
             this.rows = r.rows;
             this.total = r.total;

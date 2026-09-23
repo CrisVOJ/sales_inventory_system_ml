@@ -1,0 +1,88 @@
+<section class="page">
+    <header class="page_header">
+        <h1>Productos</h1>
+    </header>
+
+    <app-data-table
+        [entityName]="'Producto'"
+        [columns]="cols"
+        [rows]="rows"
+        [total]="total"
+        [page]="page"
+        [pageSize]="pageSize"
+        [actions]="rowActions"
+        [searchPlaceholder]="'Buscar...'"
+        (create)="openCreate()"
+        (onSearch)="search($event)"
+        (pageChange)="paginate($event)"
+        (action)="onRowAction($event)"
+        [showFilter]="true"
+    >
+        <div filters>
+            <form [formGroup]="filtersForm" class="filters">
+                <p-floatlabel variant="on">
+                    <p-multiselect 
+                        formControlName="categoryIds"
+                        inputId="category"
+                        [options]="categoryOptions" 
+                        optionLabel="displayLabel" 
+                        optionValue="categoryId"
+                        [filter]="true" 
+                        filterBy="displayLabel" 
+                        [virtualScroll]="true" 
+                        [virtualScrollItemSize]="38" 
+                        emptyFilterMessage="No se encontraron categorías."
+                        [showClear]="true"
+                        emptyMessage="No se encontraron categorías."
+                        display="chip"
+                    />
+                    <label for="location">Categoría</label>
+                </p-floatlabel>
+
+                <p-floatlabel variant="on">
+                    <p-multiselect 
+                        formControlName="unitIds"
+                        inputId="unit"
+                        [options]="unitOptions" 
+                        optionLabel="displayLabel" 
+                        optionValue="unitId"
+                        [filter]="true" 
+                        filterBy="displayLabel" 
+                        [virtualScroll]="true" 
+                        [virtualScrollItemSize]="38" 
+                        emptyFilterMessage="No se encontraron unidades."
+                        [showClear]="true"
+                        emptyMessage="No se encontraron unidades."
+                        display="chip"
+                    />
+                    <label for="unit">Unidad</label>
+                </p-floatlabel>
+            </form>
+        </div>
+    </app-data-table>
+
+    <app-modal
+        [open]="formOpen"
+        [title]="formTitle"
+        [hasFooter]="false"
+        (close)="closeForm()"
+    >
+        <product-form
+            *ngIf="formOpen"
+            [value]="editing"
+            (cancel)="closeForm()"
+            (submit)="onSubmitForm($event)"
+        />
+    </app-modal>
+
+    <app-modal
+        [open]="detailOpen"
+        [title]="formTitle"
+        [hasFooter]="false"
+        (close)="detailOpen = false"
+    >
+        <product-details [p]="selected"/>
+    </app-modal>
+
+    <app-confirm/>
+</section>

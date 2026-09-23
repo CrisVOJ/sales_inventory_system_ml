@@ -70,9 +70,9 @@ public class ProductService {
         }
     }
 
-    public Object getProducts(String filter, Boolean status, Pageable pageable) {
+    public Object getProducts(String filter, List<Integer> categoryIds, List<Integer> unitIds, Boolean status, Pageable pageable) {
         try {
-            Page<ProductResponse> products = productRepository.findAllProducts(filter, status, pageable)
+            Page<ProductResponse> products = productRepository.findAllProducts(filter, categoryIds, unitIds, status, pageable)
                     .map(productResponse -> new ProductResponse(
                             productResponse.getProductId(),
                             productResponse.getName(),

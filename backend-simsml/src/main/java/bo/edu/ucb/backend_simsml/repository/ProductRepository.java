@@ -11,15 +11,21 @@ import java.util.List;
 
 public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 
-    @Query(value = "SELECT p FROM products p " +
-            "WHERE (" +
-            ":filter IS NULL OR " +
-            "p.name ILIKE %:filter% OR " +
-            "p.description ILIKE %:filter% OR " +
-            "p.code ILIKE %:filter%) AND " +
-            "(:status IS NULL OR p.active = :status)"
+    @Query(value = "SELECT DISTINCT p FROM products p " +
+            "JOIN categories c " +
+            "WHERE (:filter IS NULL " +
+            "OR p.name ILIKE %:filter% " +
+            "OR p.description ILIKE %:filter% " +
+            "OR p.code ILIKE %:filter%) " +
+            "AND (:categoryIds IS NULL OR c.categoryId IN :categoryIds) " +
+            "AND (:unitIds IS NULL OR p.unit.unitId IN :unitIds) " +
+            "AND (:status IS NULL OR p.active = :status)"
     )
-    Page<ProductEntity> findAllProducts(@Param("filter") String filter, @Param("status") Boolean status, Pageable pageable);
+    Page<ProductEntity> findAllProducts(@Param("filter") String filter,
+                                        @Param("categoryIds") List<Integer> categoryIds,
+                                        @Param("unitIds") List<Integer> unitIds,
+                                        @Param("status") Boolean status,
+                                        Pageable pageable);
 
     @Query(value = "SELECT p FROM products p " +
             "WHERE (" +
