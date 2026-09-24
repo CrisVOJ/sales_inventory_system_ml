@@ -7,103 +7,30 @@ import { PredictionsService } from "./predictions.service";
 import { MessageService } from "primeng/api";
 import { PredictionFormComponent } from "./prediction-form.component";
 import { PredictionChartComponent } from "./prediction-chart.component";
+import { FormBuilder, FormGroup, ReactiveFormsModule } from "@angular/forms";
+import { FloatLabel } from "primeng/floatlabel";
+import { DatePicker, DatePickerModule } from "primeng/datepicker";
+import { debounceTime, distinctUntilChanged } from "rxjs";
 
 @Component({
     selector: 'predictions-page',
+    templateUrl: './predictions.page.html',
+    styleUrls: ['./predictions.page.scss'],
     imports: [
-    CommonModule,
-    DataTableComponent,
-    ModalComponent,
-    PredictionFormComponent,
-    PredictionChartComponent
-],
-    template: `
-        <section class="page">
-            <header class="page__header">
-                <h1>Predicciones</h1>
-
-                <div class="tabs">
-                  <button
-                    class="tab"
-                    [class.is-active]="viewMode === 'table'"
-                    (click)="viewMode = 'table'">
-                    Tabla
-                  </button>
-                  <button
-                    class="tab"
-                    [class.is-active]="viewMode === 'chart'"
-                    (click)="viewMode = 'chart'">
-                    Gráfica
-                  </button>
-                </div>
-            </header>
-
-            <ng-container *ngIf="viewMode === 'table'">
-                <app-data-table
-                    [entityName]="'Predicción'"
-                    [columns]="cols"
-                    [rows]="rows"
-                    [total]="total"
-                    [page]="page"
-                    [pageSize]="pageSize"
-                    [searchPlaceholder]="'Buscar ...'"
-                    (create)="openCreate()"
-                    (onSearch)="search($event)"
-                    (pageChange)="paginate($event)"
-                />
-            </ng-container>
-
-            <ng-container *ngIf="viewMode === 'chart'">
-                <prediction-chart/>
-            </ng-container>
-
-            <app-modal
-                [open]="formOpen"
-                [title]="formTitle"
-                [hasFooter]="false"
-                (close)="closeForm()"
-            >
-                <prediction-form
-                    *ngIf="formOpen"
-                    (cancel)="closeForm()"
-                    [loading]="predicting"
-                    (submit)="save($event)"
-                />
-            </app-modal>
-        </section>
-    `,
-    styles:[`
-        .page__header{ margin-bottom: .75rem; }
-        h1{ 
-            font-size: 2.2rem; 
-            margin: 0 0 .5rem; 
-            color: var(--txt-1); 
-        }
-        .page{ background: transparent; }
-        .tabs {
-            display: inline-flex;
-            background: rgba(15, 23, 42, .6);
-            border-radius: 999px;
-            padding: .15rem;
-        }
-        .tab {
-            border: none;
-            background: transparent;
-            color: #9ca3af;
-            padding: .3rem .9rem;
-            border-radius: 999px;
-            font-size: .85rem;
-            cursor: pointer;
-            transition: background .15s, color .15s;
-        }
-        .tab.is-active {
-            background: #0ea5e9;
-            color: #0f172a;
-            font-weight: 600;
-        }
-    `]
+        CommonModule,
+        DataTableComponent,
+        ModalComponent,
+        PredictionFormComponent,
+        PredictionChartComponent,
+        ReactiveFormsModule,
+        FloatLabel,
+        DatePickerModule
+    ],
 })
 export class PredictionPage {
+    private fb = new FormBuilder();
+    private formSubscription?: any;
+
     cols: CrudColumn<Prediction>[] = [
         { key:'targetMonth',    header:'Mes' },
         { key:'inventory',      header:'Inventario',
@@ -117,10 +44,16 @@ export class PredictionPage {
     total = 0;
     page = 1; pageSize = 5;
     q = '';
+    additionalParams: Record<string, any> = {};
 
     predicting = false;
 
     viewMode: 'table' | 'chart' = 'table';
+
+    filterForm: FormGroup = this.fb.group({
+        startDate: [null],
+        endDate: [null]
+    })
 
     constructor(
         private predictions: PredictionsService,
@@ -129,11 +62,43 @@ export class PredictionPage {
         this.load();
     }
 
+    ngOnInit(): void {
+        this.formSubscription = this.filterForm.valueChanges.pipe(
+            debounceTime(300),
+            distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+        ).subscribe(val => {
+            this.applyFilters(val);
+        })
+    }
+
+    private applyFilters(formValue: any): void {
+        this.additionalParams = {};
+
+        if (formValue.startDate) {
+            this.additionalParams['startDate'] = this.formatDate(formValue.startDate);
+        }
+
+        if (formValue.endDate) {
+            this.additionalParams['endDate'] = this.formatDate(formValue.endDate);
+        }
+
+        this.page = 1;
+        this.load();
+    }
+
+    private formatDate(date: Date): string {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
     load(){
         this.predictions.list({
             q: this.q,
             page: this.page,
-            pageSize: this.pageSize
+            pageSize: this.pageSize,
+            additionalParams: this.additionalParams
         }).subscribe(r => {
             this.rows = r.rows;
             this.total = r.total;

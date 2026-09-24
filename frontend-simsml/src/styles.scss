@@ -150,6 +150,8 @@ html,body{height:100%}
   color: var(--txt-2);
 }
 
-.filters .p-select, .filters .p-multiselect {
+.filters .p-select, 
+.filters .p-multiselect,
+.filters .p-datepicker {
   width: 100%;
 }

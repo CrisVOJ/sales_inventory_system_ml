@@ -1,0 +1,23 @@
+.tabs {
+    display: inline-flex;
+    background: rgba(15, 23, 42, .6);
+    border-radius: 999px;
+    padding: .15rem;
+}
+
+.tab {
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    padding: .3rem .9rem;
+    border-radius: 999px;
+    font-size: .85rem;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+}
+
+.tab.is-active {
+    background: #0ea5e9;
+    color: #0f172a;
+    font-weight: 600;
+}
