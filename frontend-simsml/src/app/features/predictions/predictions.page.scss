@@ -1,23 +1,57 @@
+.page-content {
+    display: flex;
+    flex-direction: column;
+}
+
 .tabs {
-    display: inline-flex;
-    background: rgba(15, 23, 42, .6);
-    border-radius: 999px;
-    padding: .15rem;
+    align-self: flex-end;
+    display: flex;
+    margin-right: 15px;
 }
 
-.tab {
+.tabs .tab {
+    display: flex;
+    align-items: flex-end;
+}
+
+.tabs .tab .left {
+    border-top: 1.6em solid transparent;
+    border-right: .5em solid var(--panel-bg);
+    border-top-left-radius: 999px;
+    border-bottom-left-radius: 99px;
+    transition: all .15s;
+}
+
+.tabs .tab:has(.is-active) .left {
+    border-right-color: var(--cyan);
+}
+
+.tabs .tab button {
     border: none;
-    background: transparent;
-    color: #9ca3af;
-    padding: .3rem .9rem;
-    border-radius: 999px;
-    font-size: .85rem;
+    border-top-right-radius: 2.8px;
+    border-top-left-radius: 2.8px;
+    background: var(--panel-bg);
+    color: var(--txt-1);
     cursor: pointer;
-    transition: background .15s, color .15s;
+    transition: all .15s;
+    font-size: var(--p);
+    font-weight: 600;
+    padding: .3em 1em;
 }
 
-.tab.is-active {
-    background: #0ea5e9;
-    color: #0f172a;
-    font-weight: 600;
+.tabs .tab button.is-active {
+    background: var(--cyan);
+    color: var(--txt-2);
+}
+
+.tabs .tab .right {
+    border-top: 1.6em solid transparent;
+    border-left: .5em solid var(--panel-bg);
+    border-top-right-radius: 999px;
+    border-bottom-right-radius: 99px;
+    transition: all .15s;
+}
+
+.tabs .tab:has(.is-active) .right {
+    border-left-color: var(--cyan);
 }

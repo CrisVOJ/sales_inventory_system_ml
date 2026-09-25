@@ -1,83 +1,91 @@
 <section class="page">
     <header class="page_header">
         <h1>Predicciones</h1>
-
-        <div class="tabs">
-            <button
-            class="tab"
-            [class.is-active]="viewMode === 'table'"
-            (click)="viewMode = 'table'">
-            Tabla
-            </button>
-            <button
-            class="tab"
-            [class.is-active]="viewMode === 'chart'"
-            (click)="viewMode = 'chart'">
-            Gráfica
-            </button>
-        </div>
     </header>
 
-    <ng-container *ngIf="viewMode === 'table'">
-        <app-data-table
-            [entityName]="'Predicción'"
-            [columns]="cols"
-            [rows]="rows"
-            [total]="total"
-            [page]="page"
-            [pageSize]="pageSize"
-            [searchPlaceholder]="'Buscar ...'"
-            (create)="openCreate()"
-            (onSearch)="search($event)"
-            (pageChange)="paginate($event)"
-            [showFilter]="true"
-            [showSearch]="false"
-        >
-            <div filters>
-                <form [formGroup]="filterForm" class="filters">
-                    <p-floatLabel variant="on">
-                        <p-datepicker 
-                            formControlName="startDate" 
-                            inputId="start_date" 
-                            dateFormat="dd/mm/yy" 
-                            showIcon 
-                            iconDisplay="input" 
-                            [showClear]="true"
-                        />
-                        <label for="start_date">Fecha Inicio</label>
-                    </p-floatLabel>
-
-                    <p-floatLabel variant="on">
-                        <p-datepicker 
-                            formControlName="endDate" 
-                            inputId="end_date" 
-                            dateFormat="dd/mm/yy" 
-                            showIcon 
-                            iconDisplay="input" 
-                            [showClear]="true"
-                        />
-                        <label for="end_date">Fecha Fin</label>
-                    </p-floatLabel>
-                </form>
+    <div class="page-content">
+        <div class="tabs">
+            <div class="tab">
+                <div class="left"></div>
+                <button
+                    [class.is-active]="viewMode === 'table'"
+                    (click)="viewMode = 'table'"
+                >Tabla</button>
+                <div class="right"></div>
             </div>
-        </app-data-table>
-    </ng-container>
 
-    <ng-container *ngIf="viewMode === 'chart'">
-        <prediction-chart/>
-    </ng-container>
+            <div class="tab">
+                <div class="left"></div>
+                <button
+                    class="tab"
+                    [class.is-active]="viewMode === 'chart'"
+                    (click)="viewMode = 'chart'"
+                >Gráfica</button>
+                <div class="right"></div>
+            </div>
+        </div>
 
-    <app-modal
-        [open]="formOpen"
-        [title]="formTitle"
-        [hasFooter]="false"
-        (close)="closeForm()"
-    >
-        <prediction-form
-            *ngIf="formOpen"
-            (cancel)="closeForm()"
-            [loading]="predicting"
-            (submit)="save($event)"
-        />
-    </app-modal>
+        <ng-container *ngIf="viewMode === 'table'">
+            <app-data-table
+                [entityName]="'Predicción'"
+                [columns]="cols"
+                [rows]="rows"
+                [total]="total"
+                [page]="page"
+                [pageSize]="pageSize"
+                [searchPlaceholder]="'Buscar ...'"
+                (create)="openCreate()"
+                (onSearch)="search($event)"
+                (pageChange)="paginate($event)"
+                [showFilter]="true"
+                [showSearch]="false"
+            >
+                <div filters>
+                    <form [formGroup]="filterForm" class="filters">
+                        <p-floatLabel variant="on">
+                            <p-datepicker 
+                                formControlName="startDate" 
+                                inputId="start_date" 
+                                dateFormat="dd/mm/yy" 
+                                showIcon 
+                                iconDisplay="input" 
+                                [showClear]="true"
+                            />
+                            <label for="start_date">Fecha Inicio</label>
+                        </p-floatLabel>
+
+                        <p-floatLabel variant="on">
+                            <p-datepicker 
+                                formControlName="endDate" 
+                                inputId="end_date" 
+                                dateFormat="dd/mm/yy" 
+                                showIcon 
+                                iconDisplay="input" 
+                                [showClear]="true"
+                            />
+                            <label for="end_date">Fecha Fin</label>
+                        </p-floatLabel>
+                    </form>
+                </div>
+            </app-data-table>
+        </ng-container>
+
+        <ng-container *ngIf="viewMode === 'chart'">
+            <prediction-chart/>
+        </ng-container>
+
+        <app-modal
+            [open]="formOpen"
+            [title]="formTitle"
+            [hasFooter]="false"
+            (close)="closeForm()"
+        >
+            <prediction-form
+                *ngIf="formOpen"
+                (cancel)="closeForm()"
+                [loading]="predicting"
+                (submit)="save($event)"
+            />
+        </app-modal>
+    </div>
 </section>
