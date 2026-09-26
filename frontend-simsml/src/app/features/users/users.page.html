@@ -1,0 +1,69 @@
+<section class="page">
+    <header class="page_header">
+        <h1>Usuarios</h1>
+    </header>
+
+    <app-data-table
+        [entityName]="'Usuario'"
+        [columns]="cols"
+        [rows]="rows"
+        [total]="total"
+        [page]="page"
+        [pageSize]="pageSize"
+        [actions]="rowActions"
+        [searchPlaceholder]="'Buscar ...'"
+        (create)="openCreate()"
+        (onSearch)="search($event)"
+        (pageChange)="paginate($event)"
+        (action)="onRowAction($event)"
+        [showFilter]="true"
+    >
+        <div filters>
+            <form [formGroup]="filtersForm" class="filters">
+                <p-floatlabel variant="on">
+                    <p-multiselect 
+                        formControlName="roles"
+                        inputId="roles"
+                        [options]="roleOptions" 
+                        optionLabel="value" 
+                        optionValue="name"
+                        [filter]="true" 
+                        filterBy="value" 
+                        [virtualScroll]="true" 
+                        [virtualScrollItemSize]="38" 
+                        emptyFilterMessage="No se encontraron roles."
+                        [showClear]="true"
+                        emptyMessage="No se encontraron roles."
+                        display="chip"
+                    />
+                    <label for="role">Roles</label>
+                </p-floatlabel>
+            </form>
+        </div>
+    </app-data-table>
+
+    <app-modal 
+    [open]="formOpen" 
+    [title]="formTitle" 
+    [hasFooter]="false" 
+    (close)="closeForm()"
+    >
+        <user-form 
+            *ngIf="formOpen"
+            [value]="editing" 
+            (cancel)="closeForm()" 
+            (submit)="onSubmitForm($event)"
+        />
+    </app-modal>
+
+    <app-modal 
+        [open]="detailOpen"
+        [title]="formTitle"
+        [hasFooter]="false"
+        (close)="detailOpen=false"
+    >
+        <user-details [u]="selected"/>
+    </app-modal>
+
+    <app-confirm/>
+</section>

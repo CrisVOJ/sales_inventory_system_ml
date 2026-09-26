@@ -11,73 +11,35 @@ import { ConfirmComponent } from '../../shared/confirm/confirm.component';
 import { ConfirmService } from '../../shared/confirm/confirm.service';
 import { roleListLabel } from '../../shared/roles/role-labels';
 import { MessageService } from 'primeng/api';
+import { FloatLabel } from 'primeng/floatlabel';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
+
+interface RoleOption {
+  name: string;
+  value: string;
+}
 
 @Component({
   selector: 'users-page',
+  templateUrl: './users.page.html',
   imports: [
     CommonModule,
     DataTableComponent,
     ModalComponent,
     UserFormComponent,
     UserDetailsComponent,
-    ConfirmComponent
-],
-  template: `
-    <section class="page">
-      <header class="page__header">
-      <h1>Usuarios</h1>
-      </header>
-
-      <app-data-table
-        [entityName]="'Usuario'"
-        [columns]="cols"
-        [rows]="rows"
-        [total]="total"
-        [page]="page"
-        [pageSize]="pageSize"
-        [actions]="rowActions"
-        [searchPlaceholder]="'Buscar ...'"
-        (create)="openCreate()"
-        (onSearch)="search($event)"
-        (pageChange)="paginate($event)"
-        (action)="onRowAction($event)"
-      />
-
-      <!-- Modal Crear/Editar -->
-      <app-modal 
-        [open]="formOpen" 
-        [title]="formTitle" 
-        [hasFooter]="false" 
-        (close)="closeForm()"
-      >
-        <user-form 
-          *ngIf="formOpen"
-          [value]="editing" 
-          (cancel)="closeForm()" 
-          (submit)="onSubmitForm($event)"
-        />
-      </app-modal>
-
-      <app-modal 
-        [open]="detailOpen"
-        [title]="formTitle"
-        [hasFooter]="false"
-        (close)="detailOpen=false"
-      >
-        <user-details [u]="selected"/>
-      </app-modal>
-
-      <app-confirm/>
-    </section>
-  `,
-  styles:[`
-    .page__header{ margin-bottom: .75rem; }
-    h1{ font-size: 2.2rem; margin: 0 0 .5rem; color: var(--txt-1); }
-    .page{ background: transparent; }
-    `
+    ConfirmComponent,
+    FloatLabel,
+    MultiSelectModule,
+    ReactiveFormsModule
   ]
 })
 export class UsersPage {
+  private fb = new FormBuilder();
+  private formSubscription?: any;
+
   cols: CrudColumn<User>[] = [
     { key:'identityDoc', header:'Doc. Identidad',     width:'160px' },
     { key:'username',    header:'Nombre Usuario',  width:'220px' },
@@ -114,6 +76,9 @@ export class UsersPage {
   total = 0;
   page = 1; pageSize = 5;
   q = '';
+  additionalParams: Record<string, any> = {};
+
+  roleOptions: RoleOption[] = [];
 
   constructor(
     private users: UsersService,
@@ -123,11 +88,41 @@ export class UsersPage {
     this.load();
   }
 
+  filtersForm: FormGroup = this.fb.group({
+    roles: [null],
+  })
+
+  ngOnInit() {
+    this.roleOptions = [
+      {name: 'ADMIN', value: 'Administrador'},
+      {name: 'SELLER', value: 'Vendedor'},
+    ]
+
+    this.formSubscription = this.filtersForm.valueChanges.pipe(
+      debounceTime(300),
+      distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+    ).subscribe(val => {
+      this.applyFilters(val);
+    });
+  }
+
+  private applyFilters(formValues: any) {
+    this.additionalParams = {};
+
+    if (formValues.roles && formValues.roles.length > 0) {
+      this.additionalParams['role'] = formValues.roles;
+    }
+
+    this.page = 1;
+    this.load();
+  }
+
   load(){ 
     this.users.list({ 
       q: this.q, 
       page: this.page, 
-      pageSize: this.pageSize 
+      pageSize: this.pageSize,
+      additionalParams: this.additionalParams
     }).subscribe(r => { 
       this.rows = r.rows; 
       this.total = r.total; 

@@ -16,16 +16,21 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     @EntityGraph(attributePaths = "roles")
-    @Query(value = "SELECT u FROM users u " +
-            "WHERE (" +
-            ":filter IS NULL OR " +
-            "u.identityDoc ILIKE %:filter% OR " +
-            "u.name ILIKE %:filter% OR " +
-            "u.paternalSurname ILIKE %:filter% OR " +
-            "u.maternalSurname ILIKE %:filter%) AND " +
-            "(:status IS NULL OR u.isEnabled = :status)"
+    @Query(value = "SELECT DISTINCT u FROM users u " +
+            "JOIN roles r " +
+            "WHERE (:filter IS NULL " +
+            "OR u.identityDoc ILIKE %:filter% " +
+            "OR u.name ILIKE %:filter% " +
+            "OR u.paternalSurname ILIKE %:filter% " +
+            "OR u.maternalSurname ILIKE %:filter% " +
+            "OR u.email ILIKE %:filter%) " +
+            "AND (:role IS NULL OR r.name IN :role) " +
+            "AND (:status IS NULL OR u.isEnabled = :status)"
     )
-    Page<UserEntity> findAlleUsers(@Param("filter") String filter, @Param("status") Boolean status, Pageable pageable);
+    Page<UserEntity> findAlleUsers(@Param("filter") String filter,
+                                   @Param("role") List<String> role,
+                                   @Param("status") Boolean status,
+                                   Pageable pageable);
 
     @Query(value = "SELECT u FROM users u " +
             "WHERE u.isEnabled = true " +

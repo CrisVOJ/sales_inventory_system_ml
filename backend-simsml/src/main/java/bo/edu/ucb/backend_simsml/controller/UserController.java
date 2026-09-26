@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -71,11 +72,12 @@ public class UserController {
     @GetMapping("/all")
     public ResponseEntity<Object> getUsers(
             @RequestParam(value = "filter", required = false) String filter,
+            @RequestParam(value = "role", required = false) List<String> role,
             @RequestParam(value = "status", required = false) Boolean status,
             @PageableDefault(sort = "name", direction = Sort.Direction.ASC) Pageable pageable
     ) {
         try {
-            Object response = userService.getUsers(filter, status, pageable);
+            Object response = userService.getUsers(filter, role, status, pageable);
             return generateResponse(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

@@ -92,9 +92,9 @@ public class UserService {
     }
 
     // Find all users
-    public Object getUsers(String filter, Boolean status, Pageable pageable) {
+    public Object getUsers(String filter, List<String> role, Boolean status, Pageable pageable) {
         try {
-            Page<UserResponse> users = userRepository.findAlleUsers(filter, status, pageable)
+            Page<UserResponse> users = userRepository.findAlleUsers(filter, role, status, pageable)
                     .map(userResponse -> new UserResponse(
                             userResponse.getUserId(),
                             userResponse.getIdentityDoc(),
