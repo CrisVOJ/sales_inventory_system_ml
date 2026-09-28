@@ -9,36 +9,12 @@ import { MessageService } from "primeng/api";
 @Component({
     selector: 'profile-page',
     standalone: true,
+    templateUrl: './profile.page.html',
     imports: [
         CommonModule,
         ProfileDataComponent,
         ProfilePasswordComponent
     ],
-    template: `
-        <section class="page">
-            <header class="page__header">
-                <h1>Perfil</h1>
-            </header>
-
-            <div class="grid">
-                <div class="card">
-                    <h2>Actualizar Datos</h2>
-                    <app-profile-data 
-                        [value]="user"
-                        (submit)="updateData($event)"
-                    />
-                </div>
-
-                <div class="card">
-                    <h2>Actualizar Contraseña</h2>
-                    <app-profile-password 
-                        #passwordForm
-                        (submit)="updatePassword($event, passwordForm)" 
-                    />
-                </div>
-            </div>
-        </section>
-    `,
     styles: [`
         .grid {
             display: grid;

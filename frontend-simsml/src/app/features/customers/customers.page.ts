@@ -12,74 +12,15 @@ import { MessageService } from "primeng/api";
 
 @Component({
     selector: 'customers-page',
+    templateUrl: './customers.page.html',
     imports: [
-    CommonModule,
-    DataTableComponent,
-    ModalComponent,
-    CustomerFormComponent,
-    ConfirmComponent,
-    CustomerDetailsComponent
-],
-    template: `
-        <section class="page">
-            <header class="page__header">
-                <h1>Clientes</h1>
-            </header>
-
-            <app-data-table
-                [entityName]="'Cliente'"
-                [columns]="cols"
-                [rows]="rows"
-                [total]="total"
-                [page]="page"
-                [pageSize]="pageSize"
-                [actions]="rowActions"
-                [searchPlaceholder]="'Buscar...'"
-                (create)="openCreate()"
-                (onSearch)="search($event)"
-                (pageChange)="paginate($event)"
-                (action)="onRowAction($event)"
-            />
-
-            <app-modal
-                [open]="formOpen"
-                [title]="formTitle"
-                [hasFooter]="false"
-                (close)="closeForm()"
-            >
-                <customer-form
-                    *ngIf="formOpen"
-                    [value]="editing"
-                    (cancel)="closeForm()"
-                    (submit)="onSubmitForm($event)"
-                />
-            </app-modal>
-
-            <app-modal
-                [open]="detailOpen"
-                [title]="formTitle"
-                [hasFooter]="false"
-                (close)="detailOpen = false"
-            >
-                <customer-details [c]="selected"/>
-            </app-modal>
-
-            <app-confirm/>
-        </section>
-    `,
-    styles: [`
-        .page{ 
-            background: transparent; 
-        }
-        .page__header{ 
-            margin-bottom: .75rem; 
-        }
-        h1{ 
-            font-size: var(--h3); 
-            margin: 0 0 .5rem; 
-            color: var(--txt-1); 
-        }
-    `]
+        CommonModule,
+        DataTableComponent,
+        ModalComponent,
+        CustomerFormComponent,
+        ConfirmComponent,
+        CustomerDetailsComponent
+    ]
 })
 export class CustomersPage {
     cols: CrudColumn<Customer>[] = [

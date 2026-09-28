@@ -10,72 +10,12 @@ import { SalesService } from "../sales/sales.service";
 @Component({
   selector: 'dashboard-page',
   standalone: true,
+  templateUrl: './dashboard.page.html',
   imports: [
     CommonModule,
     PredictionChartComponent,
     DataTableComponent
   ],
-  template: `
-    <section class="dashboard">
-      <header class="dashboard__header">
-        <h1>Dashboard</h1>
-      </header>
-
-      <div class="dashboard__top">
-        <div class="dashboard__chart-card">
-          <prediction-chart></prediction-chart>
-        </div>
-
-        <div class="dashboard__side-card">
-            <header class="card-header">
-                <h2>Productos cercanos a su stock mínimo</h2>
-            </header>
-
-            <div class="side-table-wrapper">
-                <app-data-table
-                [entityName]="'Producto'"
-                [columns]="inventoryCols"
-                [rows]="inventoryRows"
-                [total]="inventoryTotal"
-                [page]="inventoryPage"
-                [pageSize]="inventoryPageSize"
-                [actions]="[]"
-                [showCreate]="false"
-                [searchPlaceholder]="'Buscar producto o ubicación...'"
-                [showSearch]="false"
-                (onSearch)="searchInventories($event)"
-                (pageChange)="paginateInventories($event)"
-                >
-                </app-data-table>
-            </div>
-        </div>
-      </div>
-
-      <div class="dashboard__bottom">
-        <div class="dashboard__full-card">
-          <header class="card-header">
-            <h2>Ventas</h2>
-          </header>
-
-          <app-data-table
-            [entityName]="'Venta'"
-            [columns]="salesCols"
-            [rows]="salesRows"
-            [total]="salesTotal"
-            [page]="salesPage"
-            [pageSize]="salesPageSize"
-            [actions]="[]"
-            [showCreate]="false"
-            [searchPlaceholder]="'Buscar cliente o usuario...'"
-            [showSearch]="false"
-            (onSearch)="searchSales($event)"
-            (pageChange)="paginateSales($event)"
-          >
-          </app-data-table>
-        </div>
-      </div>
-    </section>
-  `,
   styles: [`
   .dashboard {
     display: flex;

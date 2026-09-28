@@ -1,0 +1,45 @@
+<section class="page">
+    <header class="page_header">
+        <h1>Ubicaciones</h1>
+    </header>
+
+    <app-data-table
+        [entityName]="'Ubicación'"
+        [columns]="cols"
+        [rows]="rows"
+        [total]="total"
+        [page]="page"
+        [pageSize]="pageSize"
+        [actions]="rowActions"
+        [searchPlaceholder]="'Buscar...'"
+        (create)="openCreate()"
+        (onSearch)="search($event)"
+        (pageChange)="paginate($event)"
+        (action)="onRowAction($event)"
+    />
+
+    <app-modal
+        [open]="formOpen"
+        [title]="formTitle"
+        [hasFooter]="false"
+        (close)="closeForm()"
+    >
+        <location-form
+            *ngIf="formOpen"
+            [value]="editing"
+            (cancel)="closeForm()"
+            (submit)="onSubmitForm($event)"
+        />
+    </app-modal>
+
+    <app-modal
+        [open]="detailOpen"
+        [title]="formTitle"
+        [hasFooter]="false"
+        (close)="detailOpen = false"
+    >
+        <location-details [l]="selected"/>
+    </app-modal>
+
+    <app-confirm/>
+</section>
