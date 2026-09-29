@@ -19,12 +19,14 @@
     background-color: var(--panel-bg);
   }
 
-  .p-panelmenu-header-content:hover {
-    background-color: var(--cyan) !important;
+  .p-panelmenu-header:hover .p-panelmenu-header-content,
+  .p-panelmenu-header:focus-visible .p-panelmenu-header-content {
+    background-color: var(--cyan);
   }
 
-  .p-panelmenu-header-content:hover :is(.p-panelmenu-header-icon, .p-panelmenu-header-label) {
-    color: var(--txt-2) !important;
+  .p-panelmenu-header:hover .p-panelmenu-header-content :is(.p-panelmenu-header-icon, .p-panelmenu-header-label),
+  .p-panelmenu-header:focus-visible .p-panelmenu-header-content :is(.p-panelmenu-header-icon, .p-panelmenu-header-label) {
+    color: var(--txt-2);
   }
 
   .p-panelmenu-header-icon, .p-panelmenu-header-label {
