@@ -5,24 +5,25 @@ p-toolbar {
   box-shadow: none;
 }
 
-button {
+.p-button {
   background-color: var(--cyan);
   color: var(--txt-2);
   border-radius: 50%;
   border: 1px solid black;
 }
 
-button:hover {
-  background-color: var(--cyan) !important;
-  border: 1px solid black !important;
-  color:var(--txt-2) !important;
+.p-button:not(:disabled):hover {    
+  background-color: var(--cyan);
+  border: 1px solid black;
+  color:var(--txt-2);
   transform: translate(-0.5px, -0.5px) scale(1.05);
 }
 
-button:focus, button:active {
-  background-color: var(--cyan) !important;
-  border: 1px solid black !important;
-  color:var(--txt-2) !important;
+.p-button:focus-visible {
+  background-color: var(--cyan);
+  border: 1px solid black;
+  color:var(--txt-2);
+  outline: 1px solid var(--cyan);
 }
 
 .right {

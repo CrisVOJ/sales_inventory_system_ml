@@ -19,7 +19,7 @@
     background-color: var(--panel-bg);
   }
 
-  .p-panelmenu-header:hover .p-panelmenu-header-content,
+  .p-panelmenu-header:not(:disabled) .p-panelmenu-header-content:hover,
   .p-panelmenu-header:focus-visible .p-panelmenu-header-content {
     background-color: var(--cyan);
   }
