@@ -1,0 +1,75 @@
+<div class="chart-card">
+    <header class="chart-card_header">
+        <h2>Demanda vs Predicción</h2>
+    </header>
+
+    <form [formGroup]="filters" class="filters">
+        <p-floatlabel variant="on">
+            <p-select
+                id="location"
+                formControlName="location"
+                [options]="locationOptions"
+                optionLabel="displayLabel"
+                optionValue="locationId"
+                appendTo="body"
+                [filter]="true"
+                [showClear]="true"
+            />
+            <label for="location">Ubicación</label>
+        </p-floatlabel>
+
+        <p-floatlabel variant="on">
+            <p-select
+                id="inventory"
+                formControlName="inventory"
+                [options]="inventoryProductsOptions"
+                optionLabel="displayLabel"
+                optionValue="inventoryId"
+                appendTo="body"
+                [filter]="true"
+                [showClear]="true"
+            />
+            <label for="inventory">Producto</label>
+        </p-floatlabel>
+
+        <p-floatlabel variant="on">
+            <p-datepicker 
+                formControlName="startDate" 
+                showIcon 
+                iconDisplay="input" 
+                dateFormat="dd/mm/yy" 
+                appendTo="body"
+                [showClear]="true"
+            />
+            <label for="startDate">Fecha Inicio</label>
+        </p-floatlabel>
+
+        <p-floatlabel variant="on">
+            <p-datepicker 
+                formControlName="endDate" 
+                showIcon 
+                iconDisplay="input" 
+                dateFormat="dd/mm/yy" 
+                appendTo="body"
+                [showClear]="true"
+            />
+            <label for="endDate">Fecha Fin</label>
+        </p-floatlabel>
+    </form>
+
+    <div class="chart-wrapper">
+        <ng-container *ngIf="chartData; else emptyState">
+        <p-chart
+            type="line"
+            [data]="chartData"
+            [options]="chartOptions">
+        </p-chart>
+        </ng-container>
+
+        <ng-template #emptyState>
+        <p *ngIf="!loading" class="empty-msg">
+            Selecciona una ubicación y un producto para ver la gráfica.
+        </p>
+        </ng-template>
+    </div>
+</div>

@@ -1,6 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { Component } from "@angular/core";
-import { PredictionChartComponent } from "../predictions/prediction-chart.component";
+import { PredictionChartComponent } from "../predictions/prediction-chart/prediction-chart.component";
 import { DataTableComponent, CrudColumn } from "../../shared/data-table/data-table.component";
 import { Inventory } from "../inventories/inventories.types";
 import { Sale } from "../sales/sales.types";

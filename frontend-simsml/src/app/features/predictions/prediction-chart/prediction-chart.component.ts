@@ -1,21 +1,24 @@
 import { CommonModule } from "@angular/common";
 import { Component, OnInit } from "@angular/core";
 import { ChartModule } from "primeng/chart";
-import { PredictionsService } from "./predictions.service";
+import { PredictionsService } from "../predictions.service";
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { FloatLabelModule } from "primeng/floatlabel";
 import { SelectModule } from "primeng/select";
-import { LocationSummary } from "../locations/locations.types";
-import { Inventory } from "../inventories/inventories.types";
-import { LocationsService } from "../locations/locations.service";
-import { InventoriesService } from "../inventories/inventories.service";
+import { LocationSummary } from "../../locations/locations.types";
+import { Inventory } from "../../inventories/inventories.types";
+import { LocationsService } from "../../locations/locations.service";
+import { InventoriesService } from "../../inventories/inventories.service";
 import { MessageService } from "primeng/api";
-import { DemandVsPredictionPoint } from "./predictions.types";
+import { DemandVsPredictionPoint } from "../predictions.types";
 import { DatePickerModule } from "primeng/datepicker";
+import { debounceTime, distinctUntilChanged } from "rxjs";
 
 @Component({
     selector: 'prediction-chart',
     standalone: true,
+    templateUrl: './prediction-chart.component.html',
+    styleUrls: ['./prediction-chart.component.scss'],
     imports: [
         CommonModule,
         ChartModule,
@@ -23,187 +26,7 @@ import { DatePickerModule } from "primeng/datepicker";
         FloatLabelModule,
         SelectModule,
         DatePickerModule
-    ],
-    template: `
-        <div class="chart-card">
-            <header class="chart-card__header">
-                <h2>Demanda vs Predicción [Producto]</h2>
-            </header>
-
-            <form [formGroup]="filters" class="filters">
-                <p-floatlabel variant="on">
-                    <p-select
-                        id="location"
-                        formControlName="location"
-                        [options]="locationOptions"
-                        optionLabel="displayLabel"
-                        optionValue="locationId"
-                        appendTo="body"
-                        [filter]="true"
-                    />
-                    <label for="location">Ubicación</label>
-                </p-floatlabel>
-
-                <p-floatlabel variant="on">
-                    <p-select
-                        id="inventory"
-                        formControlName="inventory"
-                        [options]="inventoryProductsOptions"
-                        optionLabel="displayLabel"
-                        optionValue="inventoryId"
-                        appendTo="body"
-                        [filter]="true"
-                    />
-                    <label for="inventory">Producto</label>
-                </p-floatlabel>
-
-                <p-floatlabel variant="on">
-                    <p-datepicker 
-                        formControlName="startDate" 
-                        showIcon 
-                        iconDisplay="input" 
-                        dateFormat="dd/mm/yy" 
-                        appendTo="body"
-                    />
-                    <label for="startDate">Fecha Inicio</label>
-                </p-floatlabel>
-
-                <div class="field">
-                    <p-floatlabel variant="on">
-                        <p-datepicker 
-                            formControlName="endDate" 
-                            showIcon 
-                            iconDisplay="input" 
-                            dateFormat="dd/mm/yy" 
-                            appendTo="body"
-                        />
-                        <label for="endDate">Fecha Fin</label>
-                    </p-floatlabel>
-                </div>
-
-                <button
-                type="button"
-                class="btn"
-                [disabled]="filters.invalid || loading"
-                (click)="reloadChart()"
-                >
-                {{ loading ? 'Cargando...' : 'Actualizar' }}
-                </button>
-            </form>
-
-            <div class="chart-wrapper">
-                <ng-container *ngIf="chartData; else emptyState">
-                <p-chart
-                    type="line"
-                    [data]="chartData"
-                    [options]="chartOptions">
-                </p-chart>
-                </ng-container>
-
-                <ng-template #emptyState>
-                <p *ngIf="!loading" class="empty-msg">
-                    Selecciona una ubicación y un producto para ver la gráfica.
-                </p>
-                </ng-template>
-            </div>
-        </div>
-    `,
-    styles: [`
-        .chart-card {
-            background: var(--bg-2, #1f2933);
-            border-radius: .75rem;
-            padding: 1.25rem 1.5rem;
-            box-shadow: 0 0 0 1px rgba(255,255,255,.03);
-            min-height: 320px;
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        .chart-card__header {
-            text-align: center;
-        }
-        .chart-card h2 {
-            margin: 0;
-            font-size: 1.1rem;
-            color: var(--txt-1, #e5e7eb);
-        }
-
-        .filters {
-            display: grid;
-            grid-template-columns: 1.5fr 1.5fr auto;
-            gap: .75rem 1rem;
-            align-items: end;
-        }
-
-        input, p-multiselect, p-select, p-datepicker{
-            background: #EBFEFF;
-            color: #000;
-            padding: .55rem .7rem;
-            border-radius: .4rem;
-            width: 100%;
-            box-sizing: border-box;
-            min-height: 42px;
-        }
-
-        :host ::ng-deep .p-multiselect,
-        :host ::ng-deep .p-select,
-        :host ::ng-deep .p-datepicker {
-            display: flex;
-            align-items: center;
-            height: 42px !important;
-        }
-
-        :host ::ng-deep p-datepicker .p-inputtext {
-            background: #EBFEFF;
-            border: none;
-            width: 100%;
-        }
-
-        label { display: flex; }
-
-        .btn {
-            border: 0;
-            padding: .6rem 1.1rem;
-            border-radius: .5rem;
-            background: var(--header-cyan, #00BFFF);
-            color: #fff;
-            font-weight: 500;
-            font-size: .95rem;
-            cursor: pointer;
-            white-space: nowrap;
-            height: 42px;
-        }
-        .btn:disabled {
-            opacity: .7;
-            cursor: default;
-        }
-
-        .chart-wrapper {
-            position: relative;
-            min-height: 260px;
-        }
-
-        :host ::ng-deep .p-select {
-            display: flex;
-            align-items: center;
-            height: 42px !important;
-        }
-
-        .empty-msg {
-            text-align: center;
-            margin-top: 2rem;
-            color: #9ca3af;
-        }
-
-        @media (max-width: 768px) {
-            .filters {
-                grid-template-columns: 1fr;
-            }
-            .btn {
-                width: 100%;
-            }
-        }
-    `]
+    ]
 })
 export class PredictionChartComponent implements OnInit {
     chartData: any;
@@ -227,6 +50,12 @@ export class PredictionChartComponent implements OnInit {
         this.configureOptions();
         this.buildForm();
         this.loadLocationOptions();
+        this.filters.valueChanges.pipe(
+            debounceTime(300),
+            distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr))
+        ).subscribe(
+            () => this.reloadChart()
+        );
     }
 
     private buildForm() {

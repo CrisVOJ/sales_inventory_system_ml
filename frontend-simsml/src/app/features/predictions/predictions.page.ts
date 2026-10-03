@@ -6,7 +6,7 @@ import { CreatePredictionRequest, Prediction } from "./predictions.types";
 import { PredictionsService } from "./predictions.service";
 import { MessageService } from "primeng/api";
 import { PredictionFormComponent } from "./prediction-form.component";
-import { PredictionChartComponent } from "./prediction-chart.component";
+import { PredictionChartComponent } from "./prediction-chart/prediction-chart.component";
 import { FormBuilder, FormGroup, ReactiveFormsModule } from "@angular/forms";
 import { FloatLabel } from "primeng/floatlabel";
 import { DatePicker, DatePickerModule } from "primeng/datepicker";
