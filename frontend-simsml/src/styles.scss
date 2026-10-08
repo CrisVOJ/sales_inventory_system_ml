@@ -86,72 +86,93 @@ html,body{height:100%}
   gap: 12px;
 }
 
-.filters .p-datepicker-input,
-.filters .p-datepicker-panel,
-.filters .p-datepicker-header,
-.filters .p-select,
-.filters .p-select-overlay,
-.filters .p-select-filter,
-.filters .p-multiselect,
-.filters .p-multiselect-overlay,
-.filters .p-multiselect-overlay .p-checkbox-box,
-.filters .p-multiselect-filter {
+/*----- Fields / Inputs / Panels -----*/
+/*--- Selects ---*/
+.p-floatlabel .p-select,
+body .p-select-overlay,
+.p-select-overlay .p-select-filter,
+/*--- Multiselects ---*/
+.p-floatlabel .p-multiselect,
+body .p-multiselect-overlay,
+.p-multiselect-overlay .p-checkbox-box,
+.p-multiselect-overlay .p-multiselect-filter,
+/*--- Datepickers ---*/
+.p-floatlabel .p-datepicker-input,
+body .p-datepicker-panel,
+.p-datepicker-panel .p-datepicker-header {
   background-color: var(--input-bg);
   border-color: var(--app-bg);
   color: var(--txt-2);
 }
 
-.filters .p-button-text.p-button-secondary:not(:disabled):hover,
-.filters .p-datepicker-select-month:enabled:hover,
-.filters .p-datepicker-select-year:enabled:hover,
-.filters .p-datepicker-day:not(.p-datepicker-day-selected):not(.p-disabled):hover,
-.filters .p-datepicker-month:not(.p-disabled):not(.p-datepicker-month-selected):hover,
-.filters .p-datepicker-year:not(.p-disabled):not(.p-datepicker-year-selected):hover,
-.filters .p-datepicker-day-selected,
-.filters .p-datepicker-month-selected,
-.filters .p-datepicker-year-selected,
-.filters .p-datepicker-today .p-datepicker-day:hover,
-.filters .p-datepicker-today .p-datepicker-day.p-datepicker-day-selected,
-.filters .p-multiselect-overlay .p-checkbox-checked:has(.p-checkbox-input:hover) .p-checkbox-box,
-.filters .p-multiselect-overlay .p-checkbox-checked .p-checkbox-box,
-.filters .p-multiselect-overlay .p-multiselect-option-selected.p-focus {
+/*----- Fields / Inputs: Hover ------*/
+/*--- Selects ---*/
+.p-floatlabel .p-select:not(.p-disabled, .ng-invalid.ng-dirty):hover,
+.p-floatlabel .p-select.p-inputwrapper-focus,
+.p-floatlabel .p-select:not(.p-disabled).p-focus,
+/*--- Multiselects ---*/
+.p-floatlabel .p-multiselect:not(.p-disabled, .ng-invalid.ng-dirty):hover,
+.p-floatlabel .p-multiselect:not(.p-disabled).p-focus,
+/*--- Datepickers ---*/
+.p-floatlabel .p-datepicker:not(.p-disabled, .ng-invalid.ng-dirty):hover,
+.p-floatlabel .p-datepicker:not(.p-disabled).p-focus,
+/*--- Inputs ---*/
+body .p-inputtext:enabled:hover,
+body .p-inputtext:enabled:focus {
+  border-color: var(--cyan);
+}
+
+/*----- Options / Buttons / Labels: Hover / Focus / Active -----*/
+/*--- Labels ---*/
+body .p-floatlabel:has(.p-inputwrapper-focus):not(:has(.ng-invalid.ng-dirty)) label,
+body .p-floatlabel:has(.p-inputwrapper-filled) label,
+/*--- Selects ---*/
+.p-select-overlay .p-select-option:not(.p-select-option-selected):not(.p-disabled).p-focus,
+.p-select-overlay .p-select-option.p-select-option-selected,
+.p-select-overlay .p-select-option.p-select-option-selected.p-focus,
+/*--- Multiselects ---*/
+.p-floatlabel .p-multiselect-chip,
+.p-multiselect-overlay .p-checkbox-checked .p-checkbox-box,
+.p-multiselect-overlay .p-checkbox-checked:not(.p-disabled):has(.p-checkbox-input:hover) .p-checkbox-box,
+.p-multiselect-overlay .p-multiselect-option.p-multiselect-option-selected.p-focus,
+.p-multiselect-overlay .p-multiselect-option:not(.p-multiselect-option-selected):not(.p-disabled).p-focus,
+/*--- Datepickers ---*/
+.p-datepicker-panel .p-button-text.p-button-secondary:not(:disabled):hover,
+.p-datepicker-panel .p-datepicker-select-month:enabled:hover,
+.p-datepicker-panel .p-datepicker-select-year:enabled:hover,
+.p-datepicker-panel .p-datepicker-day:not(.p-datepicker-day-selected):not(.p-disabled):hover,
+.p-datepicker-panel .p-datepicker-day-selected,
+.p-datepicker-panel .p-datepicker-month:not(.p-disabled):not(.p-datepicker-month-selected):hover,
+.p-datepicker-panel .p-datepicker-month-selected,
+.p-datepicker-panel .p-datepicker-year:not(.p-disabled):not(.p-datepicker-year-selected):hover,
+.p-datepicker-panel .p-datepicker-year-selected,
+.p-datepicker-panel .p-datepicker-today .p-datepicker-day:hover,
+.p-datepicker-panel .p-datepicker-today .p-datepicker-day.p-datepicker-day-selected {
   background-color: var(--cyan);
   color: var(--txt-2);
 }
 
-.filters .p-multiselect-overlay .p-multiselect-option-selected {
-  color: var(--cyan);
-}
-
-.filters .p-datepicker-today .p-datepicker-day {
-  background-color: var(--panel-bg);
-  color: var(--txt-1);
-}
-
-.filters .p-datepicker-clear-icon,
-.filters .p-multiselect-clear-icon {
+/*----- Clear Icon -----*/
+/*--- Select ---*/
+.p-floatlabel .p-select-clear-icon,
+/*--- Multiselects ---*/
+.p-floatlabel .p-multiselect-clear-icon,
+/*--- Datepickers ---*/
+.p-floatlabel .p-datepicker-clear-icon {
   color: red;
   margin-right: -20px;
   right: 50px;
 }
 
-.filters .p-datepicker-input.p-inputtext:focus,
-.filters .p-select-open,
-.filters .p-select.p-select-open:hover,
-.filters .p-select-header input:focus,
-.filters .p-multiselect-header input:focus {
-  border-color: var(--cyan);
+/*--- Multiselects selected option ---*/
+body .p-multiselect-overlay .p-multiselect-option-selected {
+  color: var(--cyan);
 }
 
-.filters .p-floatlabel-on:has(.p-inputwrapper-focus) label,
-.filters .p-floatlabel-on:has(.p-inputwrapper-filled) label,
-.filters .p-multiselect-chip {
-  background-color: var(--cyan);
-  color: var(--txt-2);
-}
-
-.filters .p-select, 
-.filters .p-multiselect,
-.filters .p-datepicker {
-  width: 100%;
+.filters .p-floatlabel {
+  .p-select, 
+  .p-multiselect,
+  .p-datepicker {
+    width: 100%;
+  }
 }
