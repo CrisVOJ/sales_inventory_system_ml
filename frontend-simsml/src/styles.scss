@@ -88,18 +88,20 @@ html,body{height:100%}
 
 /*----- Fields / Inputs / Panels -----*/
 /*--- Selects ---*/
-.p-floatlabel .p-select,
+body .p-select,
 body .p-select-overlay,
 .p-select-overlay .p-select-filter,
 /*--- Multiselects ---*/
-.p-floatlabel .p-multiselect,
+body .p-multiselect,
 body .p-multiselect-overlay,
 .p-multiselect-overlay .p-checkbox-box,
 .p-multiselect-overlay .p-multiselect-filter,
 /*--- Datepickers ---*/
 .p-floatlabel .p-datepicker-input,
 body .p-datepicker-panel,
-.p-datepicker-panel .p-datepicker-header {
+.p-datepicker-panel .p-datepicker-header,
+/*--- Input ---*/
+body .p-inputtext {
   background-color: var(--input-bg);
   border-color: var(--app-bg);
   color: var(--txt-2);
@@ -107,9 +109,9 @@ body .p-datepicker-panel,
 
 /*----- Fields / Inputs: Hover ------*/
 /*--- Selects ---*/
-.p-floatlabel .p-select:not(.p-disabled, .ng-invalid.ng-dirty):hover,
-.p-floatlabel .p-select.p-inputwrapper-focus,
-.p-floatlabel .p-select:not(.p-disabled).p-focus,
+body .p-select:not(.p-disabled, .ng-invalid.ng-dirty):hover,
+body .p-select.p-inputwrapper-focus,
+body .p-select:not(.p-disabled).p-focus,
 /*--- Multiselects ---*/
 .p-floatlabel .p-multiselect:not(.p-disabled, .ng-invalid.ng-dirty):hover,
 .p-floatlabel .p-multiselect:not(.p-disabled).p-focus,
@@ -154,7 +156,7 @@ body .p-floatlabel:has(.p-inputwrapper-filled) label,
 
 /*----- Clear Icon -----*/
 /*--- Select ---*/
-.p-floatlabel .p-select-clear-icon,
+body .p-select-clear-icon,
 /*--- Multiselects ---*/
 .p-floatlabel .p-multiselect-clear-icon,
 /*--- Datepickers ---*/
@@ -174,5 +176,27 @@ body .p-multiselect-overlay .p-multiselect-option-selected {
   .p-multiselect,
   .p-datepicker {
     width: 100%;
+  }
+}
+
+/*----- Buttons -----*/
+body {
+  p-button {
+    .p-button {
+      background-color: var(--cyan);
+      color: var(--txt-2);
+      border-color: inherit;
+    }
+    
+    .p-button:not(:disabled, .p-button-danger):hover {
+      background-color: var(--cyan);
+      color: var(--txt-2);
+      border-color: var(--cyan);
+      outline: 1px solid var(--cyan);
+    }
+
+    .p-button:focus-visible {
+      outline: 1px solid var(--cyan);
+    }
   }
 }

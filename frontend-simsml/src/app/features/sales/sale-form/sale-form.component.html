@@ -1,0 +1,252 @@
+<!-- MARK: Form -->
+<form [formGroup]="form" class="grid">
+    <div class="field">
+        <p-floatlabel variant="on">
+            <p-select
+                id="customer"
+                formControlName="customer"
+                [options]="customerOptions"
+                optionLabel="displayLabel"
+                optionValue="customerId"
+                appendTo="body"
+                [filter]="true"
+                [showClear]="true"
+            />
+            <label for="customer">Cliente</label>
+        </p-floatlabel>
+        @if (isInvalid('customer')) {
+            <p-message
+                severity="error"
+                size="small"
+                variant="simple"
+            >Campo requerido.</p-message>
+        }
+    </div>
+
+    <div class="field">
+        <p-floatlabel variant="on">
+            <p-datepicker 
+                formControlName="registrationDate" 
+                showIcon 
+                iconDisplay="input" 
+                dateFormat="dd/mm/yy" 
+                appendTo="body"
+                [minDate]="editing ? null : registrationMinDate"
+                [showClear]="true"
+            />
+            <label for="registrationDate">Fecha de Registro</label>
+        </p-floatlabel>
+        @if (isInvalid('registrationDate')) {
+            <p-message
+                severity="error"
+                size="small"
+                variant="simple"
+            >Campo requerido.</p-message>
+        }
+    </div>
+
+    <div class="field">
+        <p-floatlabel variant="on">
+            <p-select
+                id="location"
+                formControlName="location"
+                [options]="locationOptions"
+                optionLabel="displayLabel"
+                optionValue="locationId"
+                appendTo="body"
+                [filter]="true"
+                [showClear]="true"
+                (onChange)="handleLocationChange($event.value)"
+            />
+            <label for="location">Ubicación</label>
+        </p-floatlabel>
+        @if (isInvalid('location')) {
+            <p-message
+                severity="error"
+                size="small"
+                variant="simple"
+            >Campo requerido.</p-message>
+        }
+    </div>
+
+    @if (editing) {
+        <div class="field">
+            <p-floatlabel variant="on">
+                <p-select
+                    id="saleStatus"
+                    formControlName="saleStatus"
+                    [options]="saleStatusOptions"
+                    optionLabel="name"
+                    optionValue="saleStatusId"
+                    appendTo="body"
+                    [filter]="true"
+                    [showClear]="true"
+                />
+                <label for="saleStatus">Estado</label>
+            </p-floatlabel>
+            @if (isInvalid('saleStatus')) {
+                <p-message
+                    severity="error"
+                    size="small"
+                    variant="simple"
+                >Campo requerido.</p-message>
+            }
+        </div>
+    }
+</form>
+
+<!-- MARK: Items -->
+<div class="items-header">
+    <h3>Productos</h3>
+    <p-button
+        (click)="addItem()"
+        [disabled]="!form.value.location"
+        label="Agregar Producto"
+    />
+</div>
+
+<p-table
+    [value]="saleItems.controls"
+    dataKey="id"
+    [tableStyle]="{'min-width': '100%'}"
+>
+    <ng-template pTemplate="header">
+        <tr>
+            <th style="width:35%">Producto</th>
+            <th style="width:18%">Cantidad</th>
+            <th style="width:25%">Precio</th>
+            <th style="width:20%">Subtotal</th>
+            <th style="width:2%"></th>
+        </tr>
+    </ng-template>
+
+    <!-- Empty Message -->
+    <ng-template pTemplate="emptymessage">
+        <tr>
+            <td colspan="5" class="empty">Agrega productos a la venta</td>
+        </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+        <tr [formGroup]="row">
+            <!-- Product -->
+            <td>
+                <p-select
+                    id="inventory"
+                    formControlName="inventory"
+                    [options]="inventoryProductsOptions"
+                    optionLabel="displayLabel"
+                    optionValue="inventoryId"
+                    appendTo="body"
+                    [filter]="true"
+                    (onChange)="handleInventoryChange($event.value, rowIndex)"
+                />
+                @if (isRowInvalid(rowIndex, 'inventory')) {
+                    <p-message
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >
+                        @if (getRowErrors(rowIndex, 'inventory')?.['required']) {
+                            Seleccione un producto.
+                        } @else if (getRowErrors(rowIndex, 'inventory')?.['duplicate']) {
+                            Este producto ya fue agregado a la venta.
+                        } @else {
+                            Producto inválido.
+                        }
+                    </p-message>
+                }
+            </td>
+
+            <!-- Quantity -->
+            <td>
+                <p-inputnumber
+                    [showButtons]="true"
+                    [min]="1" 
+                    formControlName="productQuantity" 
+                    (input)="recalcRow(rowIndex)" class="num" 
+                />
+                @if (isRowInvalid(rowIndex, 'productQuantity')) {
+                    <p-message
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >
+                        @if (getRowErrors(rowIndex, 'productQuantity')?.['required']) {
+                            La cantidad es requerida.
+                        } @else {
+                            Ingrese una cantidad numérica mayor a 0.
+                        }
+                    </p-message>
+                }
+            </td>
+
+            <!-- Unit Price -->
+            <td>
+                <p-inputnumber
+                    [showButtons]="true"
+                    [min]="0.00"
+                    prefix="Bs "
+                    mode="decimal"
+                    [maxFractionDigits]="2"
+                    formControlName="unitPrice" 
+                    (input)="recalcRow(rowIndex)" 
+                    class="num" 
+                />
+                @if (isRowInvalid(rowIndex, 'unitPrice')) {
+                    <p-message
+                        severity="error"
+                        size="small"
+                        variant="simple"
+                    >
+                        @if (getRowErrors(rowIndex, 'unitPrice')?.['required']) {
+                            El precio unitario es requerido.
+                        } @else {
+                            El precio debe ser mayor a 0.
+                        }
+                    </p-message>
+                }
+            </td>
+
+            <!-- Subtotal -->
+            <td>
+                {{ formatMoney(subtotalOf(rowIndex))}}
+            </td>
+
+            <!-- Action Button (Delete) -->
+            <td class="actions">
+                <p-button
+                    icon="pi pi-trash"
+                    [rounded]="true"
+                    [text]="true"
+                    severity="danger" 
+                    (click)="removeRow(rowIndex)" 
+                />
+            </td>
+        </tr>
+
+        @if (meta[rowIndex]?.stock != null || stockError(rowIndex)) {
+            <tr class="meta">
+                <td colspan="5">
+                    <small class="hint" *ngIf="meta[rowIndex]?.stock != null">
+                        Stock en ubicación: {{ meta[rowIndex]?.stock }}
+                    </small>
+                    <small class="warn" *ngIf="stockError(rowIndex)">
+                        Cantidad supera el stock disponible.
+                    </small>
+                </td>
+            </tr>
+        }
+    </ng-template>
+</p-table>
+
+<div class="total">
+    <b>Total: {{ formatMoney(total()) }}</b>
+</div>
+
+<div class="actions full">
+    <p-button
+        (click)="save()"
+        label="Guardar"
+    />
+</div>

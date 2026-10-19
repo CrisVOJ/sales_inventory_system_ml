@@ -1,21 +1,21 @@
 import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { Sale } from "./sales.types";
+import { Sale } from "../sales.types";
 import { FormGroup, NonNullableFormBuilder, ReactiveFormsModule, Validators, FormsModule, FormArray } from "@angular/forms";
-import { InputTextModule } from "primeng/inputtext";
+import { InputNumberModule } from "primeng/inputnumber";
 import { FloatLabelModule } from "primeng/floatlabel";
 import { SelectModule } from "primeng/select";
-import { CustomersService } from "../customers/customers.service";
-import { CustomerSummary } from "../customers/customers.types";
+import { CustomersService } from "../../customers/customers.service";
+import { CustomerSummary } from "../../customers/customers.types";
 import { DatePickerModule } from "primeng/datepicker";
-import { LocationSummary } from "../locations/locations.types";
-import { LocationsService } from "../locations/locations.service";
-import { SaleStatusSummary } from "./sale-statuses/sale-statuses.types";
-import { SaleStatusesService } from "./sale-statuses/sale-statuses.service";
+import { LocationSummary } from "../../locations/locations.types";
+import { LocationsService } from "../../locations/locations.service";
+import { SaleStatusSummary } from "../sale-statuses/sale-statuses.types";
+import { SaleStatusesService } from "../sale-statuses/sale-statuses.service";
 import { CommonModule } from "@angular/common";
 import { TableModule } from "primeng/table";
 import { ButtonModule } from "primeng/button";
-import { InventoriesService } from "../inventories/inventories.service";
-import { Inventory } from "../inventories/inventories.types";
+import { InventoriesService } from "../../inventories/inventories.service";
+import { Inventory } from "../../inventories/inventories.types";
 import { MessageService } from "primeng/api";
 import { MessageModule } from "primeng/message";
 
@@ -24,326 +24,20 @@ export type SaleFormValue = Omit<Sale, 'saleId'>;
 @Component({
     selector: 'sale-form',
     standalone: true,
+    templateUrl: './sale-form.component.html',
+    styleUrls: ['./sale-form.component.scss'],
     imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    InputTextModule,
-    FloatLabelModule,
-    SelectModule,
-    DatePickerModule,
-    TableModule,
-    ButtonModule,
-    FormsModule,
-    MessageModule
-],
-    template: `
-        <form [formGroup]="form" class="grid">
-            <div class="field">
-                <p-floatlabel variant="on">
-                    <p-select
-                        id="customer"
-                        formControlName="customer"
-                        [options]="customerOptions"
-                        optionLabel="displayLabel"
-                        optionValue="customerId"
-                        appendTo="body"
-                        [filter]="true"
-                    />
-                    <label for="customer">Cliente</label>
-                </p-floatlabel>
-                @if (isInvalid('customer')) {
-                    <p-message
-                        severity="error"
-                        size="small"
-                        variant="simple"
-                    >Campo requerido.</p-message>
-                }
-            </div>
-
-            <div class="field">
-                <p-floatlabel variant="on">
-                    <p-datepicker 
-                        formControlName="registrationDate" 
-                        showIcon 
-                        iconDisplay="input" 
-                        dateFormat="dd/mm/yy" 
-                        appendTo="body"
-                        [minDate]="editing ? null : registrationMinDate"
-                    />
-                    <label for="registrationDate">Fecha de Registro</label>
-                </p-floatlabel>
-                @if (isInvalid('registrationDate')) {
-                    <p-message
-                        severity="error"
-                        size="small"
-                        variant="simple"
-                    >Campo requerido.</p-message>
-                }
-            </div>
-
-            <div class="field">
-                <p-floatlabel variant="on">
-                    <p-select
-                        id="location"
-                        formControlName="location"
-                        [options]="locationOptions"
-                        optionLabel="displayLabel"
-                        optionValue="locationId"
-                        appendTo="body"
-                        [filter]="true"
-                        (onChange)="handleLocationChange($event.value)"
-                    />
-                    <label for="location">Ubicación</label>
-                </p-floatlabel>
-                @if (isInvalid('location')) {
-                    <p-message
-                        severity="error"
-                        size="small"
-                        variant="simple"
-                    >Campo requerido.</p-message>
-                }
-            </div>
-
-            @if (editing) {
-                <div class="field">
-                    <p-floatlabel variant="on">
-                        <p-select
-                            id="saleStatus"
-                            formControlName="saleStatus"
-                            [options]="saleStatusOptions"
-                            optionLabel="name"
-                            optionValue="saleStatusId"
-                            appendTo="body"
-                            [filter]="true"
-                        />
-                        <label for="saleStatus">Estado</label>
-                    </p-floatlabel>
-                    @if (isInvalid('saleStatus')) {
-                        <p-message
-                            severity="error"
-                            size="small"
-                            variant="simple"
-                        >Campo requerido.</p-message>
-                    }
-                </div>
-            }
-        </form>
-
-        <!-- Items -->
-        <div class="items-header">
-            <h3>Productos</h3>
-            <button 
-                pButton 
-                type="button" 
-                label="Agregar Producto" 
-                (click)="addItem()" 
-                [disabled]="!form.value.location"
-            >
-            </button>
-        </div>
-
-        <p-table
-            [value]="saleItems.controls"
-            dataKey="id"
-            [tableStyle]="{'min-width': '100%'}"
-        >
-            <ng-template pTemplate="header">
-                <tr>
-                <th style="width:320px">Producto</th>
-                <th style="width:120px">Cantidad</th>
-                <th style="width:140px">Precio</th>
-                <th style="width:140px">Subtotal</th>
-                <th style="width:70px"></th>
-                </tr>
-            </ng-template>
-
-            <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
-                <tr [formGroup]="row">
-                    
-                    <td>
-                        <p-floatlabel variant="on">
-                            <p-select
-                                id="inventory"
-                                formControlName="inventory"
-                                [options]="inventoryProductsOptions"
-                                optionLabel="displayLabel"
-                                optionValue="inventoryId"
-                                appendTo="body"
-                                [filter]="true"
-                                (onChange)="handleInventoryChange($event.value, rowIndex)"
-                            />
-                            <label for="inventory">Producto*</label>
-                        </p-floatlabel>
-                        @if (isRowInvalid(rowIndex, 'inventory')) {
-                            <p-message
-                            severity="error"
-                            size="small"
-                            variant="simple"
-                            >
-                            @if (getRowErrors(rowIndex, 'inventory')?.['required']) {
-                                Seleccione un producto.
-                            } @else if (getRowErrors(rowIndex, 'inventory')?.['duplicate']) {
-                                Este producto ya fue agregado a la venta.
-                            } @else {
-                                Producto inválido.
-                            }
-                            </p-message>
-                        }
-                    </td>
-
-                    <td>
-                        <input type="number" min="1" formControlName="productQuantity" (input)="recalcRow(rowIndex)" class="num" />
-                        @if (isRowInvalid(rowIndex, 'productQuantity')) {
-                            <p-message
-                            severity="error"
-                            size="small"
-                            variant="simple"
-                            >
-                            @if (getRowErrors(rowIndex, 'productQuantity')?.['required']) {
-                                La cantidad es requerida.
-                            } @else {
-                                Ingrese una cantidad numérica mayor a 0.
-                            }
-                            </p-message>
-                        }
-                    </td>
-
-                    <td>
-                        <input type="number" min="0" step="0.01" formControlName="unitPrice" (input)="recalcRow(rowIndex)" class="num" />
-                        @if (isRowInvalid(rowIndex, 'unitPrice')) {
-                            <p-message
-                            severity="error"
-                            size="small"
-                            variant="simple"
-                            >
-                            @if (getRowErrors(rowIndex, 'unitPrice')?.['required']) {
-                                El precio unitario es requerido.
-                            } @else {
-                                El precio debe ser mayor a 0.
-                            }
-                            </p-message>
-                        }
-                    </td>
-
-                    <td>
-                        <input [value]="formatMoney(subtotalOf(rowIndex))" readonly class="num readonly" />
-                    </td>
-
-                    <td class="actions">
-                        <button pButton icon="pi pi-trash" severity="danger" (click)="removeRow(rowIndex)" text></button>
-                    </td>
-                </tr>
-
-                <tr class="meta">
-                    <td colspan="5">
-                        <small class="hint" *ngIf="meta[rowIndex]?.stock != null">
-                            Stock en ubicación: {{ meta[rowIndex]?.stock }}
-                        </small>
-                        <small class="warn" *ngIf="stockError(rowIndex)">
-                            Cantidad supera el stock disponible.
-                        </small>
-                    </td>
-                </tr>
-            </ng-template>
-
-            <ng-template pTemplate="emptymessage">
-                <tr><td colspan="5" class="empty">Agrega productos a la venta</td></tr>
-            </ng-template>
-        </p-table>
-
-        <div class="total">
-            <b>Total: {{ formatMoney(total()) }}</b>
-        </div>
-
-        <div class="actions full">
-        <button 
-            type="button" 
-            class="btn" 
-            (click)="save()"
-        >
-            Guardar
-        </button>
-        </div>
-    `,
-    styles:[`
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: .9rem 1.2rem;
-        }
-
-        input, p-multiselect, p-select, p-datepicker{
-            background: #EBFEFF;
-            color: #000;
-            padding: .55rem .7rem;
-            border-radius: .4rem;
-            width: 100%;
-            box-sizing: border-box;
-            min-height: 42px;
-        }
-
-        :host ::ng-deep p-floatlabel,
-        :host ::ng-deep .p-floatlabel {
-            display: block;
-            width: 100%;
-            min-width: 0;
-        }
-
-        :host ::ng-deep .p-select,
-        :host ::ng-deep .p-datepicker, 
-        :host ::ng-deep .p-multiselect {
-            display: flex;
-            align-items: center;
-            height: 42px !important;
-            width: 100% !important;
-            max-width: 100%;
-            min-width: 0;
-            box-sizing: border-box;
-        }
-
-        :host ::ng-deep p-datepicker .p-inputtext {
-            background: #EBFEFF;
-            border: none;
-            width: 100%;
-        }
-
-        .field {
-            width: 100%;
-            max-width: 100%;
-            min-width: 0;
-        }
-
-        label { display: flex; }
-
-        .actions.full {
-            grid-column: 1 / -1;
-            display: flex;
-            justify-content: center;
-            margin-top: 1rem;
-        }
-
-        .btn {
-            border: 0;
-            padding: .6rem 1rem;
-            border-radius: .5rem;
-            background: var(--header-cyan, #00BFFF);
-            color: #fff;
-            font-weight: 500;
-            font-size: var(--h6, 1rem);
-            cursor: pointer;
-        }
-
-        @media (max-width: 1024px) {
-            .grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        @media (max-width: 600px) {
-            .grid { grid-template-columns: minmax(0, 1fr); }
-            .btn { width: 100%; }
-        }
-    `]
+        CommonModule,
+        ReactiveFormsModule,
+        InputNumberModule,
+        FloatLabelModule,
+        SelectModule,
+        DatePickerModule,
+        TableModule,
+        ButtonModule,
+        FormsModule,
+        MessageModule
+    ]
 })
 export class SaleFormComponent {
   @Input() value: Partial<Sale> | null = null;

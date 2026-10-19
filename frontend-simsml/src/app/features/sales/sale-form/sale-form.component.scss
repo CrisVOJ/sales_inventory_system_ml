@@ -1,0 +1,144 @@
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.field .p-floatlabel {
+    .p-select, .p-datepicker {
+        width: 100%;
+    }
+}
+
+:host ::ng-deep {
+    .field p-message.ng-star-inserted {
+        position: absolute;
+    }
+}
+
+.items-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    h3 {
+        font-size: var(--h5);
+        font-weight: Normal;
+        margin: 0;
+    }
+}
+
+.actions.full {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+button {
+    border: 0;
+    padding: .6rem 1rem;
+    border-radius: .5rem;
+    background: var(--cyan);
+    color: var(--txt-2);
+    font-size: var(--h6);
+    cursor: pointer;
+}
+
+button:not(:disabled):hover {
+    background: var(--cyan);
+    border-color: var(--cyan);
+    border-radius: .5rem;
+}
+
+button:focus-visible {
+    outline: 1px solid var(--cyan);
+}
+
+:host ::ng-deep {
+    .p-datatable-table {
+        border: 1px solid var(--app-bg);
+        border-radius: var(--radius-md);
+
+        .p-datatable-thead {
+            tr {
+                th:first-of-type {
+                    border-top-left-radius: var(--radius-md);
+                }
+
+                th {
+                    background-color: var(--cyan);
+                    color: var(--txt-2);
+                    border: none;
+                    border-bottom: 1px solid var(--app-bg);
+                }
+
+                th:last-of-type {
+                    border-top-right-radius: var(--radius-md);
+                }
+            }
+        }
+
+        .p-datatable-tbody {
+            tr {
+                background-color: transparent;
+                td {
+                    background-color: transparent;
+                    color: var(--txt-1);
+                    border: none;
+                    border-bottom: 1px solid var(--app-bg);
+
+                    .p-select, .p-inputnumber-input, .num{
+                        width: 100%;
+                    }
+
+                    .p-button-text.p-button-danger:not(:disabled):hover {
+                        background-color: transparent;
+                        border-color: var(--p-button-text-danger-color);
+                    }
+
+                }
+            }
+
+            tr:nth-of-type(odd) {
+                td {border-bottom: none}
+            }
+            
+            tr:nth-of-type(even) {
+                td {border-top: none;}
+            }
+
+            tr:last-of-type {
+                td:first-of-type {
+                    border-bottom-left-radius: var(--radius-md);
+                }
+                td:last-of-type {
+                    border-bottom-right-radius: var(--radius-md);
+                    border-bottom: none;
+                }
+            }
+        }
+    }
+}
+
+.total {
+    margin-top: 1rem;
+    margin-right: 5rem;
+    text-align: right;
+}
+
+@media (max-width: 1024px) {
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .grid { 
+        grid-template-columns: 1fr; 
+    }
+    .btn { 
+        width: 100%; 
+    }
+}

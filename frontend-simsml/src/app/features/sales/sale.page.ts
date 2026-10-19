@@ -4,7 +4,7 @@ import { CrudAction, CrudColumn, DataTableComponent } from "../../shared/data-ta
 import { ModalComponent } from "../../shared/modal/modal.component";
 import { Sale } from "./sales.types";
 import { SalesService } from "./sales.service";
-import { SaleFormComponent } from "./sale-form.component";
+import { SaleFormComponent } from "./sale-form/sale-form.component";
 import { MessageService } from "primeng/api";
 import { FormBuilder, FormGroup, ReactiveFormsModule } from "@angular/forms";
 import { DatePicker } from "primeng/datepicker";
