@@ -13,35 +13,42 @@
 }
 
 :host ::ng-deep {
-  .p-panelmenu-panel {
-    border: none;
-    box-shadow: none;
-    background-color: var(--panel-bg);
-  }
+  .p-panelmenu {
+    .p-panelmenu-panel {
+      border: none;
+      box-shadow: none;
+      background-color: transparent;
 
-  .p-panelmenu-header:not(:disabled) .p-panelmenu-header-content:hover,
-  .p-panelmenu-header:focus-visible .p-panelmenu-header-content {
-    background-color: var(--cyan);
-  }
+      .p-panelmenu-header {
+        .p-panelmenu-header-content {
+          .p-panelmenu-header-link {
+            .p-panelmenu-header-icon {
+              padding: .2rem 0;
+            }
 
-  .p-panelmenu-header:hover .p-panelmenu-header-content :is(.p-panelmenu-header-icon, .p-panelmenu-header-label),
-  .p-panelmenu-header:focus-visible .p-panelmenu-header-content :is(.p-panelmenu-header-icon, .p-panelmenu-header-label) {
-    color: var(--txt-2);
-  }
+            .p-panelmenu-header-icon, .p-panelmenu-header-label {
+              color: var(--txt-1);
+            }
 
-  .p-panelmenu-header-icon, .p-panelmenu-header-label {
-    color: var(--txt-1);
-  }
+            .p-panelmenu-header-label {
+              transition: opacity 3s ease-in-out;
+            }
+          }
+        }
+      }
 
-  .p-panelmenu-header-icon {
-    padding: .2rem 0;
+      .p-panelmenu-header:not(:disabled) .p-panelmenu-header-content:hover,
+      .p-panelmenu-header:focus-visible .p-panelmenu-header-content {
+        background-color: var(--cyan);
+
+        .p-panelmenu-header-icon, .p-panelmenu-header-label {
+          color: var(--txt-2);
+        }
+      }
+    }
   }
 
   .is-collapsed .p-panelmenu-header-label {
     display: none;
-  }
-
-  .p-panelmenu-header-label {
-    transition: opacity 3s ease-in-out;
   }
 }
