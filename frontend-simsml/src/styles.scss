@@ -198,5 +198,10 @@ body {
     .p-button:focus-visible {
       outline: 1px solid var(--cyan);
     }
+
+    .p-button-danger {
+      background-color: transparent;
+      color: var(--p-button-text-danger-color);
+    }
   }
 }

@@ -1,0 +1,33 @@
+@if (open) {
+    <div 
+        class="backdrop"  
+        (click)="backdropClose ? close.emit() : null"
+    ></div>
+
+    <div 
+        class="sheet" 
+        [class.sm]="size === 'sm'" 
+        [class.md]="size === 'md'" 
+        [class.lg]="size === 'lg'"
+    >
+        <header class="sheet_header">
+            <h3>{{ title }}</h3>
+            <p-button 
+                icon="pi pi-times" 
+                [rounded]="true" 
+                severity="danger"
+                (click)="close.emit()"
+            />
+        </header>
+
+        <section class="sheet_body">
+            <ng-content></ng-content>
+        </section>
+        
+        @if (hasFooter) {
+            <footer class="sheet_footer">
+                <ng-content select="[footer]"></ng-content>
+            </footer>
+        }
+    </div>
+}
