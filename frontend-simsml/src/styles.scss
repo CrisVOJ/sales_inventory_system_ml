@@ -54,14 +54,14 @@ html,body{height:100%}
 .header-trigger { cursor: pointer; padding: .5rem; border-radius: .5rem; }
 .header-trigger:hover { background: rgba(0,0,0,.05); }
 
-/*--- Title views ---*/
+// ----- MARK: Title views
 .page_header h1 {
     font-size: var(--h1);
     margin: 0 0 .75rem;
     color: var(--txt-1);
 }
 
-/*--- Table filters container ---*/
+// ----- MARK: Table filters container
 .p-component.p-popover {
   background-color: var(--panel-bg);
   border: 1px solid var(--app-bg);
@@ -79,7 +79,7 @@ html,body{height:100%}
   width: max(350px, 25vw);
 }
 
-/*--- Filters popover ---*/
+// ----- MARK: Filters popover
 .filters {
   display: flex;
   flex-direction: column;
@@ -128,6 +128,7 @@ body .p-inputtext:enabled:focus {
 /*--- Labels ---*/
 body .p-floatlabel:has(.p-inputwrapper-focus):not(:has(.ng-invalid.ng-dirty)) label,
 body .p-floatlabel:has(.p-inputwrapper-filled) label,
+body .p-floatlabel-on:has(input.p-filled) label,
 /*--- Selects ---*/
 .p-select-overlay .p-select-option:not(.p-select-option-selected):not(.p-disabled).p-focus,
 .p-select-overlay .p-select-option.p-select-option-selected,
