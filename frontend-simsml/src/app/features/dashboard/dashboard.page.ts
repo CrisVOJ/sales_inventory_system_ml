@@ -11,99 +11,12 @@ import { SalesService } from "../sales/sales.service";
   selector: 'dashboard-page',
   standalone: true,
   templateUrl: './dashboard.page.html',
+  styleUrls: ['./dashboard.page.scss'],
   imports: [
     CommonModule,
     PredictionChartComponent,
     DataTableComponent
-  ],
-  styles: [`
-  .dashboard {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-  }
-
-  .dashboard__header h1 {
-    margin: 0;
-    font-size: var(--h2, 1.6rem);
-    color: var(--txt-1, #e5e7eb);
-  }
-
-  .dashboard__header .subtitle {
-    margin: .2rem 0 0;
-    color: #9ca3af;
-    font-size: .9rem;
-  }
-
-  .dashboard__top {
-    display: grid;
-    grid-template-columns: minmax(0, 1.7fr) minmax(0, 1.5fr);
-    gap: 1.25rem;
-    align-items: stretch;
-  }
-
-  .dashboard__chart-card {
-    min-height: 360px;
-  }
-
-  .dashboard__side-card,
-  .dashboard__full-card {
-    background: var(--bg-2, #111827);
-    border-radius: .75rem;
-    padding: 1rem 1.25rem;
-    box-shadow: 0 0 0 1px rgba(255,255,255,.03);
-  }
-
-  .dashboard__side-card {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .card-header {
-    margin-bottom: .75rem;
-  }
-
-  .card-header h2 {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--txt-1, #e5e7eb);
-  }
-
-  .dashboard__bottom {
-    display: block;
-  }
-
-  .side-table-wrapper {
-    flex: 1;
-    max-height: 420px;
-    overflow: auto;
-  }
-
-  .side-table-wrapper ::ng-deep th {
-    white-space: nowrap;
-  }
-
-  @media (max-width: 1024px) {
-    .dashboard__top {
-      grid-template-columns: 1fr;
-    }
-
-    .dashboard__chart-card {
-      order: 1;
-    }
-
-    .dashboard__side-card {
-      order: 2;
-    }
-
-    .side-table-wrapper {
-      max-height: none;
-    }
-  }
-`]
-
-
+  ]
 })
 export class DashboardPage {
   inventoryCols: CrudColumn<Inventory>[] = [
