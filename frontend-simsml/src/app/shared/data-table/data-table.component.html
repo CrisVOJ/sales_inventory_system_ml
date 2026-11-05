@@ -64,6 +64,7 @@
                         *ngFor="let c of columns" 
                         [class.center]="c.align==='center'" 
                         [class.right]="c.align==='right'"
+                        title="{{ c.format ? c.format(row, i) : $any(row)[c.key] }}"
                     >
                         {{ c.format ? c.format(row, i) : $any(row)[c.key] }}
                     </td>

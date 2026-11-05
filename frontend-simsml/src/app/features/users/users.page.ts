@@ -41,15 +41,15 @@ export class UsersPage {
   private formSubscription?: any;
 
   cols: CrudColumn<User>[] = [
-    { key:'identityDoc', header:'Doc. Identidad',     width:'160px' },
-    { key:'username',    header:'Nombre Usuario',  width:'220px' },
-    { key:'roles',        header:'Rol',                width:'150px', 
+    { key:'identityDoc', header:'CI',       width:'15%' },
+    { key:'username',    header:'Usuario',  width:'15%' },
+    { key:'roles',       header:'Rol',      width:'15%', 
       format: (u) => roleListLabel(u.roles)
     },
-    { key:'name',        header:'Nombre',
+    { key:'name',        header:'Nombre',   width:'20%',
       format: (u) => [u.name, u.paternalSurname, u.maternalSurname].filter(Boolean).join(' ')
      },
-    { key:'email',       header:'Correo',             width:'260px' },
+    { key:'email',       header:'Correo',   width:'20%' },
   ];
 
   rowActions: CrudAction<User>[] = [
