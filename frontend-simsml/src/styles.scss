@@ -150,7 +150,9 @@ body .p-floatlabel-on:has(input.p-filled) label,
 .p-datepicker-panel .p-datepicker-year:not(.p-disabled):not(.p-datepicker-year-selected):hover,
 .p-datepicker-panel .p-datepicker-year-selected,
 .p-datepicker-panel .p-datepicker-today .p-datepicker-day:hover,
-.p-datepicker-panel .p-datepicker-today .p-datepicker-day.p-datepicker-day-selected {
+.p-datepicker-panel .p-datepicker-today .p-datepicker-day.p-datepicker-day-selected,
+/*--- Input Number ---*/
+.p-inputnumber .p-inputnumber-button:not(:disabled):hover {
   background-color: var(--cyan);
   color: var(--txt-2);
 }
