@@ -108,15 +108,15 @@
 <p-table
     [value]="saleItems.controls"
     dataKey="id"
-    [tableStyle]="{'min-width': '100%'}"
+    [tableStyle]="{'table-layout': 'fixed','width': '100%'}"
 >
     <ng-template pTemplate="header">
         <tr>
-            <th style="width:35%">Producto</th>
+            <th style="width:30%">Producto</th>
             <th style="width:18%">Cantidad</th>
-            <th style="width:25%">Precio</th>
+            <th style="width:22%">Precio</th>
             <th style="width:20%">Subtotal</th>
-            <th style="width:2%"></th>
+            <th style="width:10%"></th>
         </tr>
     </ng-template>
 
